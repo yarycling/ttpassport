@@ -4,7 +4,7 @@
 **Baseline:** `TTP-2A-BASELINE-DRAFT-01`, owner-approved 22 November 2026<br>
 **Execution date:** 22 November 2026<br>
 **Environment:** macOS; Wappler 7.9.9; Node.js v23.6.0; npm 10.9.2; Wappler Development target `http://localhost:3002/`; Firefox Responsive Design Mode and installed Wappler Design view<br>
-**Repository:** `main`; source revision at start `3389381`; pending package commit recorded after commit<br>
+**Repository:** `main`; source revision at start `3389381`; package implementation/evidence commit `ef417fd`; register update commit `bffc5d2`<br>
 **Test status:** 7 PASS, 1 FAIL, 1 N/A; Stage 2A remains `TESTING`; GUI/business acceptance is pending.
 
 ## Scope and safety
