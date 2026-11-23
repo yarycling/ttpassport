@@ -1,0 +1,13 @@
+CT-2A-001: PASS — 4 local README links; missing=[]; observed configuration/map facts=True; start=node ./index.js
+CT-2A-002: PASS — routes=15; unique=15; missing_pages=[]; missing_layouts=[]
+CT-2A-003: PASS — projectType=web; activeTarget=Development; targetURL=http://localhost:3002/; appPort=3002; targetSQLite=/db/db_dev.sqlite3; Wappler connection=/db/db_dev.sqlite3; runtime=capacitor; protected config changed=[]
+CT-2A-004: PASS — listener=TCP *:3002 (LISTEN); process=node ./index.js; local PID and OS account omitted from public evidence; route statuses/HTML titles=[('/', 200, True), ('/account/sign-in', 200, True), ('/account/register', 200, True), ('/account/verify-email', 200, True), ('/account/forgot-password', 200, True), ('/account/reset-password', 200, True), ('/citizen/dashboard', 200, True), ('/citizen/apply/first-time', 200, True), ('/citizen/track', 200, True), ('/design-preview/backoffice/overview', 200, True), ('/design-preview/backoffice/applications', 200, True), ('/design-preview/backoffice/review', 200, True), ('/design-preview/backoffice/administration', 200, True), ('/verification/preview', 200, True), ('/verification/preview/review', 200, True)]
+CT-2A-007: PASS — sensitive paths=[]; literal secret scan=[]; expected ignore rules=True; protected runtime diff=[]
+CT-2A-008: PASS — back-office routes=4; app/api files=[]; static preview markers=['design preview', 'not configured', 'no live']
+CT-2A-009: PASS — package.json unchanged=True; project metadata unchanged=True; no package test script=True; route regression suite CT-2A-004=15/15 HTTP 200
+SCREENSHOT_EVIDENCE: 1440px=15; 375px=15; expected=15 each
+DOC_REGISTER_VALIDATION: PASS — 11 modified Markdown files; all 11 local links resolve.
+DOC_REGISTER_VALIDATION: PASS — roadmap, master register and status register contain 150 identical package ID/title mappings.
+DOC_REGISTER_VALIDATION: PASS — Stage 1A–1H each CLOSED_PASS in both registers; LP-013 remains unclosed.
+DOC_REGISTER_VALIDATION: PASS — Stage 2A remains TESTING with CT-2A-005 finding; Stage 2B remains unauthorized.
+DOC_REGISTER_VALIDATION: PASS — 15 desktop and 15 mobile route screenshots exist.

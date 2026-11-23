@@ -1,19 +1,19 @@
 # Stage 2A — Project Repository and Code Structure
 
 **Package:** 2A — Project Repository and Code Structure<br>
-**Baseline reference:** TTP-2A-BASELINE-DRAFT-01<br>
-**Status:** DRAFT PREPARED FOR OWNER APPROVAL; implementation remains `NOT_STARTED`<br>
+**Baseline reference:** TTP-2A-BASELINE-DRAFT-01 (owner-approved 22 November 2026)<br>
+**Status:** APPROVED FOR IMPLEMENTATION; package work is in progress and test results are recorded separately<br>
 **Prepared:** 22 November 2026<br>
 **Source revision inspected:** `9a16cf8` on `main` (published to `origin/main`)<br>
-**Stage 1:** Documentation and architecture technical-review recommendation `PASSED`; final human-owner closure approval pending; Stage 1 is not `CLOSED_PASS`.
+**Stage 1:** Documentation, requirements, architecture and governance-register deliverables for 1A–1H are `CLOSED_PASS` by project-owner acceptance dated 22 November 2026; unresolved government and release dependencies remain open.
 
 ## 1. Purpose and approval boundary
 
-Define a repository and code-structure baseline that fits the **actual Wappler scaffold** and preserves the owner-accepted 15-screen GUI baseline. This document is preparation for package 2A only. It is not approval to implement; the owner must approve this baseline before implementation begins. Package status remains `NOT_STARTED` until that approval and later package evidence are recorded.
+Define the approved repository and code-structure baseline that fits the **actual Wappler scaffold** and preserves the owner-accepted 15-screen GUI baseline. The project owner approved reference `TTP-2A-BASELINE-DRAFT-01` on 22 November 2026. This approval authorizes only the scope and acceptance criteria in this document.
 
 Package 2A is limited to repository orientation, Wappler-compatible file-organization conventions, documentation, and safe repository hygiene. It must not add application behavior or expand the GUI.
 
-### In scope for the proposed package
+### Approved scope
 
 - Document the existing repository, Wappler-managed locations, project entry points, and rules for placing future files.
 - Add or update a concise root `README.md` describing the actual Wappler project, how to open/run its Development target, the port, and protected locations.
@@ -74,7 +74,7 @@ The source of truth is the accepted GUI baseline and current `app/config/routes.
 
 The account, application, tracking, verification, and back-office pages are presentational. Back-office preview routes have no Security Provider or route restriction and contain no live records/actions; keep them design-only and off any public production target until an approved security package implements server-side controls.
 
-## 3. Proposed repository and module boundaries
+## 3. Repository and module boundaries
 
 ### Repository layout
 
@@ -117,12 +117,12 @@ These are future domain boundaries, not a directive to create or implement them 
 
 Use narrow purpose-specific Wappler Server Connect actions at approved boundaries. Do not introduce custom Express routes, an alternative controller framework, a new ORM, handwritten replacements for native App Connect interactions, or undocumented routes/jobs. Where native Wappler capability is insufficient for a specialist function, stop that implementation slice and use the explicit extension approval process in `AGENTS.md` §3.
 
-## 4. Proposed files and implementation increments
+## 4. Approved files and implementation increments
 
-| Proposed path | Purpose | Baseline constraint |
+| Path | Purpose | Baseline constraint |
 |---|---|---|
 | `README.md` (new) | Project orientation, Wappler Development target/run steps, port 3002, current stack, directory map, testing/evidence locations, and explicit preview-only/security caveats | Document observed settings; no new startup script, secret, or production claim. |
-| `docs/architecture/STAGE_2A_PROJECT_REPOSITORY_AND_CODE_STRUCTURE_BASELINE.md` (this file) | Approved package scope, scaffold inventory, module boundaries, acceptance criteria, tests, security and rollback | Remains a proposal until owner approves it. |
+| `docs/architecture/STAGE_2A_PROJECT_REPOSITORY_AND_CODE_STRUCTURE_BASELINE.md` (this file) | Approved package scope, scaffold inventory, module boundaries, acceptance criteria, tests, security and rollback | Owner-approved baseline `TTP-2A-BASELINE-DRAFT-01`, authorized 22 November 2026. |
 | `.gitignore` (conditional) | Maintain exclusions for credentials, local databases, uploads, private storage, logs and machine-local Wappler files | Current rules already cover the observed cases; change only for a demonstrated gap and review the complete diff. Do not ignore required source/runtime files. |
 | `docs/project/MASTER_DEVELOPMENT_REGISTER.md` and `docs/project/PROJECT_STATUS.md` | Record the approved baseline, stable AC/CT IDs, status and evidence after package authorization/implementation | Do not report 2A `DEVELOPMENT_COMPLETE` or `CLOSED_PASS` from this preparation document. |
 | `docs/evidence/TTP-2A/` (implementation evidence) | Retain command output, browser results/screenshots, Wappler compatibility notes, regression results and unresolved blockers | Do not include credentials, real identities, local database contents, or private infrastructure details. |
@@ -130,16 +130,16 @@ Use narrow purpose-specific Wappler Server Connect actions at approved boundarie
 
 Do not relocate the current flat `views/*.ejs` files in this package. Keep route configuration managed through Wappler. Do not change `.wappler/project.json`, target metadata, `app/config/config.json`, connection files, `package.json`, dependency versions, `lib/`, `public/dmxAppConnect/`, or `public/bootstrap/5/` under this baseline.
 
-## 5. Proposed acceptance criteria
+## 5. Acceptance criteria
 
-These IDs are proposed for owner approval; they are not acceptance results.
+These acceptance IDs are approved for this package. Results are recorded in `docs/evidence/TTP-2A/TEST_RECORD.md`.
 
-| Acceptance ID | Proposed criterion |
+| Acceptance ID | Acceptance criterion |
 |---|---|
 | AC-2A-001 | A root README and repository-structure document describe the observed Wappler project, actual Development target, safe run procedure, protected/generated directories, and evidence locations without inventing configuration. |
 | AC-2A-002 | Repository organization and logical domain boundaries are documented in a Wappler-maintainable way; existing 15 view paths, shared layouts/partials and route declarations are not moved or duplicated. |
 | AC-2A-003 | The exact 15 existing route/page/layout mappings remain resolvable; port 3002, the active Development target and SQLite connection remain unchanged. |
-| AC-2A-004 | IVP, passport, account, case, payment, issuance/release, fulfilment, audit and reporting boundaries are explicit; IVP has no passport-table/status dependency or direct cross-database foreign key in the proposed structure. |
+| AC-2A-004 | IVP, passport, account, case, payment, issuance/release, fulfilment, audit and reporting boundaries are explicit; IVP has no passport-table/status dependency or direct cross-database foreign key in the documented target structure. |
 | AC-2A-005 | Repository hygiene is checked: secret/private-data files are excluded and absent from the package diff; public assets remain presentation-only; no sensitive evidence is committed. |
 | AC-2A-006 | No unapproved route, server action, database, authentication provider, specialized service, dependency, public deployment or Wappler runtime modification is introduced. |
 | AC-2A-007 | Wappler Design view can maintain the retained route/layout structure; any Wappler-specific metadata or file-placement uncertainty is recorded rather than guessed. |
@@ -147,7 +147,7 @@ These IDs are proposed for owner approval; they are not acceptance results.
 
 ## 6. Proposed automated test cases
 
-Tests below are package-plan items, not executed implementation tests. At implementation, map each test to the approved AC, run it in the actual non-production Wappler Development target, and retain artifacts under `docs/evidence/TTP-2A/`. Use synthetic/non-sensitive data only.
+Tests below are the approved package test plan. They are executed against the actual non-production Wappler Development target and recorded in `docs/evidence/TTP-2A/TEST_RECORD.md`. Use synthetic/non-sensitive data only.
 
 | Test ID | AC mapping | Planned method | Expected result / evidence |
 |---|---|---|---|
@@ -173,7 +173,7 @@ For the planned implementation, run all applicable cases and report `PASS`, `FAI
 - Preserve the existing owner-approved crimson/gold/ivory/charcoal design, coat of arms and `public/assets/ttpassport/` backgrounds. No GUI or accessibility baseline waiver is included.
 - Maintain local Development port 3002 and SQLite configuration. This package must not touch MySQL, the ignored `db/` directory, or any private database.
 - Do not change Wappler-managed dependencies or generated runtime bundles. The six moderate npm advisory groups and unverified MySQL 8.4 compatibility remain separate tracked matters, not justification for an unapproved change in 2A.
-- The current `.wappler/project.json` has `runtime: "capacitor"` while `projectType` is `web`; do not silently normalize it. Confirm the intended Wappler GUI value before any package change that depends on it.
+- Wappler 7.9.9 Project Settings were inspected through the installed application. The `Targets` panel displayed Development, Usage `Development`, Web Server URL `http://localhost:3002/`, and SQLite `/db/db_dev.sqlite3`; the General panel displayed a NodeJS server model and NodeJS routing handler. Neither visible panel displayed the `runtime` field or supplied a definition for `runtime: "capacitor"`. Its meaning is therefore unconfirmed. This package does not change targets, packaging, or runtime metadata, so the value has no effect on the approved 2A scope and remains unchanged. Revisit only if a later approved package depends on it.
 
 ## 8. Rollback
 
@@ -185,8 +185,8 @@ For the planned implementation, run all applicable cases and report `PASS`, `FAI
 ## 9. Readiness and pending decisions
 
 - **Preparation:** complete; actual scaffold and the accepted 15-screen route inventory are recorded.
-- **Stage 1:** `DEVELOPMENT_COMPLETE`; documentation/architecture technical-review recommendation `PASSED`; human closure approval is pending.
-- **Stage 2A baseline:** ready for owner review; **not approved** and not implementation authorization.
-- **Implementation status:** `NOT_STARTED`.
-- **Outstanding before implementation:** owner approval of this baseline; explicit Stage 1 closure decision before any stage transition; confirm the `runtime: "capacitor"` metadata in Wappler if package changes depend on it; settle any browser/screenshot baseline prerequisite if UI files are included in an approved 2A scope.
+- **Stage 1:** 1A–1H `CLOSED_PASS` for the owner-approved documentation, requirements, architecture and governance-register scope. Government/legal, biometric, integration, security and production dependencies remain open; LP-013 is not closed.
+- **Stage 2A baseline:** `TTP-2A-BASELINE-DRAFT-01`, approved by the owner on 22 November 2026 for implementation within this document's scope.
+- **Implementation status:** `TESTING`; actual outcomes and blockers are in `docs/evidence/TTP-2A/TEST_RECORD.md`.
+- **Outstanding before implementation:** none for this authorized scope. The observed `runtime: "capacitor"` metadata remains undefined in Wappler's visible settings, but does not affect this package because no target or packaging changes are included. GUI/business acceptance and Stage 2A owner closure remain pending.
 - **Subsequent package boundary:** Database Foundation is 2C; Authentication and Authorisation Foundation is 2D. Neither is included here.

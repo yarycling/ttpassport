@@ -7,6 +7,8 @@
 **Implementation state:** `NOT_STARTED`<br>
 **Inspected revision:** `9a16cf8` (`main`, pushed and matching `origin/main` before these documentation updates)<br>
 
+This is a historical record of the baseline preparation before the owner decision. The owner subsequently approved the baseline `TTP-2A-BASELINE-DRAFT-01` and authorized implementation on 22 November 2026; current status and authorization are recorded in `OWNER_AUTHORIZATION.md`, the Stage 2A baseline, and project registers.
+
 ## Scope
 
 This record evidences read-only scaffold, route, configuration, documentation and repository checks used to prepare the [Stage 2A baseline](../../architecture/STAGE_2A_PROJECT_REPOSITORY_AND_CODE_STRUCTURE_BASELINE.md). No application, GUI, Wappler configuration, database, dependency or runtime file was changed. Planned `CT-2A-001`–`CT-2A-009` in the baseline are implementation tests and have **not** been run or passed.
@@ -42,3 +44,5 @@ The accepted GUI-BASELINE-01B evidence states that screenshots and raw browser t
 ## Result and next action
 
 The 2A baseline is prepared for owner review. It is not an approved implementation baseline. No Stage 2A implementation acceptance or command test has passed. The next action is owner review of the baseline and explicit authorization before implementation; Stage 1 remains `DEVELOPMENT_COMPLETE`, not `CLOSED_PASS`.
+
+This conclusion is historical and describes the state before the project owner's later decision on 22 November 2026. It is superseded by `OWNER_AUTHORIZATION.md`, `../TTP-01A-01H/OWNER_CLOSURE_ACCEPTANCE.md`, the updated baseline, and the current project registers. Stage 1A–1H are now `CLOSED_PASS` for the accepted documentation scope; Stage 2A is authorized and in `TESTING`, with CT-2A-005 failing on the pre-existing favicon 404.

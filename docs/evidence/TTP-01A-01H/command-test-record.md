@@ -33,7 +33,7 @@ Human visual acceptance is `PASS / CLOSED` for GUI-BASELINE-01 and GUI-BASELINE-
 
 ## Outstanding test and approval items
 
-- Owner technical review of Stage 1 deliverables is pending. Stage 2A is not started.
+- Historical at command-test-record preparation: owner technical review/closure of Stage 1 was pending and Stage 2A had not started. The subsequent owner closure and Stage 2A authorization are recorded in `OWNER_CLOSURE_ACCEPTANCE.md`, `../TTP-2A/OWNER_AUTHORIZATION.md`, and the project registers.
 - The current Development SQLite file is absent/ignored; no database schema or business query exists. Database connectivity, migrations, transaction and concurrency tests are not applicable until a non-production DB baseline is approved.
 - No backend Security Provider, role/office/tenant authorization, Server Connect action, IVP, payment, production/issuance or fulfilment API exists to test.
 - The public repository has no tracked package lock. The advisory audit used installed hidden lock metadata in a temporary directory; review the findings with a reproducible lockfile and approved dependency remediation. No package was upgraded.

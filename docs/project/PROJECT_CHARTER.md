@@ -86,4 +86,4 @@ See [`../governance/LEGAL_AND_POLICY_DEPENDENCIES.md`](../governance/LEGAL_AND_P
 
 ## Approval record
 
-This charter is a Stage 1 deliverable. Owner technical review of the foundation is pending; no Stage 2 implementation is authorised by this document.
+This charter is a Stage 1 deliverable accepted at Stage 1 closure on 22 November 2026. Stage 2A has since been authorized under the separate baseline `TTP-2A-BASELINE-DRAFT-01`; this charter does not authorize work beyond that approved package.

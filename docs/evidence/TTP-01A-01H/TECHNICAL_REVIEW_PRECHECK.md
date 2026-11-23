@@ -3,10 +3,11 @@
 - **Review package:** TTP-01A-01H-R1 (remediation of TTP-01A-01H-REVIEW)
 - **Review date:** 22 November 2026
 - **Starting commit:** `ea94162`
-- **Stage 1 status:** DEVELOPMENT_COMPLETE; not CLOSED_PASS
-- **Current recommendation:** PASSED for the Stage 1 documentation and architecture review; final human-owner closure approval remains pending.
+- **Stage 1 status at review completion:** DEVELOPMENT_COMPLETE; owner closure had not yet been recorded.
+- **Technical-review recommendation:** PASSED for the Stage 1 documentation and architecture review.
+- **Current owner decision:** Stage 1A–1H closure accepted on 22 November 2026; see the owner closure addendum at the end of this record.
 
-This record retains the complete R1 remediation evidence and records the final Codex technical-review recommendation for Stage 1 documentation and architecture. It does not claim independent third-party test execution, approve legal policy, implement Stage 2, close Stage 1, or authorize a database, dependency, Wappler connection, application port, or GUI baseline change.
+This record retains the complete R1 remediation evidence and records the Codex technical-review recommendation for Stage 1 documentation and architecture. At the time it was prepared, it did not itself close Stage 1 or authorize Stage 2. The later owner decision below closes Stage 1 only for its completed documentation, requirements, architecture and governance-register deliverables and separately authorizes Stage 2A. It does not claim independent third-party test execution, approve legal policy, or authorize a database, dependency, Wappler connection, application port, or GUI baseline change.
 
 The initial review at `ea94162` found that Option C was not recorded and identified two documentation cross-reference/current-state gaps. TTP-01A-01H-R1 records the owner's confirmed design decision, restores all package titles, and corrects those documentation gaps. Government operational-policy approval for LP-013 remains pending.
 
@@ -153,6 +154,12 @@ The following records are from the original review at `ea94162`; the R1 results 
 
 - **Result:** PASSED for the Stage 1 documentation and architecture review scope: business requirements and form mapping; workflow and architecture traceability; policy and integration registers; roadmap, master register and status consistency; and the R1 remediation evidence above.
 - **Review nature:** Codex technical-review recommendation based on repository documents and recorded command evidence. It is not independent third-party test execution, a government approval, a production-readiness finding, or human owner acceptance.
-- **Stage 1 status:** `DEVELOPMENT_COMPLETE`; **not** `CLOSED_PASS`. Final human-owner closure approval is pending and must be explicit.
+- **Stage 1 status at review completion:** `DEVELOPMENT_COMPLETE`; owner closure was pending at that time.
 - **Outstanding dependencies:** Government approval for LP-013; six moderate npm advisory groups pending a reproducible Wappler-compatible dependency baseline; MySQL 8.4/Wappler compatibility remains unverified; back-office preview routes remain static, unauthenticated design previews and must not be exposed as a public production service.
-- **Stage 2A:** The canonical package is **Project Repository and Code Structure**. A separate proposed baseline has been prepared for owner approval; Stage 2A implementation remains `NOT_STARTED` and is not authorized by this review record.
+- **Stage 2A at review completion:** The canonical package is **Project Repository and Code Structure**. Its proposed baseline had not yet been approved and implementation was `NOT_STARTED` at that time. The subsequent owner authorization is recorded below.
+
+## Owner closure and authorization addendum — 22 November 2026
+
+- **Stage 1 closure:** The project owner explicitly accepted closure of packages 1A–1H for their completed documentation, requirements, architecture and governance-register deliverables. The project registers now record all eight packages as `CLOSED_PASS` with owner acceptance dated 2026-11-22. This closure does not resolve government, legal, biometric, integration or security dependencies, does not approve production deployment, and does not close LP-013.
+- **Stage 2A authorization:** The owner approved `TTP-2A-BASELINE-DRAFT-01` as the implementation baseline for **Project Repository and Code Structure**. Implementation and nine planned CT-2A tests are authorized only within that baseline; final Stage 2A acceptance remains pending.
+- **Evidence:** `docs/evidence/TTP-01A-01H/OWNER_CLOSURE_ACCEPTANCE.md`, `docs/evidence/TTP-2A/OWNER_AUTHORIZATION.md`, `docs/project/PROJECT_STATUS.md`, and `docs/project/MASTER_DEVELOPMENT_REGISTER.md`.
