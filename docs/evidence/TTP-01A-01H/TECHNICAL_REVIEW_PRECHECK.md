@@ -97,7 +97,7 @@ Before this precheck was added, `main` was two commits ahead of `origin/main`: `
 
 The review scan found no tracked credential/private-key/database/upload paths in the commit range and zero matches for private-key blocks, AWS access-key tokens, GitHub tokens, credential assignments, or database connection URIs in added lines. No dedicated `gitleaks`, `trufflehog`, or `detect-secrets` executable is installed, so this is a documented pattern scan plus manual review, not a claim from a dedicated secret-scanning product. No real identity data or provider secrets were found. The new precheck records only the local loopback listener and binary version, without credentials or personal data.
 
-Publication decision: the reviewed changes are suitable to publish to the existing public `main` branch. The planned push must remain a normal fast-forward push; do not force-push or rewrite history. Re-fetch and verify remote state immediately before publishing, then verify `origin/main` equals the pushed local commit.
+Publication decision: the reviewed changes are suitable to publish to the existing public `main` branch. A normal fast-forward push completed without force-pushing or rewriting history. A post-push fetch verified that `origin/main` matched local `main`, and the worktree was clean. The final synchronization check is repeated after this report update.
 
 ## Review evidence summary
 
