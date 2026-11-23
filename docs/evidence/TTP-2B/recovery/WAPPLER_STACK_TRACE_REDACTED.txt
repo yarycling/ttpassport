@@ -1,0 +1,13 @@
+Source: local Wappler log, ~/Library/Logs/Wappler/wappler.log
+Project path, user name and connection contents redacted. No credential values appear in this excerpt.
+
+[2026-11-23 00:49:59.916] initUI - Database Query Builder
+[2026-11-23 00:49:59.916] START inspectConnectionFile, fileName=passport_test, siteName=undefined, target=undefined, CURRENT_SERVER_TYPE=node
+[2026-11-23 00:50:01.163] Uncaught Exception:
+TypeError: Cannot read properties of undefined (reading 'track')
+    at WebContents.<anonymous> ([Wappler app]/Shared/DMXzone/dmxAppCreator/UI/main_init.jsc:1:41437)
+    at WebContents.emit (node:events:518:28)
+    at openGuestWindow (node:electron/js2c/browser_init:2:105209)
+    at WebContents.<anonymous> (node:electron/js2c/browser_init:2:92060)
+
+The same Query Builder initialization and `main_init.jsc:1:41437` exception were recorded again at 2026-11-23 00:52:12.022.

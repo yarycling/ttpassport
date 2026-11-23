@@ -1,0 +1,132 @@
+{
+  "method": "copied npm hidden lockfile of installed app tree; verified all direct dependency installed versions; added root manifest metadata only",
+  "directDependencies": [
+    {
+      "name": "archiver",
+      "range": "^7.0.1",
+      "version": "7.0.1"
+    },
+    {
+      "name": "compression",
+      "range": "^1.7.4",
+      "version": "1.8.2"
+    },
+    {
+      "name": "connect-session-knex",
+      "range": "^4.0.0",
+      "version": "4.0.2"
+    },
+    {
+      "name": "cookie-parser",
+      "range": "^1.4.6",
+      "version": "1.4.7"
+    },
+    {
+      "name": "cors",
+      "range": "^2.8.5",
+      "version": "2.8.6"
+    },
+    {
+      "name": "debug",
+      "range": "^4.3.2",
+      "version": "4.4.3"
+    },
+    {
+      "name": "dotenv",
+      "range": "^17.4.2",
+      "version": "17.4.2"
+    },
+    {
+      "name": "ejs",
+      "range": "^3.1.6",
+      "version": "3.1.10"
+    },
+    {
+      "name": "express",
+      "range": "^5.2.1",
+      "version": "5.3.0"
+    },
+    {
+      "name": "express-end",
+      "range": "0.0.8",
+      "version": "0.0.8"
+    },
+    {
+      "name": "express-fileupload",
+      "range": "^1.2.1",
+      "version": "1.6.0"
+    },
+    {
+      "name": "express-session",
+      "range": "^1.17.2",
+      "version": "1.19.0"
+    },
+    {
+      "name": "follow-redirects",
+      "range": "^1.14.5",
+      "version": "1.16.3"
+    },
+    {
+      "name": "fs-extra",
+      "range": "^11.2.0",
+      "version": "11.4.1"
+    },
+    {
+      "name": "http-proxy",
+      "range": "^1.18.1",
+      "version": "1.18.1"
+    },
+    {
+      "name": "knex",
+      "range": "^3.0.1",
+      "version": "3.3.0"
+    },
+    {
+      "name": "mime-types",
+      "range": "^3.0.2",
+      "version": "3.0.2"
+    },
+    {
+      "name": "node-schedule",
+      "range": "^2.0.0",
+      "version": "2.1.2"
+    },
+    {
+      "name": "nodemon",
+      "range": "^3.0.1",
+      "version": "3.1.14"
+    },
+    {
+      "name": "qs",
+      "range": "^6.10.1",
+      "version": "6.17.1"
+    },
+    {
+      "name": "session-file-store",
+      "range": "^1.5.0",
+      "version": "1.5.0"
+    },
+    {
+      "name": "socket.io",
+      "range": "^4.7.5",
+      "version": "4.8.4"
+    },
+    {
+      "name": "sqlite3",
+      "range": "^6.0.1",
+      "version": "6.0.1"
+    },
+    {
+      "name": "unzipper",
+      "range": "^0.12.1",
+      "version": "0.12.5"
+    },
+    {
+      "name": "uuid",
+      "range": "^14.0.1",
+      "version": "14.0.3"
+    }
+  ],
+  "lockfileVersion": 3,
+  "lockedPackages": 328
+}

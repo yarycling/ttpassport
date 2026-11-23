@@ -1,0 +1,3 @@
+PASS passport backup restored and synthetic-fixture digest matches (backup sha256 fa334ce65dcc4f82ddcde6a86e39b9eb917e0be987748dc7789e19193ae7b111)
+PASS ivp backup restored and synthetic-fixture digest matches (backup sha256 a4df41862a2d9c6988fcdce2ac19a4df2db5c9f06f3cf14892a20f0ba9230d56)
+PASS private backups and restored fixtures remain outside the repository

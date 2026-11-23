@@ -1,0 +1,2 @@
+npm_audit_exit=1
+npm_audit_omit_dev_exit=1

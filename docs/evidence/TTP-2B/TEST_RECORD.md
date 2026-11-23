@@ -51,3 +51,24 @@ The four matched visual-reference screenshots are under `visual-regression/`. Pi
 ## Outstanding blockers and disposition
 
 Stage 2B is not ready for owner acceptance because Wappler's Query Builder main-process error prevented verification of the actual Server Connect MySQL driver/query path and the planned Wappler restore readback. The Wappler app's dependency audits also remain unavailable until an approved lockfile/audit strategy exists. Do not mark Stage 2B `CLOSED_PASS`; Stage 2C remains unauthorized. Human GUI/business acceptance is still pending.
+
+## Compatibility recovery supplemental disposition — 2026-11-23
+
+This supplement preserves the original dispositions and historical failure evidence above. It records the subsequent TTP-2B-RECOVERY-01 retest. The package remains `TESTING`, owner acceptance is pending, and Stage 2C is not authorized.
+
+| Retested test | Current supplemental result | Evidence / reason |
+|---|---|---|
+| CT-2B-002 | BLOCKED | The isolated Test server and test-only MySQL2 driver pass, but a Database Query through Wappler Server Connect and its selected driver/dialect were not verified. See [SUPPLEMENTAL_RETEST_2026-11-23.md](recovery/SUPPLEMENTAL_RETEST_2026-11-23.md) and [retest-database-driver.log](recovery/retest-database-driver.log). |
+| CT-2B-003 | BLOCKED | Wappler 7.9.9 reproduces a `track` TypeError while opening the Query Builder. Root cause is unconfirmed; SQLite comparison and disposable Wappler project reproduction remain outstanding. See [WAPPLER_DIAGNOSIS.md](recovery/WAPPLER_DIAGNOSIS.md) and [WAPPLER_STACK_TRACE_REDACTED.txt](recovery/WAPPLER_STACK_TRACE_REDACTED.txt). |
+| CT-2B-006 | BLOCKED | Test-only MySQL2 connection failure and recovery passed; Wappler-native failure/recovery was not executable while Query Builder/Server Connect compatibility is unresolved. See [retest-connection-recovery.log](recovery/retest-connection-recovery.log). |
+| CT-2B-007 | BLOCKED | Separate synthetic Passport and IVP backups restored with matching fixture digests; reading restored rows through Wappler remained blocked. See [retest-backup-restore.log](recovery/retest-backup-restore.log). |
+| CT-2B-010 | PASS WITH FINDINGS | A lockfile matching all 328 installed package records was evaluated in a disposable copy, passed npm clean-install dry runs, then added without changing `package.json` or installed dependencies. Both app audit commands now execute and report six moderate package groups; no fixes were applied. The secret scan passed after the final files were prepared. See [DEPENDENCY_AUDIT_ASSESSMENT.md](recovery/DEPENDENCY_AUDIT_ASSESSMENT.md). |
+| CT-2B-011 | PASS carried forward | Prior rollback evidence confirms saved temporary files absent and the baseline configuration restored. During recovery, port/config were rechecked; unsaved Wappler editor artifacts were preserved in memory, so their UI-state cleanup is not verified. See [SUPPLEMENTAL_RETEST_2026-11-23.md](recovery/SUPPLEMENTAL_RETEST_2026-11-23.md). |
+
+### Affected regression results
+
+The supplemental browser run passed all 64 cases: route inventory, each of the 15 approved screens at 1440, 1024, 768 and 375 pixels, keyboard focus/accessibility/resource/console/overflow checks, public mobile navigation, wizard preview and review tabs. All 60 new responsive screenshots matched the previously accepted Stage 2B screenshots byte-for-byte; all four visual comparisons passed again. Configuration and API-inventory tests passed; business API assertions remain N/A because no Server Connect business APIs exist in the scaffold. The database boundary/privilege, driver smoke, backup/restore and isolated recovery tests passed. Full commands and evidence are indexed in [SUPPLEMENTAL_RETEST_2026-11-23.md](recovery/SUPPLEMENTAL_RETEST_2026-11-23.md).
+
+The first attempt to run the suite in a disposable copy omitted `playwright.config.mjs`, so Playwright had no base URL and the invocation was invalid. The config was copied into the disposable test tree and the valid rerun passed 64/64; this was a harness-staging issue, not an application failure.
+
+The Wappler connection/action files are absent from the project and Development-target files. Two unsaved Wappler editor artifacts remain open in memory and were preserved to avoid discarding that state. CT-2B-011's historical rollback record remains unchanged; final removal of those in-memory artifacts was not verified. Port 3002, the SQLite `db` connection, all 15 routes, and MAMP's 3306 listener remained available.

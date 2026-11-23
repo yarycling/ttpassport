@@ -1,0 +1,10 @@
+
+> ttpassport-stage2b-tests@1.0.0 test:api:inventory
+> node api/inventory.mjs
+
+{
+  "approvedGuiRoutes": 15,
+  "serverConnectApiFiles": [],
+  "loopbackClient": "GET / returned HTTP 200; non-loopback base and authority-overriding path rejected",
+  "businessApiAssertions": "N/A: no business Server Connect API actions are present in the current scaffold"
+}
