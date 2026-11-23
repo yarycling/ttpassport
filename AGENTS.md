@@ -366,30 +366,41 @@ Within an approved package, Codex may implement and fix ordinary in-scope defect
 
 ### 17.3 COMMAND TEST — Codex responsibility
 
-Execute **actual** relevant commands/API/database tests against the approved non-production environment:
+Codex executes and records the applicable automated test suite for **every development package**, using the approved non-production environment and synthetic or explicitly authorised data. Test scope must follow the package's acceptance criteria and actual changed behaviour. Before implementation, map stable `CT-<package>-NNN` test IDs to `AC-<package>-NNN` criteria; after implementation, run the tests, fix ordinary in-scope defects, retest, and check regressions. A test that cannot be run because its tool, environment, access, baseline or prerequisite is unavailable is `BLOCKED`, never `PASS`. Mark genuinely inapplicable test classes `N/A` with a short scope-based reason; do not call an unexecuted applicable test N/A.
 
-- Application starts in the actual Wappler target; real Server Connect action and DB connectivity verified.
-- Positive, negative, boundary, expired-session, invalid-input and failure-recovery tests.
-- Backend role, office-scope, tenant-scope, record-level authorisation and IDOR tests.
-- Migration integrity, transaction rollback, locking/concurrency and idempotency tests.
-- eKYC mock/real provider distinctions; incomplete checks cannot issue verified assertion.
-- Payment webhook/replay/reconciliation and courier custody tests where relevant.
-- Regressions affecting existing accepted packages.
+Run the applicable checks, including:
 
-For every test report: `Test ID | Acceptance ID | environment | command | expected | actual | PASS/FAIL/BLOCKED | evidence path`.
+- Application startup using the actual configured Wappler Development target for packages that change application behavior; real Server Connect actions and database connectivity where those components are in scope.
+- Positive, negative, boundary, expired-session, invalid-input and failure-recovery tests for affected behavior.
+- Backend authentication, role, office-scope, tenant-scope, record-level authorization and IDOR tests for affected protected operations.
+- Migration integrity, transaction rollback, locking/concurrency and idempotency tests where data changes require them.
+- eKYC mock/real provider distinctions and proof that incomplete checks cannot produce a verified assertion, where eKYC behavior changes.
+- Payment webhook/replay/reconciliation and courier custody tests where those workflows change.
+- Regression checks for previously accepted functionality affected by the package.
+- Automated browser functionality, responsive layout, keyboard/accessibility and visual regression checks for packages that add or change user-facing screens or interactions, as detailed in 17.4.
 
-**Never:** claim a browser test, production biometric assurance, live provider acceptance, signed assertion verification or government approval has passed based solely on unit tests, mocks or source inspection.
+Use Playwright or another approved browser-automation method when available, preferring existing tools and development dependencies. Do not add application runtime frameworks, modify Wappler-generated files or create unsupported custom startup tooling just to facilitate tests. If the approved test environment cannot be used safely, stop the affected test and report the blocker; do not point tests at production or unrelated databases/services.
 
-### 17.4 GUI TEST — human owner responsibility
+For every test report: `Test ID | Acceptance ID | environment | command/method | expected | actual | PASS/FAIL/BLOCKED/N/A | evidence path`. Retain commands, outputs and relevant artifacts under `docs/evidence/<PACKAGE-ID>/`. Do not store credentials, real identity data or other sensitive evidence in the repository.
 
-Codex prepares a concise manual GUI checklist covering visible flows, errors, mobile/layout and expected results. The **human owner** performs GUI/browser acceptance and explicitly reports PASS/FAIL. Codex may run command-line tests and automation of non-GUI functions; GUI acceptance stays `PENDING` until the owner confirms it.
+**Never:** claim a browser test, visual comparison, production biometric assurance, live provider acceptance, signed assertion verification or government approval has passed based solely on unit tests, mocks, source inspection or generated screenshots. Distinguish mock, local, approved sandbox and production evidence accurately.
+
+### 17.4 AUTOMATED GUI TEST — Codex responsibility; human acceptance remains required
+
+For every package affecting the user interface, Codex must run automated browser checks against the application started through its actual configured Wappler Development target, using a real browser and approved browser-automation tooling where available. Exercise new and modified interactive controls, navigation, forms, validation and readable errors, loading/success/failure states, modal behavior, and relevant recovery paths. Check responsive behavior at approximately **1440, 1024, 768 and 375 px**, including horizontal overflow, broken assets and overlapping content; run applicable keyboard navigation and accessibility checks; and capture screenshots of affected screens.
+
+Compare screenshots with the approved visual baseline and record material differences. If no suitable approved baseline or comparison tool exists, record the comparison as `BLOCKED` (or explicitly N/A only when the package does not change visuals); do not claim visual regression passed without performing the comparison. Review browser console errors and retain test results, screenshots and comparison findings in `docs/evidence/<PACKAGE-ID>/`. Use synthetic or explicitly authorised data and avoid capturing secrets or personal identity information. Fix ordinary in-scope defects and rerun failed checks.
+
+If browser automation, the Wappler target, a suitable test account or other required access is unavailable, record each affected GUI test as `BLOCKED`, name the missing prerequisite, and do not report the package as ready for acceptance while a required check remains blocked. A manual checklist may supplement the automated results but does not replace them. The human owner remains responsible for business suitability, visual approval where appropriate, unresolved risk decisions and final sign-off; GUI acceptance remains `PENDING` until the owner explicitly reports a result.
 
 ### 17.5 Independent review and closure
 
 - ChatGPT/technical reviewer may critically assess source and evidence; reviewing a Codex-generated log is **not** independent execution.
-- `CLOSED_PASS` requires actual relevant COMMAND TEST evidence, human GUI acceptance (where applicable), documentation/rollback, no unresolved release blockers and explicit owner closure approval.
+- Every package must complete the applicable `IMPLEMENT → TEST → IDENTIFY DEFECTS → FIX → RETEST → VERIFY REGRESSION → REPORT` cycle. Do not modify tests merely to manufacture a PASS result.
+- A package is not ready for acceptance while a required applicable test is failed or blocked, a material defect remains, evidence is missing, or Wappler compatibility is not established. Report such work as `BLOCKED` or `TESTING` as appropriate; never relabel it N/A to pass a gate.
+- `CLOSED_PASS` requires actual relevant command and automated GUI test evidence (GUI tests where applicable), documented limitations and rollback, no unresolved release blockers, human GUI/business acceptance where applicable, and explicit owner closure approval.
 - Never automatically advance to the next package, declare legal/security approval or deploy to production on AI authority alone.
-- If blocked, report exact issue and continue unrelated safe approved work when possible.
+- If blocked, report the exact issue and continue unrelated safe approved work when possible.
 
 ---
 
@@ -400,20 +411,22 @@ PROJECT: TTPASSPORT
 PACKAGE: [e.g., 3A — eKYC Client/Tenant Management]
 APPROVED BASELINE: [version/date/reference]
 STATUS: NOT_STARTED | IN_PROGRESS | BLOCKED | DEVELOPMENT_COMPLETE | TESTING | UAT_PENDING | CLOSED_PASS
-ENVIRONMENT: [actual Wappler, Node, DB, target, Git branch/commit]
+ENVIRONMENT: [actual Wappler, Node, DB, target, browser/tool versions, Git branch/commit]
 IMPLEMENTED: [screens, Wappler actions, libraries, schema changes]
 WAPPLER-NATIVE IMPLEMENTATION: [which native components and how GUI-editable]
 APPROVED EXTENSIONS: [reference or NONE]
 FILES / MIGRATIONS: [actual changed paths]
-COMMAND TEST: PASS __ / FAIL __ / BLOCKED __
-EVIDENCE: [CT ID | AC ID | environment | command | expected | actual | result | evidence path]
+COMMAND TEST: PASS __ / FAIL __ / BLOCKED __ / N/A __ (with scope reason)
+AUTOMATED GUI TEST: PASS __ / FAIL __ / BLOCKED __ / N/A __ (with scope reason)
+RESPONSIVE / ACCESSIBILITY / VISUAL COMPARISON: [viewports, keyboard/accessibility checks, baseline comparison result]
+EVIDENCE: [CT ID | AC ID | environment | command/method | expected | actual | PASS/FAIL/BLOCKED/N/A | evidence path]
 RBAC / OFFICE / TENANT ISOLATION: [evidence]
 TRANSACTION / IDEMPOTENCY / AUDIT: [evidence]
 REGRESSIONS: [checked]
 RISKS / UNTESTED / BLOCKERS: [plainly stated]
 ROLLBACK: [how to undo safely]
-GUI CHECKLIST: [3–6 specific owner-run tests]
-GUI ACCEPTANCE: PENDING HUMAN RESULT
+GUI CHECKLIST: [3–6 specific owner review/acceptance checks, if applicable]
+GUI ACCEPTANCE: PENDING HUMAN RESULT (automated Codex evidence is recorded separately)
 GIT: [branch and commit]
 NEXT ACTION: [request technical review / owner GUI acceptance / blocker decision]
 ```
@@ -439,7 +452,7 @@ If the repo/project path has not been provided, the correct next step is to requ
 
 ## 20. Definition of Done and instruction hierarchy
 
-An accepted package must be: Wappler maintainable (except explicitly approved specialist services), secure at the server and data boundaries, properly scoped, tested with reproducible evidence, documented, rollback-ready, and explicitly signed off by the owner.
+An accepted package must be: Wappler maintainable (except explicitly approved specialist services), secure at the server and data boundaries, properly scoped, verified by all applicable Codex-executed automated tests with reproducible evidence (including browser, responsive, accessibility and visual-regression checks for UI changes), documented, rollback-ready, and explicitly signed off by the owner. Human owner sign-off remains required; it does not replace routine automated testing.
 
 Never weaken legal identity, approval, financial or custody controls for convenience or to make a demo work. Never assert that the platform is government-authorised, certified or production-ready without corresponding official approvals.
 
