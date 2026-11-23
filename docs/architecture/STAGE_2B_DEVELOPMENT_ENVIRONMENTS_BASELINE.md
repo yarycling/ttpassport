@@ -217,7 +217,7 @@ These are planned Stage 2B tests, not executed results. Execution occurs only af
 
 ## 13. Proposed files and ownership
 
-No files in this section are created by this draft other than this baseline document and the corresponding status-register references.
+This draft creates the baseline document, the status-register references and a documentation-validation note. The environment and test-harness files below are proposed only; no infrastructure or implementation test files are created.
 
 | Proposed file/group | Owner/purpose |
 |---|---|
@@ -225,7 +225,7 @@ No files in this section are created by this draft other than this baseline docu
 | tests/README.md, playwright.config.js, tests/gui/, tests/api/, tests/database/, tests/fixtures/ | Test-only harness and synthetic data; no application business modules/endpoints |
 | package.json test script and a reviewed package lock | Reproducible test/dependency installation only after owner approval; no test-only dependency in production/runtime install |
 | .gitignore entries if evidenced necessary | Ignore temporary profiles, browser traces, generated reports and test DB/dumps while preserving approved evidence |
-| docs/evidence/TTP-2B/ | Actual version/config observations, commands, outputs, screenshots, connection and privilege tests, backup/restore evidence and review |
+| docs/evidence/TTP-2B/ | The baseline-preparation validation note is present. Future implementation evidence will include actual version/config observations, commands, outputs, screenshots, connection and privilege tests, backup/restore evidence and review. |
 | docs/project/PROJECT_STATUS.md and docs/project/MASTER_DEVELOPMENT_REGISTER.md | Track Stage 2B as NOT_STARTED until its baseline receives owner implementation approval and work actually begins |
 
 Do not directly edit Wappler-generated runtime code, App Connect/Bootstrap bundles, the current route configuration or page/layout files as part of environment setup.
