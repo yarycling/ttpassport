@@ -4,9 +4,9 @@
 - **Review date:** 22 November 2026
 - **Starting commit:** `ea94162`
 - **Stage 1 status:** DEVELOPMENT_COMPLETE; not CLOSED_PASS
-- **Current recommendation:** Documentation remediation complete; final owner review remains pending before any Stage 1 closure.
+- **Current recommendation:** PASSED for the Stage 1 documentation and architecture review; final human-owner closure approval remains pending.
 
-This record prepares Stage 1 for independent technical review. It does not approve legal policy, implement Stage 2, close Stage 1, or authorize a database, dependency, Wappler connection, application port, or GUI baseline change.
+This record retains the complete R1 remediation evidence and records the final Codex technical-review recommendation for Stage 1 documentation and architecture. It does not claim independent third-party test execution, approve legal policy, implement Stage 2, close Stage 1, or authorize a database, dependency, Wappler connection, application port, or GUI baseline change.
 
 The initial review at `ea94162` found that Option C was not recorded and identified two documentation cross-reference/current-state gaps. TTP-01A-01H-R1 records the owner's confirmed design decision, restores all package titles, and corrects those documentation gaps. Government operational-policy approval for LP-013 remains pending.
 
@@ -35,7 +35,7 @@ The initial review at `ea94162` found that Option C was not recorded and identif
 
 | Review requirement | Source documents and exact sections | Finding |
 |---|---|---|
-| Account for all 150 package IDs | `AGENTS.md`, §16 “Development roadmap and stable work-package IDs”; `docs/PROJECT_ROADMAP.md`, stage table; `docs/project/MASTER_DEVELOPMENT_REGISTER.md`, package table; `docs/project/PROJECT_STATUS.md`, package table | PASS. The roadmap range totals 150. Both the master register and status register contain 150 unique expected IDs, with no missing, duplicate, or unexpected IDs. Future package titles are left for approved baselines rather than invented. |
+| Account for all 150 package IDs | `AGENTS.md`, §16 “Development roadmap and stable work-package IDs”; `docs/PROJECT_ROADMAP.md`, stage table; `docs/project/MASTER_DEVELOPMENT_REGISTER.md`, package table; `docs/project/PROJECT_STATUS.md`, package table | PASS. The roadmap range totals 150. Both the master register and status register contain 150 unique expected IDs, with no missing, duplicate, or unexpected IDs. All package titles match the owner-approved roadmap; future package acceptance criteria and implementation baselines remain subject to approval. |
 | Stable business requirement identifiers | `docs/requirements/BUSINESS_REQUIREMENTS.md`, requirements table and “Acceptance boundary” | PASS. BR-001 through BR-032 are present once each and in sequence. Each row maps to stable roadmap package IDs and states an acceptance caveat. |
 | Workflows agree with requirements and official-form constraints | `docs/requirements/BUSINESS_REQUIREMENTS.md`, BR-004, BR-009–BR-026 and BR-032; `docs/requirements/PASSPORT_FORM_MAPPING.md`, “Source and mapping rules”, “Supporting evidence checklist from 2026 instructions”, and “Open validation points”; `docs/architecture/BUSINESS_WORKFLOWS.md`, “Required separation of outcomes” and sections 1–15 | PASS with approvals pending. Both local and overseas applicants are included. The first-time flow preserves the documented in-person appointment requirement and says online preparation must not be represented as legal completion before approval. Age 16–17 guardian handling remains open for policy/legal validation. |
 | eKYC is the project's own platform; no NOBIS dependency | `AGENTS.md`, §§1, 3, 6, and 8; `docs/project/PROJECT_CHARTER.md`, “Objectives” and “Confirmed owner decisions and pending decisions”; `docs/requirements/BUSINESS_REQUIREMENTS.md`, BR-005–BR-008; `docs/architecture/BUSINESS_WORKFLOWS.md`, §2 “eKYC identity verification”; `docs/architecture/SOLUTION_ARCHITECTURE.md`, §§2–3 and 7; `docs/integrations/INTEGRATION_REGISTER.md`, integration table | PASS as a design requirement. The project owns the IVP concept and treats NOBIS as unavailable/not a dependency. No NOBIS provider is registered. This is not an implemented or operating IVP service: the current scaffold has no IVP API, data model, or Server Connect business action. |
@@ -139,12 +139,20 @@ The following records are from the original review at `ea94162`; the R1 results 
 | CT-1R1-006 | AC-1R1-006 | Read-only JSON/config inspection of `app/config/config.json`, both SQLite connection files, `app/config/routes.json`, package manifest, and status register | Port and GUI baseline unchanged; Development remains SQLite; future packages remain NOT_STARTED; no runtime/config/dependency changes | Port 3002; SQLite `/db/db_dev.sqlite3`; 15 configured routes; GUI baseline `CLOSED_PASS`; all 2A–18G remain `NOT_STARTED`; diff paths are only `AGENTS.md` and `docs/` | PASS |
 | CT-1R1-007 | AC-1R1-007 | `git diff --cached --check`; changed-path and targeted secret/private-data scan | Documentation-only diff; no credentials, identity data, or private secrets | Clean diff check; 10 changed paths are `AGENTS.md`/`docs/`; private-key, AWS/GitHub token, credential-assignment and connection-URI patterns each returned zero | PASS |
 
-## Outstanding items for independent review
+## Outstanding dependencies and later-stage evidence
 
 1. Government operational-policy approval for LP-013 remains pending. Keep risk classifications advisory and do not activate automated decision behavior until approved rules, authority, and tests exist.
 2. Obtain a tracked, Wappler-approved lockfile/dependency baseline and assess fixes in a separate approved dependency package; no Wappler-managed packages were changed in R1.
 3. Approve a non-production MySQL target and verify Wappler/driver/server compatibility through Wappler GUI before any database migration work.
 4. Review the proposed IVP boundary as architecture only; require a later approved baseline and extraction/isolation evidence before claiming standalone readiness.
-5. Keep Stage 1 `DEVELOPMENT_COMPLETE` pending final owner review; do not mark `CLOSED_PASS`. Stage 2 remains unstarted.
+5. Keep Stage 1 `DEVELOPMENT_COMPLETE` pending explicit human-owner closure approval; do not mark `CLOSED_PASS`. Preparing the Stage 2A draft baseline does not start or authorize Stage 2 implementation.
 
-**R1 remediation recommendation:** Ready for final owner review of Stage 1 documentation. This is not a Stage 1 closure decision. Stage 1 remains `DEVELOPMENT_COMPLETE`; LP-013 government approval, dependency remediation, and MySQL compatibility remain outstanding, and Stage 2 is not authorized by this precheck.
+**R1 remediation recommendation (historical):** Ready for final owner review of Stage 1 documentation. This was not a Stage 1 closure decision. Stage 1 remained `DEVELOPMENT_COMPLETE`; LP-013 government approval, dependency remediation, and MySQL compatibility remained outstanding.
+
+## Final technical-review recommendation
+
+- **Result:** PASSED for the Stage 1 documentation and architecture review scope: business requirements and form mapping; workflow and architecture traceability; policy and integration registers; roadmap, master register and status consistency; and the R1 remediation evidence above.
+- **Review nature:** Codex technical-review recommendation based on repository documents and recorded command evidence. It is not independent third-party test execution, a government approval, a production-readiness finding, or human owner acceptance.
+- **Stage 1 status:** `DEVELOPMENT_COMPLETE`; **not** `CLOSED_PASS`. Final human-owner closure approval is pending and must be explicit.
+- **Outstanding dependencies:** Government approval for LP-013; six moderate npm advisory groups pending a reproducible Wappler-compatible dependency baseline; MySQL 8.4/Wappler compatibility remains unverified; back-office preview routes remain static, unauthenticated design previews and must not be exposed as a public production service.
+- **Stage 2A:** The canonical package is **Project Repository and Code Structure**. A separate proposed baseline has been prepared for owner approval; Stage 2A implementation remains `NOT_STARTED` and is not authorized by this review record.
