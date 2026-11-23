@@ -1,15 +1,28 @@
 # TTP-01A-01H Technical Review Precheck
 
-- **Review package:** TTP-01A-01H-REVIEW
+- **Review package:** TTP-01A-01H-R1 (remediation of TTP-01A-01H-REVIEW)
 - **Review date:** 22 November 2026
+- **Starting commit:** `ea94162`
 - **Stage 1 status:** DEVELOPMENT_COMPLETE; not CLOSED_PASS
-- **Recommendation:** **BLOCKED** pending an authoritative reference for the requested Option C policy and resolution of the documentation discrepancies below.
+- **Current recommendation:** Documentation remediation complete; final owner review remains pending before any Stage 1 closure.
 
 This record prepares Stage 1 for independent technical review. It does not approve legal policy, implement Stage 2, close Stage 1, or authorize a database, dependency, Wappler connection, application port, or GUI baseline change.
+
+The initial review at `ea94162` found that Option C was not recorded and identified two documentation cross-reference/current-state gaps. TTP-01A-01H-R1 records the owner's confirmed design decision, restores all package titles, and corrects those documentation gaps. Government operational-policy approval for LP-013 remains pending.
+
+## TTP-01A-01H-R1 remediation record
+
+- **Option C:** The owner-confirmed design policy is [`../../governance/APPROVAL_POLICY_OPTION_C.md`](../../governance/APPROVAL_POLICY_OPTION_C.md), identifier `TTP-APPROVAL-OPTION-C`, design version 1.0. Its source is the human-approved TTPASSPORT project design decision. The owner decision is CONFIRMED; Government operational-policy approval is PENDING; implementation is NOT STARTED.
+- **Traceability:** BR-020 links to the policy. LP-013 records the owner-confirmed design and remains OPEN for government-approved classification criteria, thresholds, and authority delegation.
+- **Package titles:** Owner-provided titles are now populated for all 150 IDs in the roadmap, master register, and status register. Stage 1A–1H titles were preserved; packages 2A–18G remain NOT_STARTED.
+- **MySQL record:** `SOLUTION_ARCHITECTURE.md` now distinguishes the local listener and running server executable version from an authenticated SQL-reported server version. SQLite remains the active Development configuration.
+- **Dependency record:** `SOLUTION_ARCHITECTURE.md` now points to this precheck for advisory ranges, paths, exposure assessment, and fix limitations. No dependency or Wappler runtime was changed.
+- **Acceptance boundary:** The GUI baseline remains CLOSED_PASS; application port remains 3002. No passport-processing, authentication, biometric, payment, or other application runtime behavior was added.
 
 ## Documents reviewed
 
 - Root `AGENTS.md` (read in full; no nested `AGENTS.md` was found).
+- `docs/governance/APPROVAL_POLICY_OPTION_C.md`.
 - `docs/project/PROJECT_CHARTER.md`.
 - `docs/requirements/BUSINESS_REQUIREMENTS.md` and `docs/requirements/PASSPORT_FORM_MAPPING.md`.
 - `docs/architecture/BUSINESS_WORKFLOWS.md` and `docs/architecture/SOLUTION_ARCHITECTURE.md`.
@@ -29,17 +42,17 @@ This record prepares Stage 1 for independent technical review. It does not appro
 | IVP remains extractable as a standalone service | `AGENTS.md`, §6 “Architectural separation and modularity” and §3 “Specialised eKYC carve-out”; `docs/project/PROJECT_CHARTER.md`, “Objectives”; `docs/architecture/SOLUTION_ARCHITECTURE.md`, §3 “Proposed modules and data ownership” (IVP row and “Application and IVP” relationship), §7 “API and integration boundaries” | PASS as a proposed boundary, not as a demonstrated extraction. The design gives IVP its own data owner, client/tenant scope, authenticated versioned API, and no passport-specific tables or direct cross-database foreign keys. Future standalone deployment still needs approved contracts, service implementation, isolation tests, and extraction evidence. |
 | Wappler Server Connect is the ordinary application framework | `AGENTS.md`, §§2, 4, 5, and 6; `docs/architecture/SOLUTION_ARCHITECTURE.md`, §2 “Proposed application architecture”, §4 “Authentication and authorization boundaries”, and §7 “API and integration boundaries”; `docs/architecture/BUSINESS_WORKFLOWS.md`, §§6, 10, and 14 | PASS as the intended development rule. Wappler App Connect, Server Connect, native Database actions, and Security Providers remain primary for ordinary behavior. Current implementation status is accurately limited: App Connect/EJS layouts exist, but there are no business Server Connect actions or Security Providers. |
 | Passport and IVP data boundaries stay separate | `AGENTS.md`, §6; `docs/requirements/BUSINESS_REQUIREMENTS.md`, BR-005–BR-008; `docs/architecture/SOLUTION_ARCHITECTURE.md`, §3 module/data-ownership table and conceptual-model row “Application and IVP”; `docs/architecture/BUSINESS_WORKFLOWS.md`, §2 | PASS as a proposed architecture. Passport keeps an opaque, versioned IVP reference; IVP owns its subjects, sessions, checks, reviews, and assertions and enforces client/tenant scope. No contrary cross-database dependency was found in the reviewed documents. |
-| Risk approvals follow the specified Option C policy | `AGENTS.md`, §7; `docs/requirements/BUSINESS_REQUIREMENTS.md`, BR-020; `docs/architecture/BUSINESS_WORKFLOWS.md`, §8 “Risk-based approval”; `docs/architecture/SOLUTION_ARCHITECTURE.md`, §4; `docs/governance/LEGAL_AND_POLICY_DEPENDENCIES.md`, LP-013 | **BLOCKED.** No “Option C” text or approved Option C source was found in `AGENTS.md` or the reviewed repository documents. The available baseline only says routine cases may be approved by currently authorized officers, enhanced cases require a different authorized decision-maker, and security holds need designated authority. LP-013 leaves risk categories, delegations, hold authority, and conflict checks open. This general rule cannot be treated as proof of conformance to a specific Option C policy. |
+| Risk approvals follow the specified Option C policy | `AGENTS.md`, §7; `docs/governance/APPROVAL_POLICY_OPTION_C.md`; `docs/requirements/BUSINESS_REQUIREMENTS.md`, BR-020; `docs/architecture/BUSINESS_WORKFLOWS.md`, §8 “Risk-based approval”; `docs/architecture/SOLUTION_ARCHITECTURE.md`, §4; `docs/governance/LEGAL_AND_POLICY_DEPENDENCIES.md`, LP-013 | PASS for the owner-confirmed design: R0–R3 classifications and independent decision controls are explicitly specified. Government operational-policy approval remains pending; LP-013 stays OPEN, and no automated decision logic is implemented. |
 | Domestic and overseas applicants are supported | `docs/project/PROJECT_CHARTER.md`, “Purpose”, “Intended operator and stakeholders”, and “Confirmed owner decisions and pending decisions”; `docs/requirements/BUSINESS_REQUIREMENTS.md`, BR-004 and BR-025; `docs/requirements/PASSPORT_FORM_MAPPING.md`, applicant address/evidence mappings and open validation point 5; `docs/architecture/BUSINESS_WORKFLOWS.md`, §§5, 14, and 15; `docs/governance/LEGAL_AND_POLICY_DEPENDENCIES.md`, LP-016 | PASS as intended scope; cross-border legality and mission/courier capability remain open. Supporting overseas applicants does not assert that remote proofing or cross-border evidence transfer is approved. |
 | Payment, issuance, release, and delivery remain distinct | `AGENTS.md`, §§1, 11–13; `docs/requirements/BUSINESS_REQUIREMENTS.md`, BR-022–BR-026; `docs/architecture/BUSINESS_WORKFLOWS.md`, “Required separation of outcomes” and §§10–15; `docs/architecture/SOLUTION_ARCHITECTURE.md`, §§3 and 8 | PASS. Payment/settlement, application decision, production/QC, legal issuance, release authority, custody, and delivery confirmation are separate records and gates. No automatic issuance/release or invented provider capability is specified. |
 | Government approvals and external dependencies remain explicit | `docs/project/PROJECT_CHARTER.md`, “Confirmed owner decisions and pending decisions”; `docs/governance/LEGAL_AND_POLICY_DEPENDENCIES.md`, LP-001–LP-020, “Source-backed operational constraints”, and “Gate before affected implementation”; `docs/integrations/INTEGRATION_REGISTER.md`, integration table and “Integration boundary requirements”; `docs/requirements/PASSPORT_FORM_MAPPING.md`, “Open validation points” | PASS. The documents identify unresolved authority, remote-service, identity, biometric, signature, privacy, retention, issuance, risk delegation, fee, cross-border, fulfilment, accessibility, and security decisions. They correctly leave affected implementation gated. |
 
 ## Documentation consistency findings
 
-1. **Option C source is absent.** This is the principal acceptance gap. The approval model recorded in `AGENTS.md` and LP-013 is directionally consistent with independent review but does not name, define, or map to Option C. Obtain the authoritative approved policy/version or a human-approved mapping before claiming this criterion passes.
-2. **Database statement needs a time qualifier.** `docs/architecture/SOLUTION_ARCHITECTURE.md`, §5 “Current development state”, says there is no evidenced MySQL server. This review found a local MAMP `mysqld` process listening on loopback port 3306. The process's server executable reports 5.7.39; an unauthenticated `SELECT VERSION()` was refused with access denied, so no SQL-reported server version was obtained. The earlier statement may describe the earlier inspection, but it is no longer an accurate unqualified current snapshot. Preserve the distinction between server executable and client versions and date-scope the old evidence in a later approved documentation update.
-3. **Dependency evidence cross-reference is incomplete.** `docs/architecture/SOLUTION_ARCHITECTURE.md`, §9 says exact advisory ranges and results are recorded in `docs/evidence/TTP-01A-01H/command-test-record.md`. That record lists six affected package names/versions and the Archiver major-fix note, but does not include the affected ranges, advisory identifiers, full paths, or runtime/dev assessment requested here. This precheck supplies those details; the existing cross-reference should be reconciled during a documentation update.
-4. **Form/legal status is consistently caveated.** `PASSPORT_FORM_MAPPING.md`, “Open validation points”, LP-002, and `BUSINESS_WORKFLOWS.md`, §3 all require confirmation of the current official form/instructions and retain the in-person appointment constraint. No claim of an approved fully online legal application was found.
+1. **Option C design mapping: resolved by R1.** The approved owner design is now named and referenced consistently. Government operational rules remain pending under LP-013, so the design must not be represented as government-approved or automated.
+2. **MySQL current-state statement: corrected by R1.** The architecture now records SQLite as active, a local MySQL listener and executable version, and the absence of an authenticated SQL-reported server version.
+3. **Dependency evidence cross-reference: corrected by R1.** The architecture now points to this precheck, which holds the affected ranges, advisory identifiers, paths, exposure assessment, and Wappler remediation caveats.
+4. **Form/legal status remains consistently caveated.** `PASSPORT_FORM_MAPPING.md`, “Open validation points”, LP-002, and `BUSINESS_WORKFLOWS.md`, §3 retain the in-person appointment constraint. No approved fully online legal application is asserted.
 
 No other contradiction was identified among the requirements, form mapping, workflows, architecture, policy register, and integration register. These documents are proposals/baselines subject to their stated owner and Government approvals, not evidence that the proposed workflows have been implemented or authorized.
 
@@ -48,9 +61,10 @@ No other contradiction was identified among the requirements, form mapping, work
 | Check | Command/method | Result |
 |---|---|---|
 | Package ID accounting | Python extraction of package-table IDs in the master and status registers against the 18 stage counts in `AGENTS.md` | PASS: 150/150 unique IDs in each register; no missing, duplicate, or unexpected IDs |
+| Package title coverage | Python extraction of package title cells across the roadmap, master register, and status register | PASS after R1: all 150 IDs have the same non-placeholder owner-approved title in all three documents |
 | BR identifier sequence | Python extraction of requirement-table IDs in `BUSINESS_REQUIREMENTS.md` | PASS: BR-001–BR-032, 32 unique rows |
 | Local Markdown links | Python scan of relative links in `docs/**/*.md` | PASS: 19 local links checked; 0 missing targets |
-| Option C search | Case-insensitive search across `AGENTS.md` and `docs/` | BLOCKED: no matching approved policy source |
+| Option C traceability | Search and link checks across policy, BR-020, workflow, architecture, and LP-013 | PASS for owner-confirmed design; Government approval remains pending and LP-013 remains OPEN |
 | Wappler/database settings | Read-only inspection of `app/modules/connections/db.json`, `.wappler/targets/Development/databases/db.json`, `app/config/config.json`, package manifest, and installed dependency tree | PASS: SQLite remains configured; port remains 3002; no MySQL driver found; no DB or connection was created/changed |
 
 ## Database and MySQL 8.4 assessment
@@ -99,7 +113,9 @@ The review scan found no tracked credential/private-key/database/upload paths in
 
 Publication decision: the reviewed changes are suitable to publish to the existing public `main` branch. A normal fast-forward push completed without force-pushing or rewriting history. A post-push fetch verified that `origin/main` matched local `main`, and the worktree was clean. The final synchronization check is repeated after this report update.
 
-## Review evidence summary
+## Original review evidence summary at `ea94162`
+
+The following records are from the original review at `ea94162`; the R1 results below supersede findings that R1 corrected.
 
 | Check ID | Acceptance area | Command/method | Expected | Observed result |
 |---|---|---|---|---|
@@ -111,13 +127,24 @@ Publication decision: the reviewed changes are suitable to publish to the existi
 | TR-006 | MySQL availability/configuration | Read-only config/process/listener inspection; unauthenticated `SELECT VERSION()` | Identify SQLite state and distinguish client/server evidence | PASS: SQLite confirmed; local MySQL listener and server executable found; SQL version query denied; no connection/database change |
 | TR-007 | Public commit safety | `git diff --check`, changed-path review, targeted secret-pattern scan | Documentation-only changes, no secrets/sensitive data | PASS: reviewed range is documentation/acceptance material; no matches in reviewed secret patterns |
 
+## R1 command and configuration results
+
+| Test ID | Acceptance ID | Environment / command | Expected | Actual | Result |
+|---|---|---|---|---|---|
+| CT-1R1-001 | AC-1R1-001 | Python ID/title extraction across roadmap, master register, and status register | Exactly 150 unique IDs and populated titles in all three files | 150 IDs; 150 matching non-placeholder titles per document; no missing or duplicate IDs | PASS |
+| CT-1R1-002 | AC-1R1-002 | Text/link traceability check for policy metadata, BR-020, workflow §8, architecture §4, and LP-013 | Owner decision confirmed; policy reference consistent; government approval remains pending; LP-013 open | All references identify `TTP-APPROVAL-OPTION-C` v1.0; LP-013 remains OPEN | PASS |
+| CT-1R1-003 | AC-1R1-003 | Relative Markdown-link scan over `AGENTS.md` and `docs/**/*.md` | All local links resolve | 26 local links checked; zero missing targets | PASS |
+| CT-1R1-004 | AC-1R1-004 | Read-only review of `SOLUTION_ARCHITECTURE.md` §5 and this precheck's MySQL evidence | Distinguish active SQLite config, client version, running server executable, and SQL-reported server version | Architecture records SQLite; listener and `mysqld` executable 5.7.39; SQL-reported version remains unestablished after access denied | PASS |
+| CT-1R1-005 | AC-1R1-005 | Cross-reference/content check of `SOLUTION_ARCHITECTURE.md` §9 and this precheck | Preserve six moderate findings and point to detailed advisory evidence; no dependency update | Six moderate groups remain documented; architecture points here; no dependency/runtime change | PASS |
+| CT-1R1-006 | AC-1R1-006 | Read-only JSON/config inspection of `app/config/config.json`, both SQLite connection files, `app/config/routes.json`, package manifest, and status register | Port and GUI baseline unchanged; Development remains SQLite; future packages remain NOT_STARTED; no runtime/config/dependency changes | Port 3002; SQLite `/db/db_dev.sqlite3`; 15 configured routes; GUI baseline `CLOSED_PASS`; all 2A–18G remain `NOT_STARTED`; diff paths are only `AGENTS.md` and `docs/` | PASS |
+| CT-1R1-007 | AC-1R1-007 | `git diff --cached --check`; changed-path and targeted secret/private-data scan | Documentation-only diff; no credentials, identity data, or private secrets | Clean diff check; 10 changed paths are `AGENTS.md`/`docs/`; private-key, AWS/GitHub token, credential-assignment and connection-URI patterns each returned zero | PASS |
+
 ## Outstanding items for independent review
 
-1. Supply the approved Option C policy/source and version, or an authorized written mapping from it to the general workflow already recorded. Keep LP-013 open until the risk/authority matrix is approved.
-2. Review the proposed IVP boundary as architecture only; require a later approved baseline and extraction/isolation evidence before claiming standalone readiness.
-3. Correct or date-scope the stale MySQL server statement and the dependency-detail cross-reference in a separately reviewed documentation update.
-4. Obtain a tracked, Wappler-approved lockfile/dependency baseline and assess the fixes without changing Wappler-managed packages in this review.
-5. Approve a non-production MySQL target and verify Wappler/driver/server compatibility through Wappler GUI before any database migration work.
-6. Preserve GUI acceptance as owner-reviewed and do not mark Stage 1 CLOSED_PASS. Stage 2 remains unstarted.
+1. Government operational-policy approval for LP-013 remains pending. Keep risk classifications advisory and do not activate automated decision behavior until approved rules, authority, and tests exist.
+2. Obtain a tracked, Wappler-approved lockfile/dependency baseline and assess fixes in a separate approved dependency package; no Wappler-managed packages were changed in R1.
+3. Approve a non-production MySQL target and verify Wappler/driver/server compatibility through Wappler GUI before any database migration work.
+4. Review the proposed IVP boundary as architecture only; require a later approved baseline and extraction/isolation evidence before claiming standalone readiness.
+5. Keep Stage 1 `DEVELOPMENT_COMPLETE` pending final owner review; do not mark `CLOSED_PASS`. Stage 2 remains unstarted.
 
-**Final precheck recommendation: BLOCKED.** The documentation is substantially traceable and internally consistent, but the specific Option C acceptance criterion is unverifiable from the approved project record. This report does not close Stage 1 or authorize Stage 2.
+**R1 remediation recommendation:** Ready for final owner review of Stage 1 documentation. This is not a Stage 1 closure decision. Stage 1 remains `DEVELOPMENT_COMPLETE`; LP-013 government approval, dependency remediation, and MySQL compatibility remain outstanding, and Stage 2 is not authorized by this precheck.

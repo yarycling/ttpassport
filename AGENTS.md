@@ -183,6 +183,8 @@ Keep these IDs/concepts distinct: `citizen_account`, `applicant_profile`, `passp
 - Approval, production, legal issuance, release and physical delivery confirmation are separate operations and permissions.
 - Overseas mission users see only assigned/jurisdiction-authorised data. Access must be reevaluated after office transfers.
 - Recommenders, guardians and authorised recipients must authenticate/verify **as themselves** and cannot be impersonated by the applicant.
+- Apply the owner-confirmed design policy `TTP-APPROVAL-OPTION-C` version 1.0 for risk-based review: R0 routine, R1 correction required, R2 enhanced review, and R3 security hold. This is a project design decision only; Government operational-policy approval for classification triggers, delegation, specialist authority and detailed rules remains pending. Do not activate automated approval or rejection logic before applicable official rules are approved and implemented.
+- R0 approval requires every mandatory verification and eligibility gate to pass. R2 final decision must be made by an authorised person different from the original recommending/reviewing officer. R3 suspends affected approval, production and release actions until designated specialist authority resolves it. Classification alone is not rejection; rejection needs an authorised decision and documented legal/policy basis. See [`docs/governance/APPROVAL_POLICY_OPTION_C.md`](docs/governance/APPROVAL_POLICY_OPTION_C.md).
 - High-risk actions require fresh authentication/step-up as approved; do not expose privileged APIs using only weak email OTP.
 - All authorisation and denied-access behaviour must be covered by negative API tests, including altered object IDs and cross-office/cross-tenant attempts.
 

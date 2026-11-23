@@ -76,12 +76,17 @@ These are distinct decisions and records. Account login, OCR extraction, face si
 
 ## 8. Risk-based approval
 
-1. Approved policy classifies routine, enhanced-review, or security-hold paths using authorized evidence and configured policy version.
-2. Routine case is approved only by a currently authorized officer after all mandatory checks pass.
-3. Enhanced case is independently decided by a different authorized officer than the recommender/reviewer.
-4. Security hold is an independent blocking flag; only designated authority can clear it.
+This workflow follows the owner-confirmed **Option C — Risk-Based Approval** design, policy `TTP-APPROVAL-OPTION-C` version 1.0. Its Government operational-policy approval remains pending; see [`../governance/APPROVAL_POLICY_OPTION_C.md`](../governance/APPROVAL_POLICY_OPTION_C.md) and LP-013.
 
-**Stops/controls:** No invented score/threshold. Policy/source unavailable means hold or review. Approval does not issue or release a passport.
+1. An authorised officer classifies the case as R0 (Routine), R1 (Correction Required), R2 (Enhanced Review), or R3 (Security Hold) under the applicable approved policy version. Detailed triggers and thresholds remain subject to Government approval.
+2. R0 may be approved by one appropriately authorised officer only after every mandatory verification and eligibility gate passes.
+3. R1 requests missing or correctable information before a decision; it is not a rejection.
+4. R2 requires an independent final decision by an authorised person different from the original recommending/reviewing officer.
+5. R3 suspends affected approval, production, and release actions until designated specialist authority resolves the hold. The hold remains an independent blocking condition.
+6. A classification does not itself reject an application. Rejection requires an authorised decision and a documented legal/policy basis.
+7. Application approval, passport issuance, and release remain separately controlled; a technical administrator does not gain legal issuance authority by virtue of an administrative role.
+
+**Stops/controls:** Do not activate automated approval or rejection logic until the applicable official rules are approved and implemented. Policy/source unavailable means hold or review. Approval does not issue or release a passport.
 
 ## 9. Rejection and reconsideration
 

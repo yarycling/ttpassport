@@ -5,7 +5,7 @@
 **Baseline date:** 22 November 2026
 **Status:** Requirements baseline drafted; owner and government validation pending
 
-Requirements below describe intended capabilities, not approved legal rules or implemented behavior. Package mappings use stable stage/package IDs from [`../PROJECT_ROADMAP.md`](../PROJECT_ROADMAP.md). Detailed per-package titles are used only where the owner supplied them for Stage 1.
+Requirements below describe intended capabilities, not approved legal rules or implemented behavior. Package mappings use stable stage/package IDs and owner-supplied planning titles from [`../PROJECT_ROADMAP.md`](../PROJECT_ROADMAP.md). Package titles do not authorize implementation.
 
 | ID | Requirement | Roadmap mapping | Acceptance evidence / caveat |
 |---|---|---|---|
@@ -28,7 +28,7 @@ Requirements below describe intended capabilities, not approved legal rules or i
 | BR-017 | Staff access shall require an approved Wappler Security Provider and server-side role, office/mission jurisdiction, assignment, workflow-state and policy checks. | 7A–7J, 15A–15H | Hiding UI controls is insufficient; role/office/IDOR negative tests required |
 | BR-018 | Administrator, Supervisor and Staff shall be primary back-office categories with granular permissions assigned separately. | 7A–7J | Approved privilege matrix and independent controls required |
 | BR-019 | Supervisors shall be able to manage authorised office queues and case assignments; staff shall handle assigned work only. | 7A–7J | Assignment concurrency and audit tests required |
-| BR-020 | The workflow shall support routine cases, enhanced review, security holds and independent decision-maker controls. | 7A–7J, 15A–15H | Risk policy and authority matrix pending; no invented risk thresholds |
+| BR-020 | The workflow shall support routine cases, enhanced review, security holds and independent decision-maker controls. | 7A–7J, 15A–15H | Owner-confirmed Option C design policy `TTP-APPROVAL-OPTION-C` v1.0; Government approval of categories, triggers, thresholds and delegated authority remains pending. See [`../governance/APPROVAL_POLICY_OPTION_C.md`](../governance/APPROVAL_POLICY_OPTION_C.md) and LP-013. |
 | BR-021 | Corrections, rejection, reconsideration and any appeal shall be distinct workflow outcomes with approved notice and authority. | 5A–5K, 7A–7J | No universal appeal right or rejection basis assumed |
 | BR-022 | Payment timing, fees, exemptions, refunds and settlement shall be policy-configured, effective-dated and auditable. | 8A–8H | Provider and government fee rules unconfirmed; no live transactions |
 | BR-023 | Browser redirects shall not be treated as proof of payment; approved provider callbacks/reconciliation shall be authenticated and idempotent. | 8A–8H, 14A–14G | Provider contract and sandbox required |
