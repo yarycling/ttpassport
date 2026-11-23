@@ -1,0 +1,41 @@
+# TTP-01A-01H Command and Configuration Test Record
+
+**Package:** TTP-01A-01H — Stage 1A–1H documentation and technical foundation<br>
+**Test date:** 22 November 2026<br>
+**Environment:** macOS local workspace; Wappler 7.9.9 (previously verified in GUI-BASELINE-01B), Node v23.6.0, npm 10.9.2, Development target `http://localhost:3002/`, SQLite configured; no MySQL server version established<br>
+**Repository:** `main`; base commit `8c38241`; origin/main matched at inspection
+
+Tests were run against the local documentation, scaffold configuration and existing Development app. No database, migration, Server Connect action, authentication, identity/eKYC, payment, passport or courier workflow was created or tested.
+
+## Acceptance and command evidence
+
+| Test ID | Acceptance ID | Environment | Command / method | Expected | Actual | Result | Evidence path |
+|---|---|---|---|---|---|---|---|
+| CT-1A-001 | AC-1A-001 | Local repository | Node file/content review of `docs/project/PROJECT_CHARTER.md` | Charter documents purpose, intended operator, scope, exclusions, confirmed decisions and pending approvals | Charter exists and includes the requested scope and approval boundary | PASS | `docs/project/PROJECT_CHARTER.md` |
+| CT-1B-001 | AC-1B-001 | Local repository | `node` Stage 1 content/count assertions | Stable requirements map to roadmap packages | 32 unique BR rows; mappings use stable stage/package IDs | PASS | `docs/requirements/BUSINESS_REQUIREMENTS.md` |
+| CT-1C-001 | AC-1C-001 | Official Government sources reviewed on 2026-11-22 | Open Immigration Division forms page and linked adult form/instructions; Node field-row count | Use current official source; map form fields, conditionality, validation proposal, evidence/check and owner | Linked official 4-page adult form and 2026 2-page instructions reviewed; 133 field rows; unmarked requiredness explicitly left pending | PASS | `docs/requirements/PASSPORT_FORM_MAPPING.md` |
+| CT-1D-001 | AC-1D-001 | Local repository | `node` Stage 1 content/count assertions | Document all 15 requested workflows and separate verification/eligibility/approval/issuance/release/delivery | 15 workflow sections present; outcome separation is explicit | PASS | `docs/architecture/BUSINESS_WORKFLOWS.md` |
+| CT-1E-001 | AC-1E-001 | Local repository | `node` Stage 1 content/count assertions | Identify legal, privacy, identity, remote service, payment, issuance and delivery decisions | 20 open legal/policy dependencies recorded; in-person appointment constraint documented | PASS | `docs/governance/LEGAL_AND_POLICY_DEPENDENCIES.md` |
+| CT-1F-001 | AC-1F-001 | Local repository | `node` Stage 1 content/count assertions; scan integration register | Register external candidates, owner, interface, security, availability and state | 10 candidates documented; no provider endpoint invented; no NOBIS integration listed | PASS | `docs/integrations/INTEGRATION_REGISTER.md` |
+| CT-1G-001 | AC-1G-001 | Local scaffold | Node JSON/config/route assertion against `.wappler/project.json`, `app/config/config.json`, `app/config/routes.json`, and database connection files | Config parses; port and current DB are accurately reported; all routes resolve | JSON valid; Development target and runtime remain port 3002; SQLite path/client unchanged; 15 unique routes and referenced views/layouts exist | PASS | `docs/architecture/SOLUTION_ARCHITECTURE.md` |
+| CT-1G-002 | AC-1G-001 | Local scaffold | Source/config inspection; `npm ls mysql2 mysql --depth=2` | Record database and Server Connect facts without inventing connectivity | SQLite configured; ignored DB file absent; no Server Connect business actions or Security Providers; no MySQL driver/server evidence. DB connectivity and migrations were not attempted under scope | BLOCKED BY SCOPE | `docs/architecture/SOLUTION_ARCHITECTURE.md` |
+| CT-1H-001 | AC-1H-001 | Local repository | Node Stage 1 content/count assertions | Track exactly 150 roadmap package IDs and required register fields | 150 IDs in both master register and status snapshot; Stage 1 titles only; future titles/criteria not inferred | PASS | `docs/project/MASTER_DEVELOPMENT_REGISTER.md`; `docs/project/PROJECT_STATUS.md` |
+| CT-1H-002 | AC-1H-001 | Local repository | Node Markdown relative-link checker over `docs/**/*.md` | All local documentation links resolve | 12 Markdown files checked; 19 local links; zero missing targets | PASS | `docs/evidence/TTP-01A-01H/command-test-record.md` |
+| CT-1H-003 | AC-1G-001 | Existing local Development app on port 3002 | Node `fetch` loop using `app/config/routes.json` against `http://127.0.0.1:3002` | All 15 configured screens return HTTP 200 | 15/15 routes returned HTTP 200 | PASS | `docs/evidence/TTP-01A-01H/command-test-record.md` |
+| CT-1H-004 | AC-1G-001 | Existing local Development app | `ps -p 83715`; inspect process cwd; Node route smoke; cross-reference `CT-GUI-BASELINE-01B-001` fresh `npm start` record | Application starts on configured port and serves screens | Current process is `node ./index.js` from this workspace; all 15 routes return 200. Prior fresh `npm start` with no port override is recorded PASS at port 3002. This package did not restart an already-running server | PASS | `docs/evidence/GUI-BASELINE-01B/startup-config-check.txt`; `docs/evidence/TTP-01A-01H/command-test-record.md` |
+| CT-1H-005 | AC-1G-001 | Local Git worktree | `git status --short`; `git diff HEAD -- public/dmxAppConnect public/bootstrap/5` | Only intended documentation changes; protected generated runtimes remain unchanged | Every changed/untracked path is under `docs/`; protected App Connect and Bootstrap files have no diff; port/database configuration unchanged | PASS | `docs/evidence/TTP-01A-01H/command-test-record.md` |
+| CT-1H-006 | AC-1H-001 | Local Git worktree | `git ls-files` sensitive-path scan; staged-path and literal-secret review before commit | No credentials, citizen data, private DB/storage or key files committed | No tracked `.env`, key/certificate, DB, upload, storage or citizen-data files; staged diff reviewed before commit | PASS | `docs/evidence/TTP-01A-01H/command-test-record.md` |
+| CT-1H-007 | AC-1G-001 | Installed npm tree; temporary audit directory, no repository files written | `npm audit --json` using temporary copy of `package.json` and `node_modules/.package-lock.json` | Dependency advisories are identified for owner review; zero findings would be needed for a clean audit | npm audit exited 1 and reported 6 moderate findings: `archiver@7.0.1`, `archiver-utils@5.0.2`, `glob@10.5.0`, `minimatch@9.0.9` and `10.2.6`, `nodemon@3.1.14`, and `zip-stream@6.0.1`; no high/critical findings. `archiver` fix path requires major v8 | FAIL — advisories found | `docs/evidence/TTP-01A-01H/command-test-record.md` |
+
+## GUI baseline acceptance
+
+Human visual acceptance is `PASS / CLOSED` for GUI-BASELINE-01 and GUI-BASELINE-01B, supplied by the owner on 22 November 2026. The 15-screen baseline, branding, responsive checks, Wappler Design-view check, and port 3002 are recorded in `docs/GUI_BASELINE_01.md` and `docs/evidence/GUI-BASELINE-01B/`. That acceptance does not approve backend or production behavior.
+
+## Outstanding test and approval items
+
+- Owner technical review of Stage 1 deliverables is pending. Stage 2A is not started.
+- The current Development SQLite file is absent/ignored; no database schema or business query exists. Database connectivity, migrations, transaction and concurrency tests are not applicable until a non-production DB baseline is approved.
+- No backend Security Provider, role/office/tenant authorization, Server Connect action, IVP, payment, production/issuance or fulfilment API exists to test.
+- The public repository has no tracked package lock. The advisory audit used installed hidden lock metadata in a temporary directory; review the findings with a reproducible lockfile and approved dependency remediation. No package was upgraded.
+- Current official instructions require an in-person appointment. Any remote substitute, electronic signature, biometric method, or online legal completion requires government/legal approval.
+- Government sources, data sharing, legal powers, provider contracts, office capabilities, privacy/retention, hosting and cross-border handling remain open as recorded in the Stage 1 registers.

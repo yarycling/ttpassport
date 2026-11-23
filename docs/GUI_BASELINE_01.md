@@ -1,10 +1,17 @@
 # GUI-BASELINE-01 — Build and Test Record
 
-**Status:** `UAT_PENDING`  
-**Baseline:** `CODEX_GUI_BUILD_PROMPT.md`, 22 November 2026  
+**Status:** `CLOSED / PASS`<br>
+**Baseline:** `CODEX_GUI_BUILD_PROMPT.md`, 22 November 2026<br>
 **Scope:** GUI presentation only. No passport processing, identity verification, payment, approval, issuance, fulfilment or production deployment.
 
-**Latest package update:** `GUI-BASELINE-01B` — Government branding, GitHub configuration and Wappler port. Human GUI acceptance remains `UAT_PENDING`.
+**Latest package update:** `GUI-BASELINE-01B` — Government branding, GitHub configuration and Wappler port. The human owner confirmed visual acceptance on 22 November 2026; both GUI baseline packages are `CLOSED / PASS`.
+
+## Owner acceptance record
+
+| Baseline | Status | Human visual acceptance | Accepted port | Screens |
+|---|---|---|---:|---:|
+| GUI-BASELINE-01 | CLOSED / PASS | PASS — owner confirmation supplied 22 November 2026 | 3002 | 15 |
+| GUI-BASELINE-01B | CLOSED / PASS | PASS — owner confirmation supplied 22 November 2026 | 3002 | 15 |
 
 ## G0 — Scaffold audit
 
@@ -96,7 +103,7 @@ No asset, package manifest, database, Wappler runtime or Bootstrap distribution 
 | CT-GUI-BASELINE-01-009 | GUI-AC-010, 011 | Browser viewport and DOM checks for all 15 routes at 1440, 1024, 768 and 375 px | No page-level overflow, duplicate IDs or unlabeled controls | 60 route/viewport checks; zero horizontal overflow. At 375 px, zero duplicate IDs and zero unlabeled form controls. Back-office scope control is labeled and active nav updates. Keyboard Tab focuses the skip link with a visible 3px outline; mobile nav opens and reports `aria-expanded=true`. | PASS |
 | CT-GUI-BASELINE-01-010 | GUI-AC-010, 011 | Browser console errors/warnings at port 55362 | No page errors during preview checks | No warnings or errors reported | PASS |
 | CT-GUI-BASELINE-01-011 | GUI-AC-008 | Inspect staff routes and configured Wappler security | Staff interface is protected or isolated to Development | Routes are explicitly under `/design-preview/backoffice/`; they render only empty/static UI, with no live data or actions. No Security Provider or route restriction exists, and the route file is not target-gated. | BLOCKED before any production/public target |
-| CT-GUI-BASELINE-01-012 | GUI-AC-004 | Wappler visual editor check | Target project opens and remains GUI-maintainable in Wappler | The installed Wappler 7.9.9 UI was open to `secretangel`, not TTPASSPORT. Browser checks confirmed the target Node renderer and App Connect runtime, but the target project was not opened in the visual designer. | BLOCKED/PENDING |
+| CT-GUI-BASELINE-01-012 | GUI-AC-004 | Wappler visual editor check | Target project opens and remains GUI-maintainable in Wappler | At the original check, Wappler was open to another project; the later GUI-BASELINE-01B Design-view check passed for TTPASSPORT. | BLOCKED at original check; superseded by CT-GUI-BASELINE-01B-006 |
 
 The project currently has no `test` script in `package.json`; no database or Server Connect business tests apply to this GUI-only slice. No actual GUI acceptance is claimed by these browser checks.
 
@@ -107,14 +114,14 @@ The project currently has no `test` script in `package.json`; no database or Ser
 | GUI-AC-001 | PASS | Shared crimson, gold, ivory and charcoal tokens. |
 | GUI-AC-002 | PASS | Selected hero asset visibly renders behind live HTML. |
 | GUI-AC-003 | PASS | Shared masthead, navigation, footer and office sidebar partials. |
-| GUI-AC-004 | PASS / Wappler editor pending | Existing EJS/layout/routes conventions and App Connect runtime retained; Wappler GUI session was on a different project. |
+| GUI-AC-004 | PASS | Existing EJS/layout/routes conventions and App Connect runtime retained; GUI-BASELINE-01B later confirmed the project opens in Wappler Design view. |
 | GUI-AC-005 | PASS | Implemented pages link to real preview routes; renewal is plainly planned/unavailable. |
 | GUI-AC-006 | PASS | Nine-stage wizard, labels, guidance, disabled save, and functional App Connect step switching. |
 | GUI-AC-007 | PASS | Back-office nav contains passport functions only. |
 | GUI-AC-008 | BLOCKED for future deployment | Static previews contain no real records/actions, but there is no route-level Development-only gate or staff security provider. Exclude or gate these routes before any production/public target. |
 | GUI-AC-009 | PASS | eKYC visuals show “Not assessed/Not connected”; no camera, evidence upload or verification claim works. |
 | GUI-AC-010 | PASS | All 15 screens tested at 1440, 1024, 768 and 375 px without page overflow. |
-| GUI-AC-011 | PASS / owner visual review pending | Labels, focus ring, skip link and mobile navigation were checked; contrast, zoom and usability still need owner review. |
+| GUI-AC-011 | PASS | Labels, focus ring, skip link and mobile navigation were checked; the human owner accepted the visual baseline on 22 November 2026. |
 | GUI-AC-012 | PASS | Selected assets return successfully; no generated runtime or Bootstrap files changed. |
 | GUI-AC-013 | PASS | No API, authentication, schema, payment, identity, approval, issuance or courier workflow added. |
 | GUI-AC-014 | PASS | This report and the owner checklist are in `docs/`. |
@@ -134,11 +141,11 @@ For GUI-BASELINE-01, the original three-file snapshot was kept in the local temp
 
 ## Next step
 
-Owner GUI review only. Use `docs/GUI_REVIEW_CHECKLIST_GUI_BASELINE_01.md`; report visual GUI acceptance as `PASS` or `FAIL`. Do not start backend modules automatically.
+The human owner accepted both GUI baseline packages on 22 November 2026. The review checklist is retained as scope evidence. Backend security, legal, integration and production acceptance remain open and are tracked separately.
 
 ## GUI-BASELINE-01B — Government branding, GitHub configuration and Wappler port
 
-**Package status:** `UAT_PENDING`  
+**Package status:** `CLOSED / PASS`<br>
 **Scope:** preserve the existing 15-screen GUI, add owner-supplied government branding, configure the existing Wappler Development target for port `3002`, publish the project baseline to the owner-specified public repository, and update the owner review instructions. No backend passport workflow was added.
 
 ### Changes
@@ -193,11 +200,11 @@ Owner GUI review only. Use `docs/GUI_REVIEW_CHECKLIST_GUI_BASELINE_01.md`; repor
 | `AC-GUI-BASELINE-01B-004` | PASS | Responsive, no-overflow and App Connect interaction checks passed; browser console showed no new errors during checked flows. |
 | `AC-GUI-BASELINE-01B-005` | PASS | TTPASSPORT home rendered in Wappler `7.9.9` Design view with App Connect inspector available. |
 | `AC-GUI-BASELINE-01B-006` | PASS | Public GitHub baseline was audited, committed on `main` and pushed to the requested origin. |
-| `AC-GUI-BASELINE-01B-007` | PENDING | Human GUI review and explicit owner acceptance remain outstanding. |
+| `AC-GUI-BASELINE-01B-007` | PASS | Human owner confirmed GUI acceptance on 22 November 2026, as recorded in the owner-provided TTP-01A-01H request. |
 
-### Outstanding issues and owner review
+### Outstanding issues after owner acceptance
 
-- GUI acceptance remains `UAT_PENDING`; owner review is required using [`GUI_REVIEW_CHECKLIST_GUI_BASELINE_01.md`](GUI_REVIEW_CHECKLIST_GUI_BASELINE_01.md).
+- Human GUI acceptance is `CLOSED / PASS` for both `GUI-BASELINE-01` and `GUI-BASELINE-01B`. The owner confirmation is recorded as supplied on 22 November 2026; this repository does not contain an independently signed acceptance artifact.
 - Existing GUI-AC-008 remains a deployment blocker: the static back-office preview routes have no staff authentication or Development-only route gate. Keep this local preview on `localhost`; do not deploy or expose it publicly.
 - The whole-tree whitespace audit remains non-blocking; it flags existing Wappler source whitespace and Markdown hard-break formatting. The 01B runtime config, theme and shared partial changes pass the scoped check.
 - No passport processing, eKYC, payment, approval, issuance, fulfilment or production deployment work was performed.

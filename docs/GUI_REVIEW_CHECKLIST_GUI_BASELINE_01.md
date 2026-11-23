@@ -1,13 +1,15 @@
 # GUI-BASELINE-01 — Owner GUI Review Checklist
 
-**Human GUI acceptance:** `PENDING`  
-**Latest update:** `GUI-BASELINE-01B` — government branding and port 3002  
-**Review URL:** [Citizen home preview](http://localhost:3002/)  
+**Human GUI acceptance:** `PASS — CLOSED`<br>
+**Accepted:** `22 November 2026` — owner confirmation recorded in the TTP-01A-01H request<br>
+**Accepted baseline:** `GUI-BASELINE-01` and `GUI-BASELINE-01B`; 15 screens; Development port `3002`<br>
+**Latest update:** `GUI-BASELINE-01B` — government branding and port 3002<br>
+**Review URL:** [Citizen home preview](http://localhost:3002/)<br>
 **Target behavior:** visual acceptance only. Do not use real credentials, identity details or documents in these UI-only pages.
 
 ## GUI-BASELINE-01B — Branding and port review
 
-Please review these additions alongside the original 12 GUI scenarios below. Leave final acceptance as `PENDING` until you have completed your review and report `PASS` or `FAIL`.
+The human owner has accepted these additions and the original GUI scenarios below. This checklist is retained as a record of reviewed scope; no GUI acceptance action remains open for this baseline.
 
 1. At [http://localhost:3002/](http://localhost:3002/), confirm the 2025 Coat of Arms displays at a clear size in the shared government masthead, with its proportions preserved and no clipping or pixelation.
 2. Open a citizen screen and a back-office preview screen. Confirm both use the same government masthead and the footer emblem is legible against its backing.
@@ -15,7 +17,7 @@ Please review these additions alongside the original 12 GUI scenarios below. Lea
 4. Confirm the homepage and a direct nested route such as `http://localhost:3002/citizen/apply/first-time` load after restarting the local Development app.
 5. Confirm the existing preview warning remains clear and that no credential, application, verification or payment action is enabled.
 
-Please review these 12 scenarios and report `PASS` or `FAIL` with notes:
+Reviewed GUI scenarios (the owner accepted the baseline as a whole):
 
 1. At 1440 px, confirm the shared masthead, preview label, owner-supplied Coat of Arms and public navigation are legible.
 2. At 1440 px, confirm the selected hero asset, editable heading and CTAs do not overlap the passport/skyline artwork.
