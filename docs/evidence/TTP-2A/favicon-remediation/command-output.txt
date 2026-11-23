@@ -1,0 +1,11 @@
+PASS shared layout favicon registration: views/layouts/main.ejs
+PASS shared layout favicon registration: views/layouts/backoffice.ejs
+PASS configured routes and rendered page/layout resources: 15/15 HTTP 200; favicon registered in every response
+PASS static resource /favicon.ico: 200 image/vnd.microsoft.icon
+PASS static resource /dmxAppConnect/dmxAppConnect.js: 200 text/javascript; charset=utf-8
+PASS static resource /dmxAppConnect/dmxRouting/dmxRouting.js: 200 text/javascript; charset=utf-8
+PASS static resource /bootstrap/5/css/bootstrap.min.css: 200 text/css; charset=utf-8
+PASS static resource /bootstrap/5/js/bootstrap.bundle.min.js: 200 text/javascript; charset=utf-8
+PASS static resource /assets/ttpassport/css/ttpassport-theme.css: 200 text/css; charset=utf-8
+PASS static resource /assets/branding/coat-of-arms-trinidad-and-tobago-2025.webp: 200 image/webp
+PASS Wappler metadata/config preserved: port 3002; runtime capacitor unchanged

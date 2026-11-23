@@ -1,0 +1,22 @@
+PASS route /: HTTP 200; shared favicon link present
+PASS route /account/sign-in: HTTP 200; shared favicon link present
+PASS route /account/register: HTTP 200; shared favicon link present
+PASS route /account/verify-email: HTTP 200; shared favicon link present
+PASS route /account/forgot-password: HTTP 200; shared favicon link present
+PASS route /account/reset-password: HTTP 200; shared favicon link present
+PASS route /citizen/dashboard: HTTP 200; shared favicon link present
+PASS route /citizen/apply/first-time: HTTP 200; shared favicon link present
+PASS route /citizen/track: HTTP 200; shared favicon link present
+PASS route /design-preview/backoffice/overview: HTTP 200; shared favicon link present
+PASS route /design-preview/backoffice/applications: HTTP 200; shared favicon link present
+PASS route /design-preview/backoffice/review: HTTP 200; shared favicon link present
+PASS route /design-preview/backoffice/administration: HTTP 200; shared favicon link present
+PASS route /verification/preview: HTTP 200; shared favicon link present
+PASS route /verification/preview/review: HTTP 200; shared favicon link present
+PASS configured routes and shared favicon registration: 15/15 HTTP 200
+PASS HTTP favicon: 200 image/vnd.microsoft.icon; 15086 bytes
+PASS browser-served favicon bytes match public/favicon.ico
+PASS ICO directory: [{"width":16,"height":16,"bits":32,"png":false,"colorType":null},{"width":32,"height":32,"bits":32,"png":false,"colorType":null},{"width":48,"height":48,"bits":32,"png":false,"colorType":null}]; sizes 16/32/48, 32-bit alpha-capable images
+PASS approved 2025 source artwork alpha metadata: WebP 1280x1248; hasAlpha=yes
+PASS ICO pixel alpha data verified: 16x16 transparent=30/256; 32x32 transparent=229/1024; 48x48 transparent=603/2304; each includes alpha values 0..255
+PASS retest screenshot dimensions: home and backoffice-review captures are exactly 1440x900 and 375x900
