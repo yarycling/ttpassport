@@ -1,0 +1,15 @@
+Stage 2B MySQL Test and Development service states after rollback check:
+/ttp2b-mysql-test running=false
+/ttp2b-mysql-development running=false
+
+Wappler config check:
+PASS Wappler port 3002, SQLite connection db, and all 15 accepted routes/layouts are unchanged.
+
+Development HTTP check:
+http://127.0.0.1:3002/ HTTP 200
+
+Application dependency and active connection status:
+PASS package manifest, SQLite connection, target connection, app port and route files match the accepted baseline.
+
+MAMP listener check: preserved host service on 127.0.0.1:3306 (PID omitted).
+PASS COMMAND=mysqld, NAME=127.0.0.1:3306

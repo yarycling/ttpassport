@@ -1,0 +1,5 @@
+
+> ttpassport-stage2b-tests@1.0.0 test:security
+> node scripts/security-scan.mjs
+
+PASS scanned 111 changed/untracked files and the current diff against origin/main; no configured secret/private-file patterns found.

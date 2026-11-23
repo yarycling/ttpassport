@@ -1,0 +1,22 @@
+{
+  "name": "ttpassport-stage2b-tests",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test:gui": "playwright test",
+    "test:visual": "node gui/visual-baseline.mjs",
+    "test:db": "node database/run.mjs",
+    "test:db:driver": "node database/driver-smoke.mjs",
+    "test:api:inventory": "node api/inventory.mjs",
+    "test:config": "node scripts/config-check.mjs",
+    "test:security": "node scripts/security-scan.mjs",
+    "audit": "npm audit --json"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.65.1",
+    "mysql2": "3.24.6",
+    "pixelmatch": "^8.0.0",
+    "pngjs": "^7.0.0"
+  }
+}

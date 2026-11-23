@@ -1,0 +1,6 @@
+Compose configuration validation:
+PASS Docker Compose config parsed with external secret paths resolved.
+
+Stage 2B container isolation and preserved state:
+/ttp2b-mysql-test running=false mounts=:/docker-entrypoint-initdb.d :/run/secrets/ivp_password :/run/secrets/ivp_schema_password :/run/secrets/passport_password :/run/secrets/passport_schema_password :/run/secrets/root_client.cnf :/run/secrets/root_password :/run/secrets/root_password_for_init ttp2b-mysql-test-data:/var/lib/mysql  networks=ttp2b-mysql-test-private  host_bindings={"3306/tcp":[{"HostIp":"127.0.0.1","HostPort":"3307"}]}
+/ttp2b-mysql-development running=false mounts=:/docker-entrypoint-initdb.d :/run/secrets/ivp_password :/run/secrets/ivp_schema_password :/run/secrets/passport_password :/run/secrets/passport_schema_password :/run/secrets/root_client.cnf :/run/secrets/root_password :/run/secrets/root_password_for_init ttp2b-mysql-development-data:/var/lib/mysql  networks=ttp2b-mysql-development-private  host_bindings={"3306/tcp":[{"HostIp":"127.0.0.1","HostPort":"3308"}]}

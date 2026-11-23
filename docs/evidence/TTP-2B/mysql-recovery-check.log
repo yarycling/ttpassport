@@ -1,0 +1,7 @@
+PASS Test connection failed while only ttp2b-mysql-test was stopped
+
+> ttpassport-stage2b-tests@1.0.0 test:db
+> node database/run.mjs --connection-check-only
+
+{"serverVersion":"8.4.13","databaseName":"passport_test"}
+PASS Test service recovered and authenticated connection succeeded

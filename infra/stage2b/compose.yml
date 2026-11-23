@@ -1,0 +1,112 @@
+name: ttp2b
+
+x-mysql-common: &mysql-common
+  image: mysql:8.4.13@sha256:f4539b86c82f2c168fc95b439448bde3b9f48e8460344ce41e39081867d2b58e
+  platform: linux/arm64/v8
+  restart: "no"
+  command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_0900_ai_ci"]
+  healthcheck:
+    test: ["CMD-SHELL", "mysqladmin --silent ping --host=127.0.0.1"]
+    interval: 3s
+    timeout: 2s
+    retries: 40
+    start_period: 20s
+
+services:
+  mysql-test:
+    <<: *mysql-common
+    profiles: ["test"]
+    container_name: ttp2b-mysql-test
+    environment:
+      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/root_password
+      TTP2B_ENV_MODE: test
+    ports:
+      - "127.0.0.1:3307:3306"
+    volumes:
+      - test_data:/var/lib/mysql
+      - ./mysql-init:/docker-entrypoint-initdb.d:ro
+    secrets:
+      - source: test_root_password
+        target: root_password
+      - source: test_root_password
+        target: root_password_for_init
+      - source: test_root_client
+        target: root_client.cnf
+      - source: passport_test_password
+        target: passport_password
+      - source: ivp_test_password
+        target: ivp_password
+      - source: passport_test_schema_password
+        target: passport_schema_password
+      - source: ivp_test_schema_password
+        target: ivp_schema_password
+    networks:
+      - test_private
+
+  mysql-development:
+    <<: *mysql-common
+    profiles: ["development"]
+    container_name: ttp2b-mysql-development
+    environment:
+      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/root_password
+      TTP2B_ENV_MODE: development
+    ports:
+      - "127.0.0.1:3308:3306"
+    volumes:
+      - development_data:/var/lib/mysql
+      - ./mysql-init:/docker-entrypoint-initdb.d:ro
+    secrets:
+      - source: development_root_password
+        target: root_password
+      - source: development_root_password
+        target: root_password_for_init
+      - source: development_root_client
+        target: root_client.cnf
+      - source: passport_development_password
+        target: passport_password
+      - source: ivp_development_password
+        target: ivp_password
+      - source: passport_development_schema_password
+        target: passport_schema_password
+      - source: ivp_development_schema_password
+        target: ivp_schema_password
+    networks:
+      - development_private
+
+secrets:
+  test_root_password:
+    file: ${TTP2B_SECRETS_DIR:?Set TTP2B_SECRETS_DIR to an external, private directory}/test-root-password.txt
+  test_root_client:
+    file: ${TTP2B_SECRETS_DIR:?Set TTP2B_SECRETS_DIR to an external, private directory}/test-root-client.cnf
+  passport_test_password:
+    file: ${TTP2B_SECRETS_DIR:?Set TTP2B_SECRETS_DIR to an external, private directory}/passport-test-password.txt
+  ivp_test_password:
+    file: ${TTP2B_SECRETS_DIR:?Set TTP2B_SECRETS_DIR to an external, private directory}/ivp-test-password.txt
+  passport_test_schema_password:
+    file: ${TTP2B_SECRETS_DIR:?Set TTP2B_SECRETS_DIR to an external, private directory}/passport-test-schema-password.txt
+  ivp_test_schema_password:
+    file: ${TTP2B_SECRETS_DIR:?Set TTP2B_SECRETS_DIR to an external, private directory}/ivp-test-schema-password.txt
+  development_root_password:
+    file: ${TTP2B_SECRETS_DIR:?Set TTP2B_SECRETS_DIR to an external, private directory}/development-root-password.txt
+  development_root_client:
+    file: ${TTP2B_SECRETS_DIR:?Set TTP2B_SECRETS_DIR to an external, private directory}/development-root-client.cnf
+  passport_development_password:
+    file: ${TTP2B_SECRETS_DIR:?Set TTP2B_SECRETS_DIR to an external, private directory}/passport-development-password.txt
+  ivp_development_password:
+    file: ${TTP2B_SECRETS_DIR:?Set TTP2B_SECRETS_DIR to an external, private directory}/ivp-development-password.txt
+  passport_development_schema_password:
+    file: ${TTP2B_SECRETS_DIR:?Set TTP2B_SECRETS_DIR to an external, private directory}/passport-development-schema-password.txt
+  ivp_development_schema_password:
+    file: ${TTP2B_SECRETS_DIR:?Set TTP2B_SECRETS_DIR to an external, private directory}/ivp-development-schema-password.txt
+
+volumes:
+  test_data:
+    name: ttp2b-mysql-test-data
+  development_data:
+    name: ttp2b-mysql-development-data
+
+networks:
+  test_private:
+    name: ttp2b-mysql-test-private
+  development_private:
+    name: ttp2b-mysql-development-private

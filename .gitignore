@@ -2,6 +2,7 @@
 node_modules/
 coverage/
 *.log
+!docs/evidence/TTP-2B/*.log
 npm-debug.log*
 yarn-debug.log*
 pnpm-debug.log*
@@ -25,6 +26,12 @@ pnpm-debug.log*
 *.sqlite
 *.sqlite3
 *.db
+/tests/node_modules/
+/tests/test-results/
+/tests/playwright-report/
+/tests/.cache/
+/docs/evidence/TTP-2B/private/
+/infra/stage2b/secrets/
 
 # Wappler machine-local/cache output
 .wappler/cache/
