@@ -149,6 +149,7 @@ Owner GUI review only. Use `docs/GUI_REVIEW_CHECKLIST_GUI_BASELINE_01.md`; repor
 - The active Development target in `.wappler/project.json` points to `http://localhost:3002/`; `app/config/config.json` sets the Wappler Node runtime port to `3002`.
 - Added `.gitignore` rules for dependencies, environment secrets, keys/certificates, local databases, private uploads/storage, logs, temporary files, Wappler caches and OS detritus.
 - Opened this project in Wappler `7.9.9` Design view. The home page rendered and the App Connect inspector was available. Existing layouts, routes, Bootstrap 5 and App Connect behavior were preserved.
+- No new screens or routes were created; the existing 15-screen baseline remains in place.
 
 ### GUI-BASELINE-01B files touched
 
@@ -167,7 +168,7 @@ Owner GUI review only. Use `docs/GUI_REVIEW_CHECKLIST_GUI_BASELINE_01.md`; repor
 
 - The repository was initialized on `main` with `origin` set to `https://github.com/yarycling/ttpassport.git`. GitHub reported the repository as public and the pre-push `git ls-remote --heads origin` check returned no branches.
 - Staged files were reviewed before publication. `.env` files, credentials, private keys/certificates, database files, uploads, storage, temporary files, `node_modules` and `.DS_Store` are excluded. The staged Wappler Development database connection files contain only the SQLite client and local database path; the database itself is ignored.
-- The owner-specified initial baseline was committed and pushed to `main` without force-pushing or replacing remote history. The exact commit is in the repository history.
+- The owner-specified initial baseline was committed as `5ccaf77` and pushed to `main` without force-pushing or replacing remote history. GitHub `origin/main` was verified at the same commit after push.
 
 ### GUI-BASELINE-01B command and configuration tests
 
@@ -179,7 +180,7 @@ Owner GUI review only. Use `docs/GUI_REVIEW_CHECKLIST_GUI_BASELINE_01.md`; repor
 | `CT-GUI-BASELINE-01B-004` | `AC-GUI-BASELINE-01B-004` | Browser check of all 15 routes at 1440, 1024, 768 and 375 px | No horizontal overflow, broken images or missing emblems | 60 route/viewport checks; zero horizontal overflow, broken images or missing emblems | PASS | [`browser-check-record.txt`](evidence/GUI-BASELINE-01B/browser-check-record.txt) |
 | `CT-GUI-BASELINE-01B-005` | `AC-GUI-BASELINE-01B-004` | Browser interaction check at port 3002 | Existing App Connect wizard, review tabs and responsive navigation continue to work | Wizard advanced from stage 1 to 2; Citizenship tab showed its empty state; navigation expanded and collapsed with matching accessibility state | PASS | [`browser-check-record.txt`](evidence/GUI-BASELINE-01B/browser-check-record.txt) |
 | `CT-GUI-BASELINE-01B-006` | `AC-GUI-BASELINE-01B-005` | Wappler `7.9.9`, open TTPASSPORT `index.ejs` in Design view | Page remains editable through the installed Wappler designer | Home page rendered in Design view and the App Connect inspector showed page/layout properties | PASS | [`browser-check-record.txt`](evidence/GUI-BASELINE-01B/browser-check-record.txt) |
-| `CT-GUI-BASELINE-01B-007` | `AC-GUI-BASELINE-01B-006` | `git status`, staged path/diff review, `.gitignore` checks, GitHub repository view and `git ls-remote --heads origin` | Publish only intended source/config/assets/docs, with no secrets or private application data | Public repository was empty before first push; ignored local data was absent from staged paths; baseline push completed without force | PASS | [`git-audit-check.txt`](evidence/GUI-BASELINE-01B/git-audit-check.txt) |
+| `CT-GUI-BASELINE-01B-007` | `AC-GUI-BASELINE-01B-006` | `git status`, staged path/diff review, `.gitignore` checks, GitHub repository view and `git ls-remote --heads origin` | Publish only intended source/config/assets/docs, with no secrets or private application data | Public repository was empty before first push; ignored local data was absent from staged paths; commit `5ccaf77` was pushed without force; `origin/main` matches | PASS | [`git-audit-check.txt`](evidence/GUI-BASELINE-01B/git-audit-check.txt) |
 | `CT-GUI-BASELINE-01B-008` | `AC-GUI-BASELINE-01B-006` | `git diff --cached --check` over the full initial commit; repeat scoped to 01B config/theme/partials | No unintended trailing whitespace in the published change | Whole-tree check reports intentional Markdown hard-break spaces and trailing whitespace in existing Wappler source; the scoped 01B config/theme/partial check is clean | FAIL (non-blocking formatting audit) | [`git-audit-check.txt`](evidence/GUI-BASELINE-01B/git-audit-check.txt) |
 
 ### Acceptance status

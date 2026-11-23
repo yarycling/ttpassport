@@ -23,3 +23,9 @@ Audit results:
 - The full staged whitespace check reports trailing whitespace in existing Wappler runtime/source files and intentional Markdown hard-breaks. The scoped 01B config, theme and shared partial files pass.
 
 pre_push_audit_result=PASS (safe to publish the intended baseline)
+
+Push verification:
+baseline_commit=5ccaf77ddf52559c5230db236056376da6fda8d3
+push_command=git push --set-upstream origin main
+push_result=PASS (new branch main pushed without force)
+post_push_remote_ref=5ccaf77ddf52559c5230db236056376da6fda8d3 refs/heads/main

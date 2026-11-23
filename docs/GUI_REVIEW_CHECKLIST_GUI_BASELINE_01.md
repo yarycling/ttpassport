@@ -12,7 +12,7 @@ Please review these additions alongside the original 12 GUI scenarios below. Lea
 1. At [http://localhost:3002/](http://localhost:3002/), confirm the 2025 Coat of Arms displays at a clear size in the shared government masthead, with its proportions preserved and no clipping or pixelation.
 2. Open a citizen screen and a back-office preview screen. Confirm both use the same government masthead and the footer emblem is legible against its backing.
 3. Review the crest at 1440 px and 375 px. Confirm it remains readable on the deep-crimson theme without causing horizontal scrolling or crowding the navigation.
-4. Confirm the homepage and a direct nested route still load at `http://localhost:3002/` after restarting the local Development app.
+4. Confirm the homepage and a direct nested route such as `http://localhost:3002/citizen/apply/first-time` load after restarting the local Development app.
 5. Confirm the existing preview warning remains clear and that no credential, application, verification or payment action is enabled.
 
 Please review these 12 scenarios and report `PASS` or `FAIL` with notes:
