@@ -5,7 +5,7 @@
 **Execution date:** 22 November 2026<br>
 **Environment:** macOS; Wappler 7.9.9; Node.js v23.6.0; npm 10.9.2; Wappler Development target `http://localhost:3002/`; Firefox Responsive Design Mode and installed Wappler Design view<br>
 **Repository:** `main`; source revision at start `3389381`; package implementation/evidence commit `ef417fd`; register update commit `bffc5d2`<br>
-**Test status:** 7 PASS, 1 FAIL, 1 N/A; Stage 2A remains `TESTING`; GUI/business acceptance is pending.
+**Initial test-run status (historical):** 7 PASS, 1 FAIL, 1 N/A. The original CT-2A-005 failure is preserved below; see the dated favicon retest and owner closure addendum at the end for final dispositions.
 
 ## Scope and safety
 
@@ -13,7 +13,7 @@ Only repository orientation, documentation, acceptance records, and the tests in
 
 The installed Wappler Project Settings UI displayed project type `web`, NodeJS server model and routing handler. The Targets settings displayed the `Development` target, Usage `Development`, URL `http://localhost:3002/`, SQLite, and `/db/db_dev.sqlite3`. The Settings UI did not expose or define the `.wappler/project.json` field `runtime: "capacitor"`. Its meaning remains unconfirmed, but does not affect this package because no target or packaging setting depends on it; the field was left unchanged.
 
-## Acceptance criteria
+## Initial run acceptance criteria (historical results)
 
 | Acceptance ID | Result | Evidence / finding |
 |---|---|---|
@@ -62,11 +62,11 @@ The browser matrix used Firefox Responsive Design Mode with a verified CSS viewp
 | `/verification/preview` | PASS | PASS | PASS | PASS | `verification-capture-1440.png`, `verification-capture-375.png` |
 | `/verification/preview/review` | PASS | PASS | PASS | PASS | `verification-review-1440.png`, `verification-review-375.png` |
 
-All 30 screenshots are in `docs/evidence/TTP-2A/screenshots/`. The four back-office screens are visual design previews only. These checks do not constitute a WCAG conformance audit or human GUI/business acceptance. Human acceptance remains `PENDING`.
+All 30 screenshots are in `docs/evidence/TTP-2A/screenshots/`. The four back-office screens are visual design previews only. These checks do not constitute a WCAG conformance audit. At the time of this initial test run, human GUI/business acceptance remained PENDING; the later owner closure addendum supersedes that state.
 
-## Known blocker and disposition
+## Original blocker observed in the initial run
 
-The browser automatically requests `/favicon.ico`; no such file exists and the local app returns HTTP 404. The request is not an application route defined in `app/config/routes.json`, and the defect is visible in Firefox's request console. The approved 2A implementation scope does not include favicon artwork or GUI/static asset changes. No asset or route was added to avoid silently expanding that approved scope or changing the accepted GUI. Resolve this through a separately approved narrow change or owner-confirmed scope update, then rerun CT-2A-005. No other in-scope defect was found.
+During the initial run, the browser automatically requested `/favicon.ico`; no such file existed and the local app returned HTTP 404. This original finding is preserved in CT-2A-005 above. It was subsequently resolved under the separate, limited authorization TTP-2A-FIX-01. The successful retest and final disposition are recorded in the dated retest and owner closure addendum below. No other in-scope defect was found.
 
 ## Validation iteration note
 
@@ -74,10 +74,28 @@ The first CT-2A-003 check used an incorrect harness assumption that the applicat
 
 ## Rollback and acceptance state
 
-This package has no database or data rollback. The code/doc delta is reviewable and may be reversed with `git revert <package-commit>`; do not force-push or rewrite history. Stage 1A–1H remain `CLOSED_PASS` for owner-accepted documentation, requirements, architecture and governance-register deliverables dated 22 November 2026. LP-013 and other legal/government, biometric, integration and security dependencies remain open. Stage 2A remains `TESTING`, not `CLOSED_PASS`; final owner GUI/business acceptance is pending. Stage 2B is not started or authorized.
+This package has no database or data rollback. The code/doc delta is reviewable and may be reversed with git revert of the package commit; do not force-push or rewrite history. At the time this initial test record was prepared, Stage 2A remained in testing and owner acceptance was pending. The later owner closure addendum below supersedes that status. Stage 1A–1H remain CLOSED_PASS for owner-accepted documentation, requirements, architecture and governance-register deliverables dated 22 November 2026. LP-013 and other legal/government, biometric, integration and security dependencies remain open. Stage 2B remains unstarted and unauthorized.
 
 A supplementary register check initially used a narrow package-letter regular expression that omitted valid roadmap suffixes I–L, and a literal check required the exact phrase “LP-013 remains open.” The corrected checker accepts the roadmap's full letter range and verifies the actual status meaning (“LP-013 is not closed” / dependencies remain open). It then confirmed 150 identical IDs/titles and all eight Stage 1 `CLOSED_PASS` records in both registers. These were checker assumptions, not repository discrepancies.
 
 ## Supplemental disposition — favicon remediation
 
-The tables and CT-2A-005 failure above are preserved as the original Stage 2A test run. The authorized correction `TTP-2A-FIX-01` and dated retest are recorded separately in [`favicon-remediation/RETEST_2026-11-22.md`](favicon-remediation/RETEST_2026-11-22.md). The retest passed CT-2A-005 across all 15 routes at 1440, 1024, 768 and 375 px; CT-2A-006 visual comparison and CT-2A-009 regression checks also passed. Stage 2A is now `UAT_PENDING` for human owner acceptance and remains not `CLOSED_PASS`; Stage 2B remains unstarted.
+The tables and CT-2A-005 failure above are preserved as the original Stage 2A test run. The authorized correction TTP-2A-FIX-01 and dated retest are recorded separately in [favicon-remediation/RETEST_2026-11-22.md](favicon-remediation/RETEST_2026-11-22.md). The retest passed CT-2A-005 across all 15 routes at 1440, 1024, 768 and 375 px; CT-2A-006 visual comparison and CT-2A-009 regression checks also passed. Stage 2A subsequently received explicit owner closure approval on 2026-11-22. Final dispositions and the preserved initial failure are summarized below and in the owner closure record. Stage 2B remains unstarted.
+
+## Owner closure addendum — 2026-11-22
+
+The project owner approved Stage 2A — Project Repository and Code Structure for closure on 2026-11-22. Status is CLOSED_PASS; owner acceptance is APPROVED. The accepted Stage 2A source/evidence tip before this closure-document update is commit 07c6cb6 (07c6cb6971fae0dfad2d4b1dca51727c37a8d51d). That package state includes the accepted repository baseline, favicon correction, test evidence and UAT_PENDING record; the later owner approval supersedes the prior pending state.
+
+| Test ID | Initial run disposition | Final closure disposition | Final supporting evidence |
+|---|---|---|---|
+| CT-2A-001 | PASS | PASS | command-output.txt; README and approved Stage 2A baseline |
+| CT-2A-002 | PASS | PASS | command-output.txt; app/config/routes.json; all 15 page/layout mappings |
+| CT-2A-003 | PASS | PASS | command-output.txt; Wappler Project Settings observation and unchanged configuration evidence |
+| CT-2A-004 | PASS | PASS | command-output.txt; browser-test-summary.md; all 15 routes returned HTTP 200 on port 3002 |
+| CT-2A-005 | FAIL — implicit /favicon.ico 404 | PASS — authorized favicon retest | Original failure remains above. favicon-remediation/RETEST_2026-11-22.md, favicon-remediation/final-command-output.txt, favicon-remediation/favicon-http-headers.txt, and retest screenshots document 60/60 route/viewport combinations, icon response/MIME and browser verification. |
+| CT-2A-006 | N/A — no visual source changed in initial 2A implementation | PASS — visual comparison after favicon correction | favicon-remediation/RETEST_2026-11-22.md and favicon-remediation/screenshots/; the four matched 1440/375 public-home and back-office review captures were compared with the approved originals. |
+| CT-2A-007 | PASS | PASS | command-output.txt; targeted secret/private-data review and protected-path diff inspection |
+| CT-2A-008 | PASS | PASS | command-output.txt; route/source review; static back-office preview evidence |
+| CT-2A-009 | PASS | PASS — regression retest | favicon-remediation/final-command-output.txt; 15 route responses, shared favicon links, static resources, port/runtime and protected paths rechecked |
+
+The CT-2A-005 historical FAIL and CT-2A-006 historical N/A have not been deleted or rewritten. The authorized retest is the final disposition for those criteria. The owner closure approval does not close Stage 1 dependencies, LP-013, or authorize Stage 2B implementation or production deployment. See [OWNER_CLOSURE_ACCEPTANCE.md](OWNER_CLOSURE_ACCEPTANCE.md) for the closure summary.
