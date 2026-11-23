@@ -1,0 +1,58 @@
+
+> ttpassport-stage2b-tests@1.0.0 test:db
+> node database/run.mjs
+
+PASS passport authenticated identity — authenticated server response matches expected MySQL 8.4 database
+PASS passport principal scope — authenticated principal is the expected database-specific account
+PASS passport read-own-boundary — synthetic fixture read from assigned database
+PASS passport scoped-DML — own-database insert, update, select and delete succeeded
+PASS passport sibling-database-denial — sibling database access was denied
+PASS passport DDL-denial — runtime principal cannot create schema objects
+PASS passport account-admin-denial — runtime principal cannot create users
+PASS passport privilege-grant-denial — runtime principal cannot grant privileges
+PASS passport transaction-rollback — rolled-back synthetic row is absent
+PASS passport compatibility-types — DECIMAL, boolean, NULL, JSON, timezone and SQL mode query succeeded
+PASS ivp authenticated identity — authenticated server response matches expected MySQL 8.4 database
+PASS ivp principal scope — authenticated principal is the expected database-specific account
+PASS ivp read-own-boundary — synthetic fixture read from assigned database
+PASS ivp scoped-DML — own-database insert, update, select and delete succeeded
+PASS ivp sibling-database-denial — sibling database access was denied
+PASS ivp DDL-denial — runtime principal cannot create schema objects
+PASS ivp account-admin-denial — runtime principal cannot create users
+PASS ivp privilege-grant-denial — runtime principal cannot grant privileges
+PASS ivp transaction-rollback — rolled-back synthetic row is absent
+PASS ivp compatibility-types — DECIMAL, boolean, NULL, JSON, timezone and SQL mode query succeeded
+PASS passport Test schema-manager own-scope DDL — own database table create/alter succeeded
+PASS passport Test schema-manager sibling-scope denied — schema principal cannot create objects in sibling database
+PASS passport Test schema-manager data-access denied — schema principal has no application data read grant
+PASS IVP Test schema-manager own-scope DDL — own database table create/alter succeeded
+PASS IVP Test schema-manager sibling-scope denied — schema principal cannot create objects in sibling database
+PASS IVP Test schema-manager data-access denied — schema principal has no application data read grant
+PASS passport authenticated identity — authenticated server response matches expected MySQL 8.4 database
+PASS passport principal scope — authenticated principal is the expected database-specific account
+PASS passport read-own-boundary — synthetic fixture read from assigned database
+PASS passport scoped-DML — own-database insert, update, select and delete succeeded
+PASS passport sibling-database-denial — sibling database access was denied
+PASS passport DDL-denial — runtime principal cannot create schema objects
+PASS passport account-admin-denial — runtime principal cannot create users
+PASS passport privilege-grant-denial — runtime principal cannot grant privileges
+PASS passport transaction-rollback — rolled-back synthetic row is absent
+PASS passport compatibility-types — DECIMAL, boolean, NULL, JSON, timezone and SQL mode query succeeded
+PASS ivp authenticated identity — authenticated server response matches expected MySQL 8.4 database
+PASS ivp principal scope — authenticated principal is the expected database-specific account
+PASS ivp read-own-boundary — synthetic fixture read from assigned database
+PASS ivp scoped-DML — own-database insert, update, select and delete succeeded
+PASS ivp sibling-database-denial — sibling database access was denied
+PASS ivp DDL-denial — runtime principal cannot create schema objects
+PASS ivp account-admin-denial — runtime principal cannot create users
+PASS ivp privilege-grant-denial — runtime principal cannot grant privileges
+PASS ivp transaction-rollback — rolled-back synthetic row is absent
+PASS ivp compatibility-types — DECIMAL, boolean, NULL, JSON, timezone and SQL mode query succeeded
+PASS passport Development schema-manager own-scope DDL — own database table create/alter succeeded
+PASS passport Development schema-manager sibling-scope denied — schema principal cannot create objects in sibling database
+PASS passport Development schema-manager data-access denied — schema principal has no application data read grant
+PASS IVP Development schema-manager own-scope DDL — own database table create/alter succeeded
+PASS IVP Development schema-manager sibling-scope denied — schema principal cannot create objects in sibling database
+PASS IVP Development schema-manager data-access denied — schema principal has no application data read grant
+PASS test passport credential rejected by Development — credential/environment boundary prevented connection
+PASS Development passport credential rejected by Test — credential/environment boundary prevented connection

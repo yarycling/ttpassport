@@ -1,0 +1,4 @@
+Disposable 3000:
+PASS no HTTP listener on disposable Wappler port 3000 after stop
+Accepted app http://127.0.0.1:3002/ status=200
+PASS accepted app remains available on port 3002

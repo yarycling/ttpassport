@@ -72,3 +72,22 @@ The supplemental browser run passed all 64 cases: route inventory, each of the 1
 The first attempt to run the suite in a disposable copy omitted `playwright.config.mjs`, so Playwright had no base URL and the invocation was invalid. The config was copied into the disposable test tree and the valid rerun passed 64/64; this was a harness-staging issue, not an application failure.
 
 The Wappler connection/action files are absent from the project and Development-target files. Two unsaved Wappler editor artifacts remain open in memory and were preserved to avoid discarding that state. CT-2B-011's historical rollback record remains unchanged; final removal of those in-memory artifacts was not verified. Port 3002, the SQLite `db` connection, all 15 routes, and MAMP's 3306 listener remained available.
+
+## TTP-2B-RECOVERY-02 supplemental disposition — 2026-11-23
+
+This additional supplement preserves the Recovery 01 results and original failures. The new comparison proves the native Query Builder and a native Server Connect SQLite read work in disposable new Wappler project scenario A. It does not prove MySQL compatibility or resolve the earlier error. The root cause remains **UNCONFIRMED**. TTPPASSPORT-copy scenarios B/D are blocked by Wappler's observed five-project license limit; MySQL scenario C and Wappler credential-dependent tests were paused following a local accessibility snapshot that exposed eight synthetic Test/Development database account passwords. The owner was asked to rotate those eight principals and update the private credential files personally. Do not enter replacement passwords in chat.
+
+| Retest | Recovery 02 disposition | Evidence / reason |
+|---|---|---|
+| CT-2B-002 | BLOCKED | New Wappler/SQLite Query Builder succeeded, but native Wappler MySQL driver/dialect and MySQL query were not tested. A credential rotation is required before resuming Test database access. See [Recovery 02 test record](recovery02/RETEST_RECORD_2026-11-23.md) and [comparison matrix](recovery02/COMPARISON_MATRIX.md). |
+| CT-2B-003 | BLOCKED overall; scenario A PASS | New Wappler SQLite Query Builder and native Server Connect returned the expected synthetic row. Scenarios B–D remain blocked/unrun; `siteName=undefined`, `target=undefined` and the `track` TypeError do not prove a cause. See [comparison matrix](recovery02/COMPARISON_MATRIX.md), [SQLite observation](recovery02/WAPPLER_SQLITE_SUCCESS_OBSERVATION.txt), and historical [redacted log](recovery02/WAPPLER_LOG_EXCERPT_REDACTED.txt). |
+| CT-2B-006 | BLOCKED | Wappler-native MySQL connection failure/recovery not exercised; prior test-harness-only recovery evidence remains preserved but is not Wappler proof. |
+| CT-2B-007 | BLOCKED | Prior backup/restore digest checks remain preserved; no restored-row readback through Wappler verified. |
+| CT-2B-010 | PASS WITH FINDINGS | App audits now execute; each reports six moderate package findings and zero high/critical. The root lockfile dry-run passes; the test-only audit reports zero. Wappler GUI package-manager behavior remains unverified. No dependency remediation. |
+| CT-2B-011 | BLOCKED overall; saved-app checks PASS | Temporary `passport_test` form canceled with password blank; no saved `passport_test` or `stage2b_db_probe` artifact found in accepted app/target. Accepted app config/port and HTTP smoke pass. Wappler restart/reopen on accepted TTPPASSPORT is pending; owner handoff paused further UI work. See [editor cleanup report](recovery02/EDITOR_CLEANUP_REPORT.md). |
+
+### Recovery 02 regression results
+
+Configuration guard, loopback API inventory, all 64 Playwright cases, all four visual comparisons, the repository secret-pattern scan, and the test-only dependency audit passed. Sixty current route/viewport screenshots matched the Recovery 01 hashes. The accepted application still returns HTTP 200 on port 3002, and the disposable Wappler server has no listener on port 3000 after its Wappler stop control was used. The root app lockfile dry-run passed; app audits reported six moderate findings. Fresh database credential-dependent tests were not run after the incident. Full commands and results are in [Recovery 02 test evidence](recovery02/RETEST_RECORD_2026-11-23.md).
+
+Stage 2B remains `TESTING`, not `CLOSED_PASS`; CT-2B-002, CT-2B-003 (overall), CT-2B-006, CT-2B-007 and CT-2B-011 remain blocked. Human GUI/business acceptance is pending. Stage 2C remains unauthorized.

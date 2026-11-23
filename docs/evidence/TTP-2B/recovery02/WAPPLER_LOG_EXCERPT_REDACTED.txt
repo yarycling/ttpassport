@@ -1,0 +1,33 @@
+[2026-11-23 00:49:59.829] IS_BETA=false
+[2026-11-23 00:49:59.830] Loading options-api preload
+[2026-11-23 00:49:59.895] Setting theme and ui-size from WapplerOptions ...
+[2026-11-23 00:49:59.916] initUI - Database Query Builder
+[2026-11-23 00:49:59.916] START inspectConnectionFile, fileName=passport_test, siteName=undefined, target=undefined, CURRENT_SERVER_TYPE=node
+[2026-11-23 00:49:59.916] inspect=file://~/mobileApps/ttpassport/app/modules/connections/passport_test.json
+[2026-11-23 00:50:01.163] Uncaught Exception:
+[2026-11-23 00:50:01.163] TypeError: Cannot read properties of undefined (reading 'track')
+    at WebContents.<anonymous> (/Applications/Wappler.app/Contents/Resources/app/Shared/DMXzone/dmxAppCreator/UI/main_init.jsc:1:41437)
+[2026-11-23 00:52:11.768] IS_BETA=false
+[2026-11-23 00:52:11.770] Loading options-api preload
+[2026-11-23 00:52:11.868] Setting theme and ui-size from WapplerOptions ...
+[2026-11-23 00:52:11.904] initUI - Database Query Builder
+[2026-11-23 00:52:11.904] START inspectConnectionFile, fileName=passport_test, siteName=undefined, target=undefined, CURRENT_SERVER_TYPE=node
+[2026-11-23 00:52:11.904] inspect=file://~/mobileApps/ttpassport/app/modules/connections/passport_test.json
+[2026-11-23 00:52:12.022] Uncaught Exception:
+[2026-11-23 00:52:12.022] TypeError: Cannot read properties of undefined (reading 'track')
+[2026-11-23 06:18:50.788] load all tables and views....
+[2026-11-23 06:18:50.788] run listTables...
+[2026-11-23 06:18:50.798] START listViews for schema: null
+[2026-11-23 06:18:50.799] load all tables and views....
+[2026-11-23 06:18:50.799] run listViews...
+[2026-11-23 06:18:50.799] START saveDatabaseConnection for db
+[2026-11-23 06:18:51.812] Uncaught Exception:
+[2026-11-23 06:18:51.812] TypeError: Cannot read properties of undefined (reading 'track')
+[2026-11-23 06:37:07.447] IS_BETA=false
+[2026-11-23 06:37:07.448] Loading options-api preload
+[2026-11-23 06:37:07.587] Setting theme and ui-size from WapplerOptions ...
+[2026-11-23 06:37:07.655] initUI - Database Query Builder
+[2026-11-23 06:37:07.655] START inspectConnectionFile, fileName=db, siteName=undefined, target=undefined, CURRENT_SERVER_TYPE=node
+[2026-11-23 06:37:07.656] inspect=file:///private/tmp/ttp2b-recovery02/app/modules/connections/db.json
+[2026-11-23 06:37:08.548] Uncaught Exception:
+[2026-11-23 06:37:08.548] TypeError: Cannot read properties of undefined (reading 'track')

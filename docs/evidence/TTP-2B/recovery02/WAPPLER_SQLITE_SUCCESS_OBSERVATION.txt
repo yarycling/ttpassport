@@ -1,0 +1,22 @@
+Wappler 7.9.9 native UI observation — 2026-11-23
+
+Project window: TTP2B-R02-SQLite-New (disposable; outside accepted repository)
+Target shown in Wappler: Development
+Connection shown for Database Query: db (SQLite)
+Query Builder window title: Database Query Builder - synthetic_recovery
+Schema loaded: synthetic_recovery
+Columns displayed: fixture_id, label
+SQL preview: select * from `synthetic_recovery`
+Query Results: one row
+  fixture_id = 702
+  label = r02-sqlite-ok
+
+The native Wappler Server Connect action r02-query-test was executed using the Wappler Development server on the disposable project's local port 3000:
+
+GET http://127.0.0.1:3000/api/r02-query-test
+HTTP 200
+{"query":[{"fixture_id":702,"label":"r02-sqlite-ok"}]}
+
+Wappler's Web Server panel displayed "App listening at http://localhost:3000". The server was subsequently stopped with Wappler's own Stop Local Server control. A later local check found no listener on 3000. The accepted app remained on 3002 and returned HTTP 200.
+
+This is a textual transcription of the live CUA accessibility and visual observations. The native screenshot was shown during this task but the available CUA screenshot interface did not provide a repository file output path; therefore no screenshot file is claimed by this record.
