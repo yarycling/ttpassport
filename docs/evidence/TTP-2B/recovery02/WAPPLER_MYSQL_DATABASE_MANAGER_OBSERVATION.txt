@@ -1,0 +1,27 @@
+Wappler MySQL Database Manager observation — 2026-11-23 (resumed retest)
+
+Environment
+- Wappler 7.9.9, disposable project TTP2B-R02-SQLite-New, Development target.
+- Package-owned synthetic Passport Test service; MySQL 8.4.13, loopback port 3307.
+- Only the existing synthetic Passport Test credential was used, as authorised by the owner after the earlier local exposure. No credential value is retained here.
+- Accepted TTPASSPORT remained on port 3002 with its original SQLite connection and route set.
+
+Observed in Wappler UI
+- Database Manager displayed the saved passport_test connection.
+- Expanding Tables displayed __ttp2b_synthetic_probe.
+- Expanding the table displayed probe_key and probe_value.
+- View/Edit Data opened for that table. Fetch Data returned one row:
+  probe_key = fixture
+  probe_value = passport-boundary-synthetic
+- This was a read of synthetic Test fixture data. No data was changed.
+
+Local package facts
+- Wappler target metadata identifies the connection type as mysql2.
+- Disposable project's installed mysql2 package version: 3.24.6.
+- Disposable project's package manifest range: ^3.6.5.
+- Diagnostic action app/api/r02-mysql-test.json remains empty ({"exec":{}}); no Server Connect database query was configured or executed.
+- No screenshot file was persisted. This text is a transcription of the visible Wappler observation and local disposable-project metadata.
+
+Disposition
+PASS for Wappler Database Manager schema loading and synthetic row read through the MySQL 8.4.13 connection.
+BLOCKED for Query Builder behavior, Server Connect runtime query execution, Wappler-native outage/recovery, and restored-database readback. This observation does not identify the root cause of the earlier Query Builder exception.

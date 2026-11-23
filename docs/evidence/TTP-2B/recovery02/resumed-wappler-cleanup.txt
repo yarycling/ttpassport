@@ -1,0 +1,15 @@
+TTP-2B-RECOVERY-02 — Temporary Wappler artifact cleanup
+Observed: 2026-11-23
+
+Disposable project: TTP2B-R02-SQLite-New at /private/tmp/ttp2b-recovery02.
+
+- Wappler Database Manager deleted the temporary passport_test connection. Wappler's confirmation stated that only the connection would be deleted, not the database. The synthetic Test database and service were not deleted.
+- Closed the temporary r02-mysql-test.json editor tab. Deleted only the package-owned diagnostic file app/api/r02-mysql-test.json from the disposable project. Preserved the project's SQLite db connection and r02-query-test action/project.
+- While the disposable Wappler server was still running, `curl --silent --show-error -i http://127.0.0.1:3000/api/r02-mysql-test` returned HTTP 404 with `{"status":"404","message":"/api/r02-mysql-test not found."}`.
+- Read-only searches `rg --files --hidden app/config app/api .wappler | rg 'passport_test|r02-mysql-test|stage2b_db_probe'` and `rg -l 'passport_test|r02-mysql-test|stage2b_db_probe' .wappler app/config app/api` returned no paths. No saved temporary connection/action reference remained in the disposable project's Wappler config or app config/API folders.
+- Stopped the disposable project server through Wappler's local-server control. `lsof -nP -iTCP:3000 -sTCP:LISTEN` returned no listener.
+- The accepted TTPPASSPORT app still returned HTTP 200 on port 3002. The configuration guard later confirmed the accepted SQLite db connection and 15 routes remain unchanged.
+- `passport_test_restore` was not read through Wappler. Existing grants constrain the Passport Test runtime principal to `passport_test` only; no root credential, grant widening, or additional principal was used. See the CT-2B-007 disposition in the retest record.
+
+Disposition
+PASS for removal of the temporary disposable connection/action and inaccessibility of the diagnostic endpoint after deletion. CT-2B-011 remains BLOCKED overall until Wappler is restarted/reopened on the accepted TTPPASSPORT project and that project is confirmed in the UI; no attempt was made to bypass Wappler's project-capacity limit.

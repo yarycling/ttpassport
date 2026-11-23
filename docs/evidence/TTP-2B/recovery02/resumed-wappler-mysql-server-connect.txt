@@ -1,0 +1,29 @@
+TTP-2B-RECOVERY-02 — Wappler-native MySQL Server Connect observation
+Observed: 2026-11-23
+
+Environment
+- Wappler 7.9.9, disposable Node.js project TTP2B-R02-SQLite-New at /private/tmp/ttp2b-recovery02.
+- Wappler Development target; local development server on port 3000.
+- Package-owned MySQL Test service ttp2b-mysql-test, loopback port 3307; server identity was recorded as MySQL Community Server 8.4.13 in the existing package evidence.
+- Wappler Database Manager connection type: mysql2. Disposable project's installed mysql2 version: 3.24.6; package range: ^3.6.5.
+- Only the existing synthetic Passport Test credential was used. No password value is retained here. No Development or other principal was used.
+- Accepted TTPPASSPORT app remained on port 3002, with its existing SQLite db connection and 15 approved GUI routes.
+
+Wappler GUI procedure and result
+- In Server Connect, selected the Execute node, used Add Action, and inserted a native Database Query step.
+- Selected the temporary passport_test connection and opened Query Builder.
+- Selected __ttp2b_synthetic_probe. Query Builder generated `select * from `__ttp2b_synthetic_probe`` and its Preview/Query Results pane returned one row:
+  probe_key = fixture
+  probe_value = passport-boundary-synthetic
+- Saved the disposable action app/api/r02-mysql-test.json through Wappler. Its step was module dbconnector / action select, connection passport_test, output array.
+- Query Builder did not raise the earlier `track` exception in this new Wappler Node.js/MySQL project. This result does not identify why the earlier TTPPASSPORT scaffold attempt raised that exception.
+
+Native Server Connect runtime check
+Command: `curl --fail-with-body --silent --show-error -i http://127.0.0.1:3000/api/r02-mysql-test`
+Observed: HTTP/1.1 200 OK; Content-Type application/json; response body:
+`{"query":[{"probe_key":"fixture","probe_value":"passport-boundary-synthetic"}]}`
+
+Disposition
+PASS for Wappler 7.9.9 Database Query Builder and a native Server Connect MySQL read in the disposable new-project scenario C.
+The result establishes the Wappler mysql2 query path in this disposable project, not the accepted TTPPASSPORT project's database integration. Scenario D and the earlier Query Builder root cause remain unresolved.
+No screenshot was persisted; the UI result and saved action were observed directly and the exact HTTP response is retained above.

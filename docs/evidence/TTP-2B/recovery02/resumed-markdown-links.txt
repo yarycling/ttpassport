@@ -1,0 +1,2 @@
+Method: Parse relative Markdown links in changed and untracked `.md` files and verify each resolved target exists.
+Result: PASS; all local Markdown links resolved across the 21 changed/untracked paths checked.

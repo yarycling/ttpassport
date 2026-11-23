@@ -1,0 +1,31 @@
+TTP-2B-RECOVERY-02 — Wappler-native Test connection recovery
+Observed: 2026-11-23
+
+Scope
+- Only the package-owned ttp2b-mysql-test container was stopped and started.
+- The package-owned ttp2b-mysql-development service, MAMP, unrelated databases, accepted application, and its port 3002 were not changed.
+- The existing synthetic Passport Test Wappler connection/action in the disposable project was used; no credential value is retained.
+
+Failure phase
+Command: `docker stop ttp2b-mysql-test`
+Observed: container stopped successfully.
+Command: `curl --silent --show-error -i http://127.0.0.1:3000/api/r02-mysql-test`
+Expected: Server Connect cannot reach the Test database and returns a safe server error.
+Observed: HTTP/1.1 500 Internal Server Error with generic JSON `{"status":"500","message":"A server error occured, to see the error enable the DEBUG flag."}`. No SQL, stack trace, credential, or connection secret was returned.
+
+Recovery phase
+Command: `docker start ttp2b-mysql-test`
+Observed: container started. `docker inspect` reported `running healthy`.
+Command: `curl --fail-with-body --silent --show-error -i http://127.0.0.1:3000/api/r02-mysql-test`
+Expected: Wappler Server Connect recovers and returns the synthetic fixture after the Test service is healthy.
+Observed: HTTP/1.1 200 OK and `{"query":[{"probe_key":"fixture","probe_value":"passport-boundary-synthetic"}]}`.
+
+Disposition
+PASS for Wappler-native Test outage/failure and recovery through the disposable Server Connect action. The failure response was generic and did not expose internal diagnostics.
+
+Final service check after cleanup
+- ttp2b-mysql-test: running, healthy.
+- ttp2b-mysql-development: running, healthy.
+- Disposable Wappler server on port 3000: stopped through Wappler; no listener remained.
+- Accepted application on port 3002: HTTP 200.
+- MAMP PRO application process remained running. No host listener on 3306 was present during the final read-only check; no MAMP control or unrelated database was changed.
