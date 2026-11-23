@@ -1,0 +1,44 @@
+<!-- Wappler include head-page="layouts/backoffice" bootstrap5="local" is="dmx-app" id="backofficeAdministration" appConnect="local" -->
+<section aria-labelledby="administration-heading">
+  <div class="page-title-row">
+    <div>
+      <p class="section-kicker">Immigration Division · Passport workspace</p>
+      <h1 id="administration-heading">Administration</h1>
+      <p class="page-subtitle">Office, user and role management layouts. No configuration changes can be made in this preview.</p>
+    </div>
+    <span class="status-chip status-chip--neutral">No live settings</span>
+  </div>
+  <div class="notice-alert notice-alert--warning mb-3" role="note">
+    <strong>Privilege management is not implemented</strong>
+    This route has no administrator access control, user store or role mutation API.
+  </div>
+  <div class="row g-3">
+    <div class="col-lg-4">
+      <section class="admin-panel">
+        <h2>Offices and missions</h2>
+        <p>Office capability and jurisdiction settings are not connected.</p>
+        <label class="form-label" for="admin-office">Office name</label>
+        <input class="form-control" id="admin-office" type="text" disabled>
+        <button class="btn btn-outline-crimson mt-3" type="button" disabled>Save unavailable</button>
+      </section>
+    </div>
+    <div class="col-lg-4">
+      <section class="admin-panel">
+        <h2>Staff accounts</h2>
+        <p>No staff account records are displayed.</p>
+        <label class="form-label" for="admin-user">Staff account</label>
+        <input class="form-control" id="admin-user" type="text" disabled>
+        <button class="btn btn-outline-crimson mt-3" type="button" disabled>Invite unavailable</button>
+      </section>
+    </div>
+    <div class="col-lg-4">
+      <section class="admin-panel">
+        <h2>Roles and permissions</h2>
+        <p>Role assignment and issuing/release authority require approved independent controls.</p>
+        <label class="form-label" for="admin-role">Role</label>
+        <select class="form-select" id="admin-role" disabled><option selected>Not connected</option></select>
+        <button class="btn btn-outline-crimson mt-3" type="button" disabled>Update unavailable</button>
+      </section>
+    </div>
+  </div>
+</section>

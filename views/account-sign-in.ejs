@@ -1,0 +1,30 @@
+<!-- Wappler include head-page="layouts/main" bootstrap5="local" is="dmx-app" id="accountSignIn" appConnect="local" -->
+<section class="auth-page" aria-labelledby="sign-in-heading">
+  <div class="container-fluid page-container">
+    <div class="auth-card">
+      <p class="section-kicker">Citizen account</p>
+      <h1 id="sign-in-heading">Sign in</h1>
+      <div class="notice-alert notice-alert--warning mb-4" role="note">
+        <strong>UI-only preview</strong>
+        Authentication is not connected. Fields are disabled; do not enter real credentials.
+      </div>
+      <form aria-describedby="auth-preview-note">
+        <div class="mb-3">
+          <label class="form-label" for="signin-email">Email address</label>
+          <input class="form-control" id="signin-email" type="email" placeholder="Email address" disabled aria-describedby="auth-preview-note">
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="signin-password">Password</label>
+          <input class="form-control" id="signin-password" type="password" placeholder="Password" disabled aria-describedby="auth-preview-note">
+        </div>
+        <button class="btn btn-primary-government" type="button" disabled>Sign in unavailable</button>
+        <p class="field-help mt-3 mb-0" id="auth-preview-note">No account, session or password service is configured.</p>
+      </form>
+      <div class="d-flex flex-wrap gap-3 mt-4">
+        <a href="/account/forgot-password">Forgot password?</a>
+        <a href="/account/register">Create an account</a>
+      </div>
+      <p class="field-help mt-3 mb-0">For layout review only: <a href="/citizen/dashboard">view the empty dashboard preview</a>. This link does not sign you in.</p>
+    </div>
+  </div>
+</section>

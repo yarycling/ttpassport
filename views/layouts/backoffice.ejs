@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <script src="/dmxAppConnect/dmxAppConnect.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#64051f">
+  <meta name="description" content="Passport back-office design preview. No live records or actions are connected.">
+  <title>Passport Back Office | Design Preview</title>
+  <link rel="stylesheet" href="/bootstrap/5/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/assets/ttpassport/css/ttpassport-theme.css">
+  <script src="/dmxAppConnect/dmxRouting/dmxRouting.js" defer></script>
+</head>
+<body is="dmx-app" id="main">
+  <a class="skip-link" href="#content">Skip to main content</a>
+  <%- await include('../partials/government-masthead', locals); %>
+  <div class="backoffice-context">
+    <div class="container-fluid page-container d-flex flex-wrap align-items-center justify-content-between gap-2">
+      <p class="mb-0"><strong>Passport back-office design preview</strong><span class="context-divider">·</span>No live records, permissions or actions are connected.</p>
+      <div class="context-controls">
+        <div class="context-office">
+          <label class="mb-0 fw-semibold" for="office-scope">Office scope</label>
+          <select class="form-select" id="office-scope" disabled aria-describedby="office-scope-note"><option selected>Not configured</option></select>
+          <span class="visually-hidden" id="office-scope-note">Office and mission scope is not available in this preview.</span>
+        </div>
+        <a href="/" class="context-link">Return to citizen preview</a>
+      </div>
+    </div>
+  </div>
+  <main is="dmx-view" id="content" class="backoffice-frame" tabindex="-1">
+    <%- await include('../partials/backoffice-sidebar', { currentPage: content }); %>
+    <div class="backoffice-content">
+      <%- await include(content, locals); %>
+    </div>
+  </main>
+  <%- await include('../partials/government-footer', locals); %>
+  <script src="/bootstrap/5/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

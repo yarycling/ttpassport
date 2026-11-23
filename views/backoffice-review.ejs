@@ -1,0 +1,52 @@
+<!-- Wappler include head-page="layouts/backoffice" bootstrap5="local" is="dmx-app" id="backofficeReview" appConnect="local" -->
+<dmx-value id="reviewSection" dmx-bind:value="'overview'"></dmx-value>
+<section aria-labelledby="review-heading">
+  <div class="page-title-row">
+    <div>
+      <p class="section-kicker">Immigration Division · Passport workspace</p>
+      <h1 id="review-heading">Staff review workspace</h1>
+      <p class="page-subtitle">A case-review shell with separate evidence areas. No applicant or case records are connected.</p>
+    </div>
+    <span class="status-chip status-chip--neutral">No case selected</span>
+  </div>
+  <div class="notice-alert notice-alert--warning mb-3" role="note">
+    <strong>Decision controls are unavailable</strong>
+    There is no staff authentication, case assignment, office scope or decision workflow in this preview.
+  </div>
+  <div class="content-panel">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+      <div><h2 class="mb-1">Case workspace</h2><p class="field-help mb-0">Applicant details are intentionally empty.</p></div>
+      <span class="status-chip status-chip--neutral">No live record</span>
+    </div>
+    <div class="review-tabs" aria-label="Review sections">
+      <button type="button" dmx-bind:class="{'is-active': reviewSection.value == 'overview'}" dmx-bind:aria-pressed="reviewSection.value == 'overview' ? 'true' : 'false'" dmx-on:click="reviewSection.setValue('overview')">Overview</button>
+      <button type="button" dmx-bind:class="{'is-active': reviewSection.value == 'citizenship'}" dmx-bind:aria-pressed="reviewSection.value == 'citizenship' ? 'true' : 'false'" dmx-on:click="reviewSection.setValue('citizenship')">Citizenship</button>
+      <button type="button" dmx-bind:class="{'is-active': reviewSection.value == 'evidence'}" dmx-bind:aria-pressed="reviewSection.value == 'evidence' ? 'true' : 'false'" dmx-on:click="reviewSection.setValue('evidence')">Evidence</button>
+      <button type="button" dmx-bind:class="{'is-active': reviewSection.value == 'identity'}" dmx-bind:aria-pressed="reviewSection.value == 'identity' ? 'true' : 'false'" dmx-on:click="reviewSection.setValue('identity')">Identity status</button>
+      <button type="button" dmx-bind:class="{'is-active': reviewSection.value == 'history'}" dmx-bind:aria-pressed="reviewSection.value == 'history' ? 'true' : 'false'" dmx-on:click="reviewSection.setValue('history')">History</button>
+    </div>
+    <section dmx-show="reviewSection.value == 'overview'" aria-label="Review overview">
+      <div class="row g-3">
+        <div class="col-md-6"><div class="status-card p-3"><h3>Applicant details</h3><p class="mb-0">No applicant record is available.</p></div></div>
+        <div class="col-md-6"><div class="status-card p-3"><h3>Decision readiness</h3><p class="mb-2">No checks have run.</p><span class="status-chip status-chip--neutral">Not assessed</span></div></div>
+      </div>
+      <div class="decision-gate mt-3"><strong>Decision panel locked in this preview</strong><p class="mb-0">Approval, rejection and release are not actionable and are not displayed as controls.</p></div>
+    </section>
+    <section dmx-show="reviewSection.value == 'citizenship'" aria-label="Citizenship review">
+      <div class="empty-state"><span class="empty-mark" aria-hidden="true">—</span><h3>Citizenship evidence not available</h3><p class="mb-0">No source documents or eligibility result are connected.</p></div>
+    </section>
+    <section dmx-show="reviewSection.value == 'evidence'" aria-label="Evidence review">
+      <div class="empty-state"><span class="empty-mark" aria-hidden="true">—</span><h3>No evidence available</h3><p class="mb-0">Document storage and evidence review are not connected.</p></div>
+    </section>
+    <section dmx-show="reviewSection.value == 'identity'" aria-label="Identity review status">
+      <div class="row g-3">
+        <div class="col-md-6"><div class="status-card p-3"><h3>Document checks</h3><span class="status-chip status-chip--neutral">Not run</span></div></div>
+        <div class="col-md-6"><div class="status-card p-3"><h3>Person-to-evidence review</h3><span class="status-chip status-chip--neutral">Not run</span></div></div>
+      </div>
+      <p class="field-help mt-3 mb-0">No identity assertion or verification outcome is produced by this screen.</p>
+    </section>
+    <section dmx-show="reviewSection.value == 'history'" aria-label="Case history">
+      <div class="empty-state"><span class="empty-mark" aria-hidden="true">—</span><h3>No case history</h3><p class="mb-0">No case or audit history is connected.</p></div>
+    </section>
+  </div>
+</section>

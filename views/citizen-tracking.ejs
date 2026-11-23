@@ -1,0 +1,40 @@
+<!-- Wappler include head-page="layouts/main" bootstrap5="local" is="dmx-app" id="citizenTracking" appConnect="local" -->
+<section class="page-section" aria-labelledby="tracking-heading">
+  <div class="container-fluid page-container">
+    <div class="page-title-row">
+      <div>
+        <p class="section-kicker">Citizen portal preview</p>
+        <h1 id="tracking-heading">Track an application</h1>
+        <p class="page-subtitle">A reference entry and status timeline layout. No application lookup is connected.</p>
+      </div>
+    </div>
+    <div class="notice-alert notice-alert--warning mb-4" role="note">
+      <strong>Secure tracking is not available</strong>
+      This screen does not accept application references or return citizen information. Sign-in and record-level access controls are not implemented.
+    </div>
+    <div class="row g-3">
+      <div class="col-lg-5">
+        <div class="content-panel">
+          <h2>Application reference</h2>
+          <label class="form-label" for="tracking-reference">Reference number</label>
+          <input class="form-control" id="tracking-reference" type="text" placeholder="Not connected" disabled aria-describedby="tracking-note">
+          <p id="tracking-note" class="field-help mt-2">Reference lookup is disabled in this preview.</p>
+          <button class="btn btn-primary-government" type="button" disabled>Lookup unavailable</button>
+        </div>
+      </div>
+      <div class="col-lg-7">
+        <div class="content-panel">
+          <h2>Application status timeline</h2>
+          <p class="field-help">Visual pattern only — no application has these statuses.</p>
+          <ol class="timeline-list">
+            <li class="timeline-item"><span class="timeline-node" aria-hidden="true">1</span><div class="timeline-copy"><strong>Submission</strong><span>Status not connected</span></div></li>
+            <li class="timeline-item"><span class="timeline-node" aria-hidden="true">2</span><div class="timeline-copy"><strong>Case review</strong><span>Status not connected</span></div></li>
+            <li class="timeline-item"><span class="timeline-node" aria-hidden="true">3</span><div class="timeline-copy"><strong>Decision</strong><span>Status not connected</span></div></li>
+            <li class="timeline-item"><span class="timeline-node" aria-hidden="true">4</span><div class="timeline-copy"><strong>Production and fulfilment</strong><span>Status not connected</span></div></li>
+          </ol>
+          <a href="/account/sign-in">Go to citizen sign-in preview</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,166 @@
+<!-- Wappler include head-page="layouts/main" bootstrap5="local" is="dmx-app" id="firstTimeApplication" appConnect="local" -->
+<dmx-value id="wizardStep" dmx-bind:value="1"></dmx-value>
+<section class="page-section application-backdrop" aria-labelledby="application-heading">
+  <div class="container-fluid page-container">
+    <div class="page-title-row">
+      <div>
+        <p class="section-kicker">First-time passport application · Design preview</p>
+        <h1 id="application-heading">Application overview</h1>
+        <p class="page-subtitle">This interactive shell demonstrates a possible sequence only. It is not an official form and does not save information.</p>
+      </div>
+      <span class="status-chip status-chip--neutral">Preview only</span>
+    </div>
+    <div class="notice-alert notice-alert--warning mb-4" role="note">
+      <strong>Do not enter personal information</strong>
+      Form fields, document uploads, photo capture, identity checks, declarations and payments are not connected.
+    </div>
+
+    <div class="wizard-grid" aria-label="Illustrative application stages">
+      <button class="wizard-step" type="button" aria-label="Go to eligibility stage" dmx-bind:class="{'is-active': wizardStep.value == 1}" dmx-on:click="wizardStep.setValue(1)"><span class="wizard-step-number">1</span>Eligibility</button>
+      <button class="wizard-step" type="button" aria-label="Go to personal details stage" dmx-bind:class="{'is-active': wizardStep.value == 2}" dmx-on:click="wizardStep.setValue(2)"><span class="wizard-step-number">2</span>Personal</button>
+      <button class="wizard-step" type="button" aria-label="Go to citizenship and guardian stage" dmx-bind:class="{'is-active': wizardStep.value == 3}" dmx-on:click="wizardStep.setValue(3)"><span class="wizard-step-number">3</span>Citizenship</button>
+      <button class="wizard-step" type="button" aria-label="Go to recommender and references stage" dmx-bind:class="{'is-active': wizardStep.value == 4}" dmx-on:click="wizardStep.setValue(4)"><span class="wizard-step-number">4</span>Recommender</button>
+      <button class="wizard-step" type="button" aria-label="Go to documents stage" dmx-bind:class="{'is-active': wizardStep.value == 5}" dmx-on:click="wizardStep.setValue(5)"><span class="wizard-step-number">5</span>Documents</button>
+      <button class="wizard-step" type="button" aria-label="Go to photograph and identity guidance stage" dmx-bind:class="{'is-active': wizardStep.value == 6}" dmx-on:click="wizardStep.setValue(6)"><span class="wizard-step-number">6</span>Photo &amp; ID</button>
+      <button class="wizard-step" type="button" aria-label="Go to office and delivery stage" dmx-bind:class="{'is-active': wizardStep.value == 7}" dmx-on:click="wizardStep.setValue(7)"><span class="wizard-step-number">7</span>Office &amp; delivery</button>
+      <button class="wizard-step" type="button" aria-label="Go to review and declarations stage" dmx-bind:class="{'is-active': wizardStep.value == 8}" dmx-on:click="wizardStep.setValue(8)"><span class="wizard-step-number">8</span>Review</button>
+      <button class="wizard-step" type="button" aria-label="Go to payment and tracking stage" dmx-bind:class="{'is-active': wizardStep.value == 9}" dmx-on:click="wizardStep.setValue(9)"><span class="wizard-step-number">9</span>Payment</button>
+    </div>
+    <p class="field-help mb-3" aria-live="polite">Preview stage <span dmx-text="wizardStep.value">1</span> of 9</p>
+
+    <div class="row g-3 align-items-start">
+      <div class="col-lg-8">
+        <section class="content-panel" aria-label="Illustrative application stage content">
+          <div class="wizard-step-panels">
+            <section dmx-show="wizardStep.value == 1" aria-labelledby="stage-one-heading">
+              <div class="panel-heading" id="stage-one-heading">1. Eligibility</div>
+              <p>This proposed first-time stream is scoped for citizens aged 16 and over. Official eligibility rules and application requirements have not been connected.</p>
+              <div class="row g-3" id="eligibility">
+                <div class="col-md-6">
+                  <label class="form-label" for="preview-age-group">Age group</label>
+                  <select class="form-select" id="preview-age-group" disabled><option selected>Choose an age group</option><option>16–17</option><option>18 or older</option></select>
+                  <div class="field-help mt-1">Illustrative control only. No eligibility is assessed.</div>
+                </div>
+                <div class="col-md-6">
+                  <div class="info-panel info-panel--gold h-100">
+                    <strong>Ages 16–17</strong>
+                    <p class="mb-0">A guardian-consent workflow is part of the approved design scope; its requirements are not implemented here.</p>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section dmx-show="wizardStep.value == 2" aria-labelledby="stage-two-heading">
+              <div class="panel-heading" id="stage-two-heading">2. Personal details</div>
+              <p>Example field arrangement only. The official application form and field rules have not been supplied in this screen.</p>
+              <div class="row g-3">
+                <div class="col-md-6"><label class="form-label" for="preview-name">Full name</label><input class="form-control" id="preview-name" type="text" disabled aria-describedby="form-preview-note"></div>
+                <div class="col-md-6"><label class="form-label" for="preview-name-history">Other names, if applicable</label><input class="form-control" id="preview-name-history" type="text" disabled aria-describedby="form-preview-note"></div>
+                <div class="col-md-6"><label class="form-label" for="preview-place-birth">Place of birth</label><input class="form-control" id="preview-place-birth" type="text" disabled aria-describedby="form-preview-note"></div>
+                <div class="col-md-6"><label class="form-label" for="preview-contact">Contact email</label><input class="form-control" id="preview-contact" type="email" disabled aria-describedby="form-preview-note"></div>
+              </div>
+              <p id="form-preview-note" class="field-help mt-3 mb-0">Controls are disabled and do not accept or store applicant details.</p>
+            </section>
+
+            <section dmx-show="wizardStep.value == 3" aria-labelledby="stage-three-heading">
+              <div class="panel-heading" id="stage-three-heading">3. Citizenship and guardian</div>
+              <p>Citizenship categories and evidence requirements must follow approved Immigration instructions.</p>
+              <div class="row g-3">
+                <div class="col-md-6"><label class="form-label" for="preview-citizenship">Citizenship details</label><select class="form-select" id="preview-citizenship" disabled><option selected>Not connected</option></select></div>
+                <div class="col-md-6"><label class="form-label" for="preview-guardian">Guardian workflow</label><select class="form-select" id="preview-guardian" disabled><option selected>Not connected</option></select></div>
+              </div>
+              <div class="notice-alert mt-3"><strong>Separate participants</strong>Any future guardian interaction must identify and authenticate the guardian as themselves.</div>
+            </section>
+
+            <section dmx-show="wizardStep.value == 4" aria-labelledby="stage-four-heading">
+              <div class="panel-heading" id="stage-four-heading">4. Recommender and references</div>
+              <p>The reference layout keeps applicant, recommender and reference contacts as distinct participants.</p>
+              <div class="row g-3">
+                <div class="col-md-6"><label class="form-label" for="preview-recommender">Recommender details</label><input class="form-control" id="preview-recommender" type="text" disabled></div>
+                <div class="col-md-6"><label class="form-label" for="preview-reference">Reference details</label><input class="form-control" id="preview-reference" type="text" disabled></div>
+              </div>
+              <p class="field-help mt-3 mb-0">No people or contact data are shown or collected in this preview.</p>
+            </section>
+
+            <section dmx-show="wizardStep.value == 5" aria-labelledby="stage-five-heading" id="requirements">
+              <div class="panel-heading" id="stage-five-heading">5. Supporting documents</div>
+              <div class="notice-alert notice-alert--warning mb-3"><strong>Official document list unavailable</strong>Do not use this preview as a checklist for a real application.</div>
+              <label class="form-label" for="preview-document-upload">Document upload layout</label>
+              <input class="form-control" id="preview-document-upload" type="file" disabled aria-describedby="upload-preview-note">
+              <p id="upload-preview-note" class="field-help mt-2 mb-0">File upload, private storage, scanning and review are not connected.</p>
+            </section>
+
+            <section dmx-show="wizardStep.value == 6" aria-labelledby="stage-six-heading">
+              <div class="panel-heading" id="stage-six-heading">6. Photograph and identity guidance</div>
+              <div class="row g-3 align-items-center">
+                <div class="col-md-5"><div class="capture-guide"><div><div class="capture-guide-shape" aria-hidden="true">Photo guide</div><p>Illustrative position guide. No camera or photo is active.</p></div></div></div>
+                <div class="col-md-7">
+                  <h3>Photo and identity steps</h3>
+                  <ul class="guidance-list">
+                    <li>Official photo specifications are not connected.</li>
+                    <li>Identity evidence and passport-print photography remain separate.</li>
+                    <li>No biometric inference or verification is performed.</li>
+                  </ul>
+                  <label class="form-label" for="preview-photo-upload">Photo upload control</label>
+                  <input class="form-control" id="preview-photo-upload" type="file" disabled>
+                </div>
+              </div>
+            </section>
+
+            <section dmx-show="wizardStep.value == 7" aria-labelledby="stage-seven-heading">
+              <div class="panel-heading" id="stage-seven-heading">7. Office and delivery preference</div>
+              <p>Office selection is a preference and remains subject to eligible service capability and routing.</p>
+              <div class="row g-3">
+                <div class="col-md-6"><label class="form-label" for="preview-office">Preferred office</label><select class="form-select" id="preview-office" disabled><option selected>Office options are not connected</option></select></div>
+                <div class="col-md-6"><label class="form-label" for="preview-delivery">Fulfilment preference</label><select class="form-select" id="preview-delivery" disabled><option selected>Options are not connected</option></select></div>
+              </div>
+              <div class="international-service-panel mt-3">
+                <strong>Local and overseas service paths</strong>
+                <p class="mb-0">The design considers citizens living in Trinidad &amp; Tobago and overseas. Office and mission options are not confirmed or connected.</p>
+              </div>
+              <p class="field-help mt-3 mb-0">No courier coverage, appointment or office service capability is represented.</p>
+            </section>
+
+            <section dmx-show="wizardStep.value == 8" aria-labelledby="stage-eight-heading">
+              <div class="panel-heading" id="stage-eight-heading">8. Review and declarations</div>
+              <div class="empty-state"><span class="empty-mark" aria-hidden="true">—</span><h3>No application details to review</h3><p class="mb-0">This preview has no saved information, declaration or signature step.</p></div>
+            </section>
+
+            <section dmx-show="wizardStep.value == 9" aria-labelledby="stage-nine-heading">
+              <div class="panel-heading" id="stage-nine-heading">9. Payment and tracking</div>
+              <div class="notice-alert notice-alert--warning"><strong>Payment is not available</strong>No fee, payment timing, gateway or transaction has been configured.</div>
+              <p class="mt-3 mb-0">Tracking will only display an application after the approved account and application services exist.</p>
+            </section>
+          </div>
+
+          <div class="wizard-actions mt-4">
+            <div class="wizard-actions-group">
+              <a class="btn btn-outline-crimson" href="/">Exit preview</a>
+              <button class="btn btn-outline-crimson" type="button" dmx-show="wizardStep.value > 1" dmx-on:click="wizardStep.setValue(wizardStep.value - 1)">Back</button>
+            </div>
+            <div class="wizard-actions-group">
+              <button class="btn btn-outline-crimson" type="button" disabled>Save draft unavailable</button>
+              <button class="btn btn-primary-government" type="button" dmx-show="wizardStep.value < 9" dmx-on:click="wizardStep.setValue(wizardStep.value + 1)">Continue</button>
+            </div>
+          </div>
+        </section>
+      </div>
+      <aside class="col-lg-4" aria-labelledby="guidance-heading">
+        <div class="content-panel mb-3">
+          <div class="panel-heading" id="guidance-heading">Application guidance</div>
+          <ul class="guidance-list">
+            <li>Use this page to review visual hierarchy only.</li>
+            <li>Official forms, instructions and document lists must be confirmed before implementation.</li>
+            <li>Applicants aged 16–17 require the approved guardian-consent workflow.</li>
+            <li>Online proofing remains subject to legal, identity and biometric approvals.</li>
+          </ul>
+        </div>
+        <div class="info-panel info-panel--gold">
+          <h2>Service state</h2>
+          <p class="mb-2"><span class="status-chip status-chip--neutral">Not connected</span></p>
+          <p class="mb-0">No application is being created, submitted, saved or reviewed.</p>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>

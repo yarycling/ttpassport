@@ -1,0 +1,31 @@
+<!-- Wappler include head-page="layouts/main" bootstrap5="local" is="dmx-app" id="accountRegister" appConnect="local" -->
+<section class="auth-page" aria-labelledby="register-heading">
+  <div class="container-fluid page-container">
+    <div class="auth-card">
+      <p class="section-kicker">Citizen account</p>
+      <h1 id="register-heading">Create an account</h1>
+      <div class="notice-alert notice-alert--warning mb-4" role="note">
+        <strong>Registration preview only</strong>
+        Account creation, email verification and privacy terms are not connected or approved. Do not enter personal information.
+      </div>
+      <form aria-describedby="register-preview-note">
+        <div class="mb-3">
+          <label class="form-label" for="register-email">Email address</label>
+          <input class="form-control" id="register-email" type="email" placeholder="Email address" disabled aria-describedby="register-preview-note">
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="register-password">Create a password</label>
+          <input class="form-control" id="register-password" type="password" placeholder="Password" disabled aria-describedby="register-preview-note">
+          <div class="field-help mt-1">Password guidance will be supplied with the approved account policy.</div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="register-confirm">Confirm password</label>
+          <input class="form-control" id="register-confirm" type="password" placeholder="Confirm password" disabled aria-describedby="register-preview-note">
+        </div>
+        <button class="btn btn-primary-government" type="button" disabled>Registration unavailable</button>
+        <p class="field-help mt-3 mb-0" id="register-preview-note">No data is accepted or stored by this screen.</p>
+      </form>
+      <p class="mt-4 mb-0">Already have an account? <a href="/account/sign-in">Sign in</a></p>
+    </div>
+  </div>
+</section>

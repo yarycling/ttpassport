@@ -1,0 +1,40 @@
+<!-- Wappler include head-page="layouts/backoffice" bootstrap5="local" is="dmx-app" id="backofficeApplications" appConnect="local" -->
+<section aria-labelledby="applications-queue-heading">
+  <div class="page-title-row">
+    <div>
+      <p class="section-kicker">Immigration Division · Passport workspace</p>
+      <h1 id="applications-queue-heading">Applications and workload</h1>
+      <p class="page-subtitle">Queue, filtering and assignment layout only. No case records or office information are connected.</p>
+    </div>
+    <span class="status-chip status-chip--neutral">No live queue</span>
+  </div>
+  <div class="notice-alert notice-alert--warning mb-3" role="note">
+    <strong>Staff access is not configured</strong>
+    This static preview has no role, office, assignment or case-state checks. No action can be performed.
+  </div>
+  <section class="content-panel mb-3" aria-labelledby="filters-heading">
+    <h2 id="filters-heading">Application filters</h2>
+    <div class="filter-row">
+      <div><label class="form-label" for="filter-service">Service</label><select class="form-select" id="filter-service" disabled><option selected>Not connected</option></select></div>
+      <div><label class="form-label" for="filter-status">Status</label><select class="form-select" id="filter-status" disabled><option selected>Not connected</option></select></div>
+      <div><label class="form-label" for="filter-office">Office</label><select class="form-select" id="filter-office" disabled><option selected>Not connected</option></select></div>
+      <div><label class="form-label" for="filter-assignment">Assignment</label><select class="form-select" id="filter-assignment" disabled><option selected>Not connected</option></select></div>
+    </div>
+  </section>
+  <section class="content-panel" aria-labelledby="queue-heading">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+      <h2 class="mb-0" id="queue-heading">Application queue</h2>
+      <span class="status-chip status-chip--neutral">Data source not connected</span>
+    </div>
+    <div class="table-responsive-preview" aria-label="Illustrative application queue table">
+      <table class="preview-table">
+        <thead><tr><th scope="col">Reference</th><th scope="col">Service</th><th scope="col">Status</th><th scope="col">Office</th><th scope="col">Assignment</th></tr></thead>
+        <tbody><tr><td colspan="5" class="text-center py-4">No queue rows are available in this preview.</td></tr></tbody>
+      </table>
+    </div>
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mt-3">
+      <span class="field-help">Pagination and counts are not connected.</span>
+      <div class="d-flex gap-2"><button class="btn btn-outline-crimson" type="button" disabled>Previous</button><button class="btn btn-outline-crimson" type="button" disabled>Next</button></div>
+    </div>
+  </section>
+</section>

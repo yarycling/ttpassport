@@ -1,0 +1,23 @@
+GUI-BASELINE-01B browser and designer check record
+date=2026-11-22
+environment=local Wappler Development preview at http://localhost:3002/; Wappler 7.9.9 Design view
+
+Responsive route sweep (browser checks completed during this package):
+- 15 configured GUI routes checked at 1440, 1024, 768 and 375 px (60 route/viewport checks).
+- No page-level horizontal overflow, broken images or missing Coat of Arms instances were observed.
+- At 375 px, no duplicate element IDs or unlabeled form controls were observed.
+- No new browser console warnings or errors were reported during the checked pages and interactions.
+
+App Connect interaction checks observed in the browser:
+- The first-time preview wizard advanced from stage 1 to stage 2; fields stayed disabled and the page continued to label itself as a preview.
+- The back-office review workspace switched to Citizenship and displayed the empty-evidence state.
+- Public navigation expanded and collapsed; the button's accessibility state changed from collapsed to expanded and back, with five navigation links visible while expanded.
+- The homepage accessibility tree exposed the Coat of Arms with descriptive alternative text. The back-office review page exposed the same shared masthead image.
+
+Wappler designer check:
+- TTPASSPORT was open in Wappler 7.9.9 with `index.ejs` in Design view.
+- The homepage rendered and the App Connect inspector exposed the page and layout properties.
+
+Evidence limitation:
+- These are observations recorded from the browser and Wappler accessibility/UI states; no screenshot or raw browser trace was exported.
+- This record is not owner GUI acceptance. Zoom, keyboard-only and final visual review remain pending.

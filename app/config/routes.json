@@ -1,0 +1,94 @@
+{
+  "routes": [
+    {
+      "path": "/",
+      "page": "index",
+      "layout": "main",
+      "routeType": "page"
+    },
+    {
+      "path": "/account/sign-in",
+      "page": "account-sign-in",
+      "layout": "main",
+      "routeType": "page"
+    },
+    {
+      "path": "/account/register",
+      "page": "account-register",
+      "layout": "main",
+      "routeType": "page"
+    },
+    {
+      "path": "/account/verify-email",
+      "page": "account-verify-email",
+      "layout": "main",
+      "routeType": "page"
+    },
+    {
+      "path": "/account/forgot-password",
+      "page": "account-forgot-password",
+      "layout": "main",
+      "routeType": "page"
+    },
+    {
+      "path": "/account/reset-password",
+      "page": "account-reset-password",
+      "layout": "main",
+      "routeType": "page"
+    },
+    {
+      "path": "/citizen/dashboard",
+      "page": "citizen-dashboard",
+      "layout": "main",
+      "routeType": "page"
+    },
+    {
+      "path": "/citizen/apply/first-time",
+      "page": "citizen-application-first-time",
+      "layout": "main",
+      "routeType": "page"
+    },
+    {
+      "path": "/citizen/track",
+      "page": "citizen-tracking",
+      "layout": "main",
+      "routeType": "page"
+    },
+    {
+      "path": "/design-preview/backoffice/overview",
+      "page": "backoffice-overview",
+      "layout": "backoffice",
+      "routeType": "page"
+    },
+    {
+      "path": "/design-preview/backoffice/applications",
+      "page": "backoffice-applications",
+      "layout": "backoffice",
+      "routeType": "page"
+    },
+    {
+      "path": "/design-preview/backoffice/review",
+      "page": "backoffice-review",
+      "layout": "backoffice",
+      "routeType": "page"
+    },
+    {
+      "path": "/design-preview/backoffice/administration",
+      "page": "backoffice-administration",
+      "layout": "backoffice",
+      "routeType": "page"
+    },
+    {
+      "path": "/verification/preview",
+      "page": "verification-capture",
+      "layout": "main",
+      "routeType": "page"
+    },
+    {
+      "path": "/verification/preview/review",
+      "page": "verification-review",
+      "layout": "main",
+      "routeType": "page"
+    }
+  ]
+}

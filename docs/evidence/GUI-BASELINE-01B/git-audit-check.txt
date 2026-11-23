@@ -1,0 +1,25 @@
+GUI-BASELINE-01B public GitHub pre-push audit
+date=2026-11-22
+repository=https://github.com/yarycling/ttpassport.git
+visibility=PUBLIC
+local_branch=main
+origin=https://github.com/yarycling/ttpassport.git
+pre_push_remote_heads=none (verified with git ls-remote --heads origin)
+staged_file_count_before_audit_record=238
+
+Excluded from publication by .gitignore:
+- node_modules/
+- .env and .env.* (except a future .env.example)
+- private keys and certificates
+- db/, SQLite/database files
+- uploads/, storage/, tmp/, temp/
+- logs, Wappler caches/logs, OS metadata
+
+Audit results:
+- No environment, credential, certificate, database, upload, storage or temp files appear in the staged file list.
+- Wappler Development database connection files were inspected; they contain only the SQLite client and local database path. The database file is ignored.
+- Credential-pattern scan found no private-key blocks, common token prefixes, or long literal secret assignments in publishable text files.
+- No local /Users/ or /home/ paths remain in publishable documentation or text files.
+- The full staged whitespace check reports trailing whitespace in existing Wappler runtime/source files and intentional Markdown hard-breaks. The scoped 01B config, theme and shared partial files pass.
+
+pre_push_audit_result=PASS (safe to publish the intended baseline)

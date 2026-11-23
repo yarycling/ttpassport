@@ -1,0 +1,9 @@
+GUI-BASELINE-01B Wappler target/config restart check
+timestamp=2026-11-22T23:55:42.637Z
+startup_command=npm start (node ./index.js; no PORT override)
+active_target=Development
+development_remote_url=http://localhost:3002/
+runtime_config_port=3002
+homepage_http_status=200
+homepage_title_present=true
+result=PASS

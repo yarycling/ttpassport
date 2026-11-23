@@ -1,0 +1,21 @@
+GUI-BASELINE-01B official artwork integrity check
+
+$ file public/assets/branding/coat-of-arms-trinidad-and-tobago-2025.webp
+public/assets/branding/coat-of-arms-trinidad-and-tobago-2025.webp: RIFF (little-endian) data, Web/P image
+exit_code=0
+
+$ sips -g pixelWidth -g pixelHeight public/assets/branding/coat-of-arms-trinidad-and-tobago-2025.webp
+public/assets/branding/coat-of-arms-trinidad-and-tobago-2025.webp
+  pixelWidth: 1280
+  pixelHeight: 1248
+exit_code=0
+
+$ md5 public/assets/branding/coat-of-arms-trinidad-and-tobago-2025.webp owner-supplied source image
+MD5 (public/assets/branding/coat-of-arms-trinidad-and-tobago-2025.webp) = a0ad3b12d08f47fa5f41bf144035c9a8
+MD5 (owner-supplied source image) = a0ad3b12d08f47fa5f41bf144035c9a8
+exit_code=0
+
+$ cmp public/assets/branding/coat-of-arms-trinidad-and-tobago-2025.webp owner-supplied source image
+exit_code=0
+
+result=PASS (source and project asset are byte-for-byte identical)

@@ -1,0 +1,64 @@
+GUI-BASELINE-01B post-restart route/resource smoke check
+timestamp_utc=2026-11-23T00:03:54.068Z
+base_url=http://localhost:3002
+routes=15
+resources=27
+branding_routes=15
+route	/	PASS	200
+route	/account/sign-in	PASS	200
+route	/account/register	PASS	200
+route	/account/verify-email	PASS	200
+route	/account/forgot-password	PASS	200
+route	/account/reset-password	PASS	200
+route	/citizen/dashboard	PASS	200
+route	/citizen/apply/first-time	PASS	200
+route	/citizen/track	PASS	200
+route	/design-preview/backoffice/overview	PASS	200
+route	/design-preview/backoffice/applications	PASS	200
+route	/design-preview/backoffice/review	PASS	200
+route	/design-preview/backoffice/administration	PASS	200
+route	/verification/preview	PASS	200
+route	/verification/preview/review	PASS	200
+resource	/dmxAppConnect/dmxAppConnect.js	PASS	200	text/javascript; charset=utf-8
+resource	/bootstrap/5/css/bootstrap.min.css	PASS	200	text/css; charset=utf-8
+resource	/assets/ttpassport/css/ttpassport-theme.css	PASS	200	text/css; charset=utf-8
+css-resource	/assets/ttpassport/banners/header-government-crimson.webp	PASS	200	image/webp
+css-resource	/assets/ttpassport/banners/hero-citizen-passport.webp	PASS	200	image/webp
+css-resource	/assets/ttpassport/backgrounds/bg-login-authentication.webp	PASS	200	image/webp
+css-resource	/assets/ttpassport/backgrounds/bg-citizen-dashboard.webp	PASS	200	image/webp
+css-resource	/assets/ttpassport/backgrounds/bg-application-form.webp	PASS	200	image/webp
+css-resource	/assets/ttpassport/backgrounds/bg-backoffice-dashboard.webp	PASS	200	image/webp
+css-resource	/assets/ttpassport/backgrounds/bg-security-guilloche.webp	PASS	200	image/webp
+css-resource	/assets/ttpassport/backgrounds/bg-international-service.webp	PASS	200	image/webp
+resource	/dmxAppConnect/dmxRouting/dmxRouting.js	PASS	200	text/javascript; charset=utf-8
+resource	/assets/branding/coat-of-arms-trinidad-and-tobago-2025.webp	PASS	200	image/webp
+resource	/	PASS	200	text/html; charset=utf-8
+resource	/citizen/apply/first-time	PASS	200	text/html; charset=utf-8
+resource	/citizen/track	PASS	200	text/html; charset=utf-8
+resource	/account/sign-in	PASS	200	text/html; charset=utf-8
+resource	/bootstrap/5/js/bootstrap.bundle.min.js	PASS	200	text/javascript; charset=utf-8
+resource	/account/forgot-password	PASS	200	text/html; charset=utf-8
+resource	/account/register	PASS	200	text/html; charset=utf-8
+resource	/citizen/dashboard	PASS	200	text/html; charset=utf-8
+resource	/design-preview/backoffice/overview	PASS	200	text/html; charset=utf-8
+resource	/design-preview/backoffice/applications	PASS	200	text/html; charset=utf-8
+resource	/design-preview/backoffice/review	PASS	200	text/html; charset=utf-8
+resource	/design-preview/backoffice/administration	PASS	200	text/html; charset=utf-8
+resource	/verification/preview/review	PASS	200	text/html; charset=utf-8
+resource	/verification/preview	PASS	200	text/html; charset=utf-8
+branding	/	PASS			1
+branding	/account/sign-in	PASS			1
+branding	/account/register	PASS			1
+branding	/account/verify-email	PASS			1
+branding	/account/forgot-password	PASS			1
+branding	/account/reset-password	PASS			1
+branding	/citizen/dashboard	PASS			1
+branding	/citizen/apply/first-time	PASS			1
+branding	/citizen/track	PASS			1
+branding	/design-preview/backoffice/overview	PASS			1
+branding	/design-preview/backoffice/applications	PASS			1
+branding	/design-preview/backoffice/review	PASS			1
+branding	/design-preview/backoffice/administration	PASS			1
+branding	/verification/preview	PASS			1
+branding	/verification/preview/review	PASS			1
+summary=PASS (57/57)

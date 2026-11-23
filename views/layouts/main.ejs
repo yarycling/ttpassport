@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <script src="/dmxAppConnect/dmxAppConnect.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#64051f">
+  <meta name="description" content="Trinidad & Tobago Passport Management System design preview.">
+  <title>Trinidad &amp; Tobago Passport Management System | Design Preview</title>
+  <link rel="stylesheet" href="/bootstrap/5/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/assets/ttpassport/css/ttpassport-theme.css">
+  <script src="/dmxAppConnect/dmxRouting/dmxRouting.js" defer></script>
+</head>
+<body is="dmx-app" id="main">
+  <a class="skip-link" href="#content">Skip to main content</a>
+  <%- await include('../partials/government-masthead', locals); %>
+  <%- await include('../partials/public-navigation', locals); %>
+  <main is="dmx-view" id="content" tabindex="-1">
+    <%- await include(content, locals); %>
+  </main>
+  <%- await include('../partials/government-footer', locals); %>
+  <script src="/bootstrap/5/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
