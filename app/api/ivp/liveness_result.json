@@ -1,0 +1,529 @@
+{
+  "meta": {
+    "$_POST": [
+      {
+        "name": "session_id",
+        "type": "text",
+        "fieldName": "session_id",
+        "options": {
+          "rules": {
+            "core:required": {}
+          }
+        }
+      },
+      {
+        "name": "result_status",
+        "type": "text",
+        "fieldName": "result_status",
+        "options": {
+          "rules": {
+            "core:required": {},
+            "core:maxlength": {
+              "param": 24
+            }
+          }
+        }
+      },
+      {
+        "name": "result_json",
+        "type": "text",
+        "fieldName": "result_json",
+        "options": {
+          "rules": {
+            "core:required": {},
+            "core:maxlength": {
+              "param": 8192
+            }
+          }
+        }
+      },
+      {
+        "name": "completed_challenge_count",
+        "type": "number",
+        "fieldName": "completed_challenge_count",
+        "options": {
+          "rules": {
+            "core:required": {}
+          }
+        }
+      },
+      {
+        "name": "total_challenge_count",
+        "type": "number",
+        "fieldName": "total_challenge_count",
+        "options": {
+          "rules": {
+            "core:required": {}
+          }
+        }
+      },
+      {
+        "name": "passive_sample_count",
+        "type": "number",
+        "fieldName": "passive_sample_count",
+        "options": {
+          "rules": {
+            "core:required": {}
+          }
+        }
+      }
+    ]
+  },
+  "exec": {
+    "steps": [
+      {
+        "name": "require_user",
+        "module": "auth",
+        "action": "restrict",
+        "options": {
+          "provider": "ivpDemo"
+        },
+        "output": false
+      },
+      {
+        "name": "identity",
+        "module": "auth",
+        "action": "identify",
+        "options": {
+          "provider": "ivpDemo"
+        },
+        "output": false,
+        "meta": [
+          {
+            "name": "identity",
+            "type": "text"
+          }
+        ],
+        "outputType": "text"
+      },
+      {
+        "name": "client",
+        "module": "dbconnector",
+        "action": "single",
+        "options": {
+          "connection": "ivp",
+          "sql": {
+            "type": "SELECT",
+            "table": {
+              "name": "ivp_clients"
+            },
+            "primary": "client_id",
+            "columns": [
+              {
+                "table": "ivp_clients",
+                "column": "client_id"
+              }
+            ],
+            "wheres": {
+              "condition": "AND",
+              "rules": [
+                {
+                  "table": "ivp_clients",
+                  "column": "client_key",
+                  "operator": "equal",
+                  "operation": "=",
+                  "value": "ttpassport-dev"
+                },
+                {
+                  "table": "ivp_clients",
+                  "column": "status",
+                  "operator": "equal",
+                  "operation": "=",
+                  "value": "ACTIVE"
+                }
+              ]
+            },
+            "limit": 1
+          }
+        },
+        "output": false,
+        "meta": [
+          {
+            "name": "client_id",
+            "type": "number"
+          }
+        ],
+        "outputType": "object"
+      },
+      {
+        "name": "validate_reported_outcome",
+        "module": "core",
+        "action": "condition",
+        "options": {
+          "if": "{{($_POST.result_status == 'COMPLETED' && $_POST.completed_challenge_count > 0 && $_POST.completed_challenge_count == $_POST.total_challenge_count && $_POST.passive_sample_count > 0) || $_POST.result_status == 'FAILED' || $_POST.result_status == 'UNAVAILABLE' || $_POST.result_status == 'NOT_PERFORMED'}}",
+          "then": [
+            {
+              "name": "owned_session",
+              "module": "dbconnector",
+              "action": "single",
+              "options": {
+                "connection": "ivp",
+                "sql": {
+                  "type": "SELECT",
+                  "table": {
+                    "name": "ivp_sessions"
+                  },
+                  "primary": "session_id",
+                  "columns": [
+                    {
+                      "table": "ivp_sessions",
+                      "column": "session_id"
+                    },
+                    {
+                      "table": "ivp_sessions",
+                      "column": "status"
+                    }
+                  ],
+                  "wheres": {
+                    "condition": "AND",
+                    "rules": [
+                      {
+                        "table": "ivp_sessions",
+                        "column": "client_id",
+                        "operator": "equal",
+                        "operation": "=",
+                        "value": "{{client.client_id}}"
+                      },
+                      {
+                        "table": "ivp_sessions",
+                        "column": "session_id",
+                        "operator": "equal",
+                        "operation": "=",
+                        "value": "{{$_POST.session_id}}"
+                      },
+                      {
+                        "table": "ivp_sessions",
+                        "column": "created_by_user_id",
+                        "operator": "equal",
+                        "operation": "=",
+                        "value": "{{identity}}"
+                      }
+                    ]
+                  },
+                  "limit": 1
+                }
+              },
+              "output": false,
+              "meta": [
+                {
+                  "name": "session_id",
+                  "type": "text"
+                },
+                {
+                  "name": "status",
+                  "type": "text"
+                }
+              ],
+              "outputType": "object"
+            },
+            {
+              "name": "session_gate",
+              "module": "core",
+              "action": "condition",
+              "options": {
+                "if": "{{owned_session && owned_session.session_id && (owned_session.status == 'IN_PROGRESS' || owned_session.status == 'REVIEW_REQUIRED')}}",
+                "then": [
+                  {
+                    "name": "liveness_consent",
+                    "module": "dbconnector",
+                    "action": "single",
+                    "options": {
+                      "connection": "ivp",
+                      "sql": {
+                        "type": "SELECT",
+                        "table": {
+                          "name": "ivp_consents"
+                        },
+                        "primary": "consent_id",
+                        "columns": [
+                          {
+                            "table": "ivp_consents",
+                            "column": "consent_id"
+                          }
+                        ],
+                        "wheres": {
+                          "condition": "AND",
+                          "rules": [
+                            {
+                              "table": "ivp_consents",
+                              "column": "client_id",
+                              "operator": "equal",
+                              "operation": "=",
+                              "value": "{{client.client_id}}"
+                            },
+                            {
+                              "table": "ivp_consents",
+                              "column": "session_id",
+                              "operator": "equal",
+                              "operation": "=",
+                              "value": "{{owned_session.session_id}}"
+                            },
+                            {
+                              "table": "ivp_consents",
+                              "column": "actor_user_id",
+                              "operator": "equal",
+                              "operation": "=",
+                              "value": "{{identity}}"
+                            },
+                            {
+                              "table": "ivp_consents",
+                              "column": "consent_version",
+                              "operator": "equal",
+                              "operation": "=",
+                              "value": "TTP-DEV-CONSENT-1.2-LIVENESS"
+                            },
+                            {
+                              "table": "ivp_consents",
+                              "column": "accepted",
+                              "operator": "equal",
+                              "operation": "=",
+                              "value": 1
+                            }
+                          ]
+                        },
+                        "limit": 1
+                      }
+                    },
+                    "output": false,
+                    "meta": [
+                      {
+                        "name": "consent_id",
+                        "type": "text"
+                      }
+                    ],
+                    "outputType": "object"
+                  },
+                  {
+                    "name": "consent_gate",
+                    "module": "core",
+                    "action": "condition",
+                    "options": {
+                      "if": "{{liveness_consent && liveness_consent.consent_id}}",
+                      "then": [
+                        {
+                          "name": "liveness_check",
+                          "module": "dbconnector",
+                          "action": "single",
+                          "options": {
+                            "connection": "ivp",
+                            "sql": {
+                              "type": "SELECT",
+                              "table": {
+                                "name": "ivp_checks"
+                              },
+                              "primary": "check_id",
+                              "columns": [
+                                {
+                                  "table": "ivp_checks",
+                                  "column": "check_id"
+                                }
+                              ],
+                              "wheres": {
+                                "condition": "AND",
+                                "rules": [
+                                  {
+                                    "table": "ivp_checks",
+                                    "column": "client_id",
+                                    "operator": "equal",
+                                    "operation": "=",
+                                    "value": "{{client.client_id}}"
+                                  },
+                                  {
+                                    "table": "ivp_checks",
+                                    "column": "session_id",
+                                    "operator": "equal",
+                                    "operation": "=",
+                                    "value": "{{owned_session.session_id}}"
+                                  },
+                                  {
+                                    "table": "ivp_checks",
+                                    "column": "check_code",
+                                    "operator": "equal",
+                                    "operation": "=",
+                                    "value": "LIVENESS"
+                                  }
+                                ]
+                              },
+                              "limit": 1,
+                              "orders": [
+                                {
+                                  "table": "ivp_checks",
+                                  "column": "check_id",
+                                  "direction": "DESC"
+                                }
+                              ]
+                            }
+                          },
+                          "output": false,
+                          "meta": [
+                            {
+                              "name": "check_id",
+                              "type": "number"
+                            }
+                          ],
+                          "outputType": "object"
+                        },
+                        {
+                          "name": "check_gate",
+                          "module": "core",
+                          "action": "condition",
+                          "options": {
+                            "if": "{{liveness_check && liveness_check.check_id}}",
+                            "then": [
+                              {
+                                "name": "save_experimental_result",
+                                "module": "dbupdater",
+                                "action": "update",
+                                "options": {
+                                  "connection": "ivp",
+                                  "sql": {
+                                    "type": "UPDATE",
+                                    "table": "ivp_checks",
+                                    "values": [
+                                      {
+                                        "column": "status",
+                                        "value": "{{$_POST.result_status}}"
+                                      },
+                                      {
+                                        "column": "provider_name",
+                                        "value": "open-face-liveness"
+                                      },
+                                      {
+                                        "column": "model_version",
+                                        "value": "0.1.0@740b0a8"
+                                      },
+                                      {
+                                        "column": "details_json",
+                                        "value": "{{$_POST.result_json}}"
+                                      }
+                                    ],
+                                    "wheres": {
+                                      "condition": "AND",
+                                      "rules": [
+                                        {
+                                          "table": "ivp_checks",
+                                          "column": "client_id",
+                                          "operator": "equal",
+                                          "operation": "=",
+                                          "value": "{{client.client_id}}"
+                                        },
+                                        {
+                                          "table": "ivp_checks",
+                                          "column": "session_id",
+                                          "operator": "equal",
+                                          "operation": "=",
+                                          "value": "{{owned_session.session_id}}"
+                                        },
+                                        {
+                                          "table": "ivp_checks",
+                                          "column": "check_id",
+                                          "operator": "equal",
+                                          "operation": "=",
+                                          "value": "{{liveness_check.check_id}}"
+                                        },
+                                        {
+                                          "table": "ivp_checks",
+                                          "column": "check_code",
+                                          "operator": "equal",
+                                          "operation": "=",
+                                          "value": "LIVENESS"
+                                        }
+                                      ]
+                                    }
+                                  }
+                                },
+                                "output": false,
+                                "meta": [
+                                  {
+                                    "name": "affected",
+                                    "type": "number"
+                                  }
+                                ],
+                                "outputType": "object"
+                              },
+                              {
+                                "name": "saved",
+                                "module": "core",
+                                "action": "setvalue",
+                                "options": {
+                                  "key": "result",
+                                  "value": "LIVENESS_RESULT_SAVED"
+                                },
+                                "output": true,
+                                "outputType": "text"
+                              }
+                            ],
+                            "else": [
+                              {
+                                "name": "missing_check",
+                                "module": "core",
+                                "action": "response",
+                                "options": {
+                                  "status": 404,
+                                  "data": {
+                                    "message": "This check is unavailable."
+                                  }
+                                },
+                                "output": false
+                              }
+                            ]
+                          },
+                          "output": false
+                        }
+                      ],
+                      "else": [
+                        {
+                          "name": "missing_consent",
+                          "module": "core",
+                          "action": "response",
+                          "options": {
+                            "status": 404,
+                            "data": {
+                              "message": "This session is unavailable for this check."
+                            }
+                          },
+                          "output": false
+                        }
+                      ]
+                    },
+                    "output": false
+                  }
+                ],
+                "else": [
+                  {
+                    "name": "missing_session",
+                    "module": "core",
+                    "action": "response",
+                    "options": {
+                      "status": 404,
+                      "data": {
+                        "message": "This session is unavailable for this check."
+                      }
+                    },
+                    "output": false
+                  }
+                ]
+              },
+              "output": false
+            }
+          ],
+          "else": [
+            {
+              "name": "invalid_report",
+              "module": "core",
+              "action": "response",
+              "options": {
+                "status": 400,
+                "data": {
+                  "message": "An incomplete experimental result cannot be recorded as completed."
+                }
+              },
+              "output": false
+            }
+          ]
+        },
+        "output": false
+      }
+    ]
+  }
+}

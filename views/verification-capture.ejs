@@ -103,12 +103,12 @@
 
       <div class="mt-4" dmx-show="ivpSessionLatest.data.session.status == 'CONSENT_REQUIRED'">
         <h3>1. Record explicit test consent</h3>
-        <p>Consent applies to this Development demonstration: private local storage of test evidence, local OCR, and a local one-to-one face-similarity calculation using YuNet and SFace. Images are not sent to an external provider. No match threshold, liveness check, document-authenticity check, or authoritative identity or citizenship verification is performed.</p>
+        <p>Consent applies to this Development demonstration: private local storage of synthetic evidence, local OCR, one-to-one face-similarity processing, and an experimental browser-camera check using open-face-liveness v0.1.0. Camera video and frames stay in the browser; only minimal check outputs are saved. No images are sent to an external provider. The liveness result is experimental and untrusted, with no approved anti-spoof threshold or legal identity or citizenship verification.</p>
         <form id="ivpConsentForm" is="dmx-serverconnect-form" method="post" action="/api/ivp/consent" dmx-on:success="ivpSessionLatest.load()">
           <input type="hidden" name="session_id" dmx-bind:value="ivpSessionLatest.data.session.session_id">
           <div class="form-check mb-3">
             <input class="form-check-input" id="ivpConsentAccepted" name="consent_accepted" type="checkbox" value="1" required>
-            <label class="form-check-label" for="ivpConsentAccepted">I consent to this local test session, including face-similarity processing, and understand it does not verify legal identity or citizenship.</label>
+            <label class="form-check-label" for="ivpConsentAccepted">I consent to local OCR, face-similarity processing, and the experimental browser-camera movement and passive anti-spoofing checks, and understand these do not verify legal identity or citizenship.</label>
           </div>
           <div class="notice-alert notice-alert--warning mb-3" role="alert" dmx-show="ivpConsentForm.lastError.status">Consent was not recorded. Please select the checkbox and try again.</div>
           <button class="btn btn-primary-government" type="submit" dmx-bind:disabled="ivpConsentForm.state.executing">Record test consent</button>
@@ -175,13 +175,13 @@
 
       <div class="mt-4" dmx-show="ivpSessionLatest.data.ocr_results[0].reviewed_at">
         <h3>4. Capture a separate synthetic selfie</h3>
-        <p>Use a synthetic test image or the device camera option. No face comparison or liveness check is run in this milestone.</p>
+        <p>Use a synthetic test image or the device camera option. The saved selfie is compared locally with the specimen portrait. The separate experimental video check below requests live browser camera access. The <code>capture="user"</code> setting is only a browser hint and does not confirm that a camera was used.</p>
         <form id="ivpSelfieUploadForm" is="dmx-serverconnect-form" method="post" action="/api/ivp/selfie_upload" enctype="multipart/form-data" dmx-on:success="ivpSessionLatest.load()">
           <input type="hidden" name="session_id" dmx-bind:value="ivpSessionLatest.data.session.session_id">
           <div class="mb-3">
             <label class="form-label" for="ivpSelfieFile">Synthetic selfie image</label>
             <input class="form-control" id="ivpSelfieFile" name="selfie_file" type="file" accept="image/png,image/jpeg" capture="user" required aria-describedby="ivpSelfieHelp">
-            <p id="ivpSelfieHelp" class="field-help mt-2">JPEG or PNG, up to 5 MB. The selfie is compared locally with the specimen portrait; the result is a score only, with no match decision. Liveness is not performed. Mobile browsers may offer the front camera; permission is controlled by your browser.</p>
+            <p id="ivpSelfieHelp" class="field-help mt-2">JPEG or PNG, up to 5 MB. The selfie is compared locally with the specimen portrait; the result is a score only, with no match decision. Mobile browsers may offer the front camera; permission is controlled by your browser.</p>
           </div>
           <div class="notice-alert notice-alert--warning mb-3" role="alert" dmx-show="ivpSelfieUploadForm.lastError.status">The synthetic selfie could not be saved. Check the image and try again.</div>
           <button class="btn btn-primary-government" type="submit" dmx-bind:disabled="ivpSelfieUploadForm.state.executing">
@@ -189,6 +189,43 @@
             <span dmx-show="ivpSelfieUploadForm.state.executing">Saving evidence…</span>
           </button>
         </form>
+      </div>
+
+      <section class="content-panel mt-4" aria-labelledby="ivp-liveness-heading" dmx-show="ivpSessionLatest.data.session.session_id &amp;&amp; ivpSessionLatest.data.liveness_consent.consent_id &amp;&amp; (ivpSessionLatest.data.session.status == 'IN_PROGRESS' || ivpSessionLatest.data.session.status == 'REVIEW_REQUIRED')">
+        <h3 id="ivp-liveness-heading">5. Experimental desktop camera check</h3>
+        <p class="field-help">The local candidate requests camera access, gives movement instructions, and records passive model outputs. Keep your face visible and follow the prompts. The browser-reported result is untrusted; a completed run means only that the candidate finished processing. It is not certified anti-spoof protection or proof of identity.</p>
+        <dmx-ivp-liveness id="ivpLiveness" dmx-on:complete="ivpLivenessResultForm.submit()">
+          <video class="w-100 rounded border mb-3" data-liveness-video autoplay muted playsinline aria-label="Local camera preview for experimental liveness check" style="max-height: 28rem; background: #111;"></video>
+        </dmx-ivp-liveness>
+        <p class="field-help mb-2" role="status" aria-live="polite" dmx-text="ivpLiveness.instruction"></p>
+        <div class="progress mb-3" role="progressbar" aria-label="Experimental camera check progress" aria-valuemin="0" aria-valuemax="100" dmx-bind:aria-valuenow="ivpLiveness.progress">
+          <div class="progress-bar bg-danger" dmx-bind:style="'width:' + ivpLiveness.progress + '%'" dmx-bind:aria-valuenow="ivpLiveness.progress"></div>
+        </div>
+        <div class="notice-alert mb-3" role="status" dmx-show="ivpLiveness.outcome == 'COMPLETED'">
+          Experimental processing completed. Movement prompts: <strong dmx-text="ivpLiveness.completedChallengeCount + ' of ' + ivpLiveness.totalChallengeCount"></strong>. Passive model samples: <strong dmx-text="ivpLiveness.passiveSampleCount"></strong>. No pass/fail anti-spoof decision is configured.
+        </div>
+        <div class="notice-alert notice-alert--warning mb-3" role="alert" dmx-show="ivpLiveness.errorMessage" dmx-text="ivpLiveness.errorMessage"></div>
+        <div class="notice-alert mb-3" role="status" dmx-show="ivpLiveness.saved">Experimental result saved to this session.</div>
+        <form id="ivpLivenessResultForm" is="dmx-serverconnect-form" method="post" action="/api/ivp/liveness_result" dmx-on:success="ivpSessionLatest.load();ivpLiveness.markSaved()">
+          <input type="hidden" name="session_id" dmx-bind:value="ivpSessionLatest.data.session.session_id">
+          <input type="hidden" name="result_status" dmx-bind:value="ivpLiveness.outcome">
+          <input type="hidden" name="result_json" dmx-bind:value="ivpLiveness.resultJson">
+          <input type="hidden" name="completed_challenge_count" dmx-bind:value="ivpLiveness.completedChallengeCount">
+          <input type="hidden" name="total_challenge_count" dmx-bind:value="ivpLiveness.totalChallengeCount">
+          <input type="hidden" name="passive_sample_count" dmx-bind:value="ivpLiveness.passiveSampleCount">
+          <div class="notice-alert notice-alert--warning mb-3" role="alert" dmx-show="ivpLivenessResultForm.lastError.status">The result could not be saved. Your identity and citizenship status have not changed.</div>
+        </form>
+        <div class="d-flex flex-wrap gap-2">
+          <button class="btn btn-primary-government" type="button" dmx-bind:disabled="ivpLiveness.busy" dmx-on:click="ivpLiveness.clearSaved();ivpLiveness.start()">
+            <span dmx-show="!ivpLiveness.busy">Start or retry camera check</span>
+            <span dmx-show="ivpLiveness.busy">Camera check running…</span>
+          </button>
+          <button class="btn btn-outline-crimson" type="button" dmx-show="ivpLiveness.busy" dmx-on:click="ivpLiveness.cancel()">Cancel check</button>
+        </div>
+      </section>
+
+      <div class="notice-alert notice-alert--warning mt-4" role="note" dmx-show="ivpSessionLatest.data.session.session_id &amp;&amp; !ivpSessionLatest.data.liveness_consent.consent_id &amp;&amp; (ivpSessionLatest.data.session.status == 'IN_PROGRESS' || ivpSessionLatest.data.session.status == 'REVIEW_REQUIRED')">
+        This session uses an earlier consent record. Start a new test session and accept the current consent to use the experimental camera check.
       </div>
 
       <div class="mt-4 d-flex flex-wrap gap-2" dmx-show="ivpSessionLatest.data.session.session_id">

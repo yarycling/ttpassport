@@ -591,6 +591,10 @@
                                       {
                                         "table": "ivp_consents",
                                         "column": "consent_id"
+                                      },
+                                      {
+                                        "table": "ivp_consents",
+                                        "column": "consent_version"
                                       }
                                     ],
                                     "wheres": {
@@ -619,13 +623,6 @@
                                         },
                                         {
                                           "table": "ivp_consents",
-                                          "column": "consent_version",
-                                          "operator": "equal",
-                                          "operation": "=",
-                                          "value": "TTP-DEV-CONSENT-1.1-FACE-POC"
-                                        },
-                                        {
-                                          "table": "ivp_consents",
                                           "column": "accepted",
                                           "operator": "equal",
                                           "operation": "=",
@@ -648,6 +645,10 @@
                                   {
                                     "name": "consent_id",
                                     "type": "text"
+                                  },
+                                  {
+                                    "name": "consent_version",
+                                    "type": "text"
                                   }
                                 ],
                                 "outputType": "object"
@@ -657,7 +658,7 @@
                                 "module": "core",
                                 "action": "condition",
                                 "options": {
-                                  "if": "{{face_consent && face_consent.consent_id}}",
+                                  "if": "{{face_consent && face_consent.consent_id && (face_consent.consent_version == 'TTP-DEV-CONSENT-1.1-FACE-POC' || face_consent.consent_version == 'TTP-DEV-CONSENT-1.2-LIVENESS')}}",
                                   "then": [
                                     {
                                       "name": "face_reference",
@@ -896,7 +897,7 @@
                                                     },
                                                     {
                                                       "column": "details_json",
-                                                      "value": "{\"status\":\"NOT_PERFORMED\",\"reason\":\"Candidate evaluation only. The reviewed Faceplugin project classifies a single image and is not used here to assert genuine live capture. macOS ARM64 support and suitable live/spoof samples were not established.\"}"
+                                                      "value": "{\"status\":\"NOT_PERFORMED\",\"reason\":\"No browser video liveness attempt has been recorded for this session.\"}"
                                                     }
                                                   ],
                                                   "wheres": {

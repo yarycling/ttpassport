@@ -473,6 +473,91 @@
                 }
               ],
               "outputType": "array"
+            },
+            {
+              "name": "liveness_consent",
+              "module": "dbconnector",
+              "action": "single",
+              "options": {
+                "connection": "ivp",
+                "sql": {
+                  "type": "SELECT",
+                  "table": {
+                    "name": "ivp_consents"
+                  },
+                  "primary": "consent_id",
+                  "columns": [
+                    {
+                      "table": "ivp_consents",
+                      "column": "consent_id"
+                    },
+                    {
+                      "table": "ivp_consents",
+                      "column": "consent_version"
+                    }
+                  ],
+                  "wheres": {
+                    "condition": "AND",
+                    "rules": [
+                      {
+                        "table": "ivp_consents",
+                        "column": "client_id",
+                        "operator": "equal",
+                        "operation": "=",
+                        "value": "{{client.client_id}}"
+                      },
+                      {
+                        "table": "ivp_consents",
+                        "column": "session_id",
+                        "operator": "equal",
+                        "operation": "=",
+                        "value": "{{session.session_id}}"
+                      },
+                      {
+                        "table": "ivp_consents",
+                        "column": "actor_user_id",
+                        "operator": "equal",
+                        "operation": "=",
+                        "value": "{{identity}}"
+                      },
+                      {
+                        "table": "ivp_consents",
+                        "column": "consent_version",
+                        "operator": "equal",
+                        "operation": "=",
+                        "value": "TTP-DEV-CONSENT-1.2-LIVENESS"
+                      },
+                      {
+                        "table": "ivp_consents",
+                        "column": "accepted",
+                        "operator": "equal",
+                        "operation": "=",
+                        "value": 1
+                      }
+                    ]
+                  },
+                  "orders": [
+                    {
+                      "table": "ivp_consents",
+                      "column": "captured_at",
+                      "direction": "DESC"
+                    }
+                  ],
+                  "limit": 1
+                }
+              },
+              "output": true,
+              "meta": [
+                {
+                  "name": "consent_id",
+                  "type": "text"
+                },
+                {
+                  "name": "consent_version",
+                  "type": "text"
+                }
+              ],
+              "outputType": "object"
             }
           ],
           "else": [
@@ -508,6 +593,17 @@
               },
               "output": true,
               "outputType": "array"
+            },
+            {
+              "name": "empty_liveness_consent",
+              "module": "core",
+              "action": "setvalue",
+              "options": {
+                "key": "liveness_consent",
+                "value": null
+              },
+              "output": true,
+              "outputType": "object"
             }
           ]
         },

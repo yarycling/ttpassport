@@ -243,7 +243,7 @@
                                   },
                                   {
                                     "column": "consent_version",
-                                    "value": "TTP-DEV-CONSENT-1.1-FACE-POC"
+                                    "value": "TTP-DEV-CONSENT-1.2-LIVENESS"
                                   },
                                   {
                                     "column": "accepted",
@@ -357,7 +357,9 @@
               "action": "response",
               "options": {
                 "status": 400,
-                "data": { "message": "Accept the development consent to continue." }
+                "data": {
+                  "message": "Accept the development consent to continue."
+                }
               },
               "output": false
             }
