@@ -1,0 +1,200 @@
+{
+  "meta": {},
+  "exec": {
+    "steps": [
+      {
+        "name": "require_citizen",
+        "module": "auth",
+        "action": "restrict",
+        "options": {
+          "provider": "citizen"
+        },
+        "output": false
+      },
+      {
+        "name": "identity",
+        "module": "auth",
+        "action": "identify",
+        "options": {
+          "provider": "citizen"
+        },
+        "output": false,
+        "meta": [
+          {
+            "name": "identity",
+            "type": "number"
+          }
+        ],
+        "outputType": "number"
+      },
+      {
+        "name": "current_draft",
+        "module": "dbconnector",
+        "action": "select",
+        "options": {
+          "connection": "passport",
+          "sql": {
+            "type": "SELECT",
+            "table": {
+              "name": "passport_applications"
+            },
+            "primary": "id",
+            "columns": [
+              {
+                "table": "passport_applications",
+                "column": "id"
+              }
+            ],
+            "wheres": {
+              "condition": "AND",
+              "rules": [
+                {
+                  "table": "passport_applications",
+                  "column": "account_id",
+                  "operator": "equal",
+                  "operation": "=",
+                  "value": "{{identity}}"
+                },
+                {
+                  "table": "passport_applications",
+                  "column": "application_type",
+                  "operator": "equal",
+                  "operation": "=",
+                  "value": "FIRST_TIME"
+                },
+                {
+                  "table": "passport_applications",
+                  "column": "status",
+                  "operator": "equal",
+                  "operation": "=",
+                  "value": "DRAFT"
+                }
+              ]
+            },
+            "limit": 1
+          }
+        },
+        "output": false,
+        "meta": [
+          {
+            "name": "id",
+            "type": "number"
+          }
+        ],
+        "outputType": "array"
+      },
+      {
+        "name": "create_once",
+        "module": "core",
+        "action": "condition",
+        "options": {
+          "if": "{{current_draft.count() == 0}}",
+          "then": [
+            {
+              "name": "new_application_key",
+              "module": "crypto",
+              "action": "uuid",
+              "options": {},
+              "output": false
+            },
+            {
+              "name": "create_application",
+              "module": "dbupdater",
+              "action": "insert",
+              "options": {
+                "connection": "passport",
+                "sql": {
+                  "type": "INSERT",
+                  "table": "passport_applications",
+                  "values": [
+                    {
+                      "column": "application_key",
+                      "value": "{{new_application_key}}"
+                    },
+                    {
+                      "column": "account_id",
+                      "value": "{{identity}}"
+                    },
+                    {
+                      "column": "application_type",
+                      "value": "FIRST_TIME"
+                    },
+                    {
+                      "column": "status",
+                      "value": "DRAFT"
+                    },
+                    {
+                      "column": "age_screening_status",
+                      "value": "REVIEW_REQUIRED"
+                    },
+                    {
+                      "column": "identity_status",
+                      "value": "REVIEW_REQUIRED"
+                    },
+                    {
+                      "column": "citizenship_status",
+                      "value": "REVIEW_REQUIRED"
+                    },
+                    {
+                      "column": "last_edited_step",
+                      "value": 1
+                    }
+                  ]
+                }
+              },
+              "output": false,
+              "meta": [
+                {
+                  "name": "identity",
+                  "type": "number"
+                },
+                {
+                  "name": "affected",
+                  "type": "number"
+                }
+              ],
+              "outputType": "object"
+            },
+            {
+              "name": "draft_created",
+              "module": "core",
+              "action": "setvalue",
+              "options": {
+                "key": "draftCreated",
+                "value": true
+              },
+              "output": true,
+              "meta": [
+                {
+                  "name": "draftCreated",
+                  "type": "boolean"
+                }
+              ],
+              "outputType": "boolean"
+            }
+          ],
+          "else": [
+            {
+              "name": "draft_exists",
+              "module": "core",
+              "action": "setvalue",
+              "options": {
+                "key": "draftCreated",
+                "value": false
+              },
+              "output": true,
+              "meta": [
+                {
+                  "name": "draftCreated",
+                  "type": "boolean"
+                }
+              ],
+              "outputType": "boolean"
+            }
+          ]
+        },
+        "output": false
+      }
+    ]
+  }
+}

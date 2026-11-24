@@ -1,0 +1,33 @@
+{
+  "meta": {},
+  "exec": {
+    "steps": [
+      {
+        "name": "sign_out",
+        "module": "auth",
+        "action": "logout",
+        "options": {
+          "provider": "citizen"
+        },
+        "output": false
+      },
+      {
+        "name": "logout_result",
+        "module": "core",
+        "action": "setvalue",
+        "options": {
+          "key": "logoutResult",
+          "value": "SIGNED_OUT"
+        },
+        "output": true,
+        "meta": [
+          {
+            "name": "logoutResult",
+            "type": "text"
+          }
+        ],
+        "outputType": "text"
+      }
+    ]
+  }
+}

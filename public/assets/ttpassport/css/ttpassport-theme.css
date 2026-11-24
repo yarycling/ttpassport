@@ -655,6 +655,10 @@ h3 {
   background-size: cover;
 }
 
+.application-backdrop aside > .content-panel {
+  height: auto;
+}
+
 .page-title-row {
   display: flex;
   flex-wrap: wrap;

@@ -45,6 +45,8 @@ pnpm-debug.log*
 .wappler/targets/Development/
 app/modules/connections/ivp.json
 app/modules/SecurityProviders/ivpDemo.json
+app/modules/connections/passport.json
+app/modules/SecurityProviders/citizen.json
 
 # OS/editor detritus
 .DS_Store

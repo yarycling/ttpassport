@@ -1,30 +1,38 @@
 <!-- Wappler include head-page="layouts/main" bootstrap5="local" is="dmx-app" id="accountSignIn" appConnect="local" -->
+<dmx-value id="citizenSignedIn" dmx-bind:value="false"></dmx-value>
 <section class="auth-page" aria-labelledby="sign-in-heading">
   <div class="container-fluid page-container">
     <div class="auth-card">
-      <p class="section-kicker">Citizen account</p>
+      <p class="section-kicker">Citizen account · Development demonstration</p>
       <h1 id="sign-in-heading">Sign in</h1>
       <div class="notice-alert notice-alert--warning mb-4" role="note">
-        <strong>UI-only preview</strong>
-        Authentication is not connected. Fields are disabled; do not enter real credentials.
+        <strong>Development use only</strong>
+        Use the synthetic account created on this local application. Signing in proves account access only; it does not verify identity or citizenship.
       </div>
-      <form aria-describedby="auth-preview-note">
+      <form id="citizenLoginForm" is="dmx-serverconnect-form" method="post" action="/api/citizen/login" dmx-on:success="citizenSignedIn.setValue(true)" aria-describedby="signin-help">
         <div class="mb-3">
           <label class="form-label" for="signin-email">Email address</label>
-          <input class="form-control" id="signin-email" type="email" placeholder="Email address" disabled aria-describedby="auth-preview-note">
+          <input class="form-control" id="signin-email" name="email" type="email" autocomplete="username" required maxlength="254" aria-describedby="signin-help">
         </div>
         <div class="mb-3">
           <label class="form-label" for="signin-password">Password</label>
-          <input class="form-control" id="signin-password" type="password" placeholder="Password" disabled aria-describedby="auth-preview-note">
+          <input class="form-control" id="signin-password" name="password" type="password" autocomplete="current-password" required maxlength="255" aria-describedby="signin-help">
         </div>
-        <button class="btn btn-primary-government" type="button" disabled>Sign in unavailable</button>
-        <p class="field-help mt-3 mb-0" id="auth-preview-note">No account, session or password service is configured.</p>
+        <div class="notice-alert notice-alert--warning mb-3" role="alert" dmx-show="citizenLoginForm.lastError.status">
+          Sign in could not be completed. Check the account details and try again.
+        </div>
+        <div class="notice-alert mb-3" role="status" dmx-show="citizenSignedIn.value">
+          Signed in. <a href="/citizen/dashboard">Continue to your dashboard</a>.
+        </div>
+        <button class="btn btn-primary-government" type="submit" dmx-bind:disabled="citizenLoginForm.state.executing">
+          <span dmx-show="!citizenLoginForm.state.executing">Sign in</span>
+          <span dmx-show="citizenLoginForm.state.executing">Signing in…</span>
+        </button>
+        <p id="signin-help" class="field-help mt-3 mb-0">The email verification service and account recovery are not configured for this demonstration. The dashboard remains a development workspace.</p>
       </form>
       <div class="d-flex flex-wrap gap-3 mt-4">
-        <a href="/account/forgot-password">Forgot password?</a>
-        <a href="/account/register">Create an account</a>
+        <a href="/account/register">Create a development account</a>
       </div>
-      <p class="field-help mt-3 mb-0">For layout review only: <a href="/citizen/dashboard">view the empty dashboard preview</a>. This link does not sign you in.</p>
     </div>
   </div>
 </section>

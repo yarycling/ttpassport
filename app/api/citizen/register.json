@@ -1,0 +1,261 @@
+{
+  "meta": {
+    "$_POST": [
+      {
+        "name": "email",
+        "type": "text",
+        "fieldName": "email",
+        "options": {
+          "rules": {
+            "core:required": {},
+            "core:email": {},
+            "core:maxlength": {
+              "param": 254
+            }
+          }
+        }
+      },
+      {
+        "name": "password",
+        "type": "text",
+        "fieldName": "password",
+        "options": {
+          "rules": {
+            "core:required": {},
+            "core:minlength": {
+              "param": 12
+            },
+            "core:maxlength": {
+              "param": 255
+            }
+          }
+        }
+      },
+      {
+        "name": "password_confirm",
+        "type": "text",
+        "fieldName": "password_confirm",
+        "options": {
+          "rules": {
+            "core:required": {}
+          }
+        }
+      }
+    ]
+  },
+  "exec": {
+    "steps": [
+      {
+        "name": "passwords_match",
+        "module": "core",
+        "action": "condition",
+        "options": {
+          "if": "{{$_POST.password == $_POST.password_confirm}}",
+          "then": [
+            {
+              "name": "password_hash",
+              "module": "crypto",
+              "action": "passwordHash",
+              "options": {
+                "password": "{{$_POST.password}}",
+                "algo": "argon2id"
+              },
+              "output": false,
+              "meta": [
+                {
+                  "name": "password_hash",
+                  "type": "text"
+                }
+              ],
+              "outputType": "text"
+            },
+            {
+              "name": "existing_account",
+              "module": "dbconnector",
+              "action": "select",
+              "options": {
+                "connection": "passport",
+                "sql": {
+                  "type": "SELECT",
+                  "table": {
+                    "name": "citizen_accounts"
+                  },
+                  "primary": "id",
+                  "columns": [
+                    {
+                      "table": "citizen_accounts",
+                      "column": "id"
+                    }
+                  ],
+                  "wheres": {
+                    "condition": "AND",
+                    "rules": [
+                      {
+                        "table": "citizen_accounts",
+                        "column": "email",
+                        "operator": "equal",
+                        "operation": "=",
+                        "value": "{{$_POST.email}}"
+                      }
+                    ]
+                  },
+                  "limit": 2
+                }
+              },
+              "output": false,
+              "meta": [
+                {
+                  "name": "id",
+                  "type": "number"
+                }
+              ],
+              "outputType": "array"
+            },
+            {
+              "name": "email_available",
+              "module": "core",
+              "action": "condition",
+              "options": {
+                "if": "{{existing_account.count() == 0}}",
+                "then": [
+                  {
+                    "name": "registration_transaction",
+                    "module": "dbupdater",
+                    "action": "transaction",
+                    "options": {
+                      "connection": "passport",
+                      "exec": {
+                        "steps": [
+                          {
+                            "name": "create_account",
+                            "module": "dbupdater",
+                            "action": "insert",
+                            "options": {
+                              "connection": "passport",
+                              "sql": {
+                                "type": "INSERT",
+                                "table": "citizen_accounts",
+                                "values": [
+                                  {
+                                    "column": "email",
+                                    "value": "{{$_POST.email}}"
+                                  },
+                                  {
+                                    "column": "password_hash",
+                                    "value": "{{password_hash}}"
+                                  },
+                                  {
+                                    "column": "status",
+                                    "value": "ACTIVE"
+                                  },
+                                  {
+                                    "column": "email_verified",
+                                    "value": 0
+                                  }
+                                ]
+                              }
+                            },
+                            "output": false,
+                            "meta": [
+                              {
+                                "name": "identity",
+                                "type": "number"
+                              },
+                              {
+                                "name": "affected",
+                                "type": "number"
+                              }
+                            ],
+                            "outputType": "object"
+                          },
+                          {
+                            "name": "create_profile",
+                            "module": "dbupdater",
+                            "action": "insert",
+                            "options": {
+                              "connection": "passport",
+                              "sql": {
+                                "type": "INSERT",
+                                "table": "applicant_profiles",
+                                "values": [
+                                  {
+                                    "column": "account_id",
+                                    "value": "{{create_account.identity}}"
+                                  }
+                                ]
+                              }
+                            },
+                            "output": false,
+                            "meta": [
+                              {
+                                "name": "identity",
+                                "type": "number"
+                              },
+                              {
+                                "name": "affected",
+                                "type": "number"
+                              }
+                            ],
+                            "outputType": "object"
+                          }
+                        ]
+                      }
+                    },
+                    "output": false
+                  },
+                  {
+                    "name": "registration_result",
+                    "module": "core",
+                    "action": "setvalue",
+                    "options": {
+                      "key": "registrationResult",
+                      "value": "ACCOUNT_CREATED"
+                    },
+                    "output": true,
+                    "meta": [
+                      {
+                        "name": "registrationResult",
+                        "type": "text"
+                      }
+                    ],
+                    "outputType": "text"
+                  }
+                ],
+                "else": [
+                  {
+                    "name": "duplicate_email",
+                    "module": "core",
+                    "action": "response",
+                    "options": {
+                      "status": 409,
+                      "data": {
+                        "message": "An account with that email address already exists."
+                      }
+                    },
+                    "output": false
+                  }
+                ]
+              },
+              "output": false
+            }
+          ],
+          "else": [
+            {
+              "name": "password_mismatch",
+              "module": "core",
+              "action": "response",
+              "options": {
+                "status": 400,
+                "data": {
+                  "message": "The passwords do not match."
+                }
+              },
+              "output": false
+            }
+          ]
+        },
+        "output": false
+      }
+    ]
+  }
+}

@@ -1,0 +1,116 @@
+-- TTP-4A-5C minimum Development/Test citizen and first-time draft schema.
+-- Run only against the isolated passport_dev or passport_test database, using
+-- its matching *_schema principal. Application endpoints use Wappler actions.
+
+CREATE TABLE IF NOT EXISTS citizen_accounts (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  email VARCHAR(254) NOT NULL,
+  password_hash VARCHAR(255) NOT NULL,
+  status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
+  email_verified TINYINT(1) NOT NULL DEFAULT 0,
+  created_at TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  updated_at TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_citizen_accounts_email (email)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE IF NOT EXISTS applicant_profiles (
+  account_id BIGINT UNSIGNED NOT NULL,
+  first_name TEXT NULL,
+  surname TEXT NULL,
+  mobile_number TEXT NULL,
+  country_of_residence TEXT NULL,
+  created_at TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  updated_at TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+  PRIMARY KEY (account_id),
+  CONSTRAINT fk_applicant_profiles_account
+    FOREIGN KEY (account_id) REFERENCES citizen_accounts(id) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE IF NOT EXISTS passport_applications (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  application_key CHAR(36) NOT NULL,
+  account_id BIGINT UNSIGNED NOT NULL,
+  application_type VARCHAR(24) NOT NULL DEFAULT 'FIRST_TIME',
+  status VARCHAR(24) NOT NULL DEFAULT 'DRAFT',
+  age_group_self_reported VARCHAR(24) NULL,
+  age_screening_status VARCHAR(24) NOT NULL DEFAULT 'REVIEW_REQUIRED',
+  identity_status VARCHAR(24) NOT NULL DEFAULT 'REVIEW_REQUIRED',
+  citizenship_status VARCHAR(24) NOT NULL DEFAULT 'REVIEW_REQUIRED',
+  last_edited_step TINYINT UNSIGNED NOT NULL DEFAULT 1,
+
+  first_name TEXT NULL,
+  middle_names TEXT NULL,
+  surname TEXT NULL,
+  maiden_name TEXT NULL,
+  former_names TEXT NULL,
+  date_of_birth DATE NULL,
+  sex_as_on_form VARCHAR(64) NULL,
+  place_of_birth_town TEXT NULL,
+  place_of_birth_country TEXT NULL,
+  height_cm TEXT NULL,
+  eye_colour TEXT NULL,
+  hair_colour TEXT NULL,
+  marital_status VARCHAR(64) NULL,
+  occupation TEXT NULL,
+  home_street TEXT NULL,
+  home_city TEXT NULL,
+  home_postal_code TEXT NULL,
+  home_country TEXT NULL,
+  mailing_address_differs TINYINT(1) NULL,
+  mailing_street TEXT NULL,
+  mailing_city TEXT NULL,
+  mailing_postal_code TEXT NULL,
+  mailing_country TEXT NULL,
+  work_local_street TEXT NULL,
+  work_local_city TEXT NULL,
+  work_local_postal_code TEXT NULL,
+  work_local_country TEXT NULL,
+  firm_name TEXT NULL,
+  home_telephone TEXT NULL,
+  mobile_telephone TEXT NULL,
+  office_telephone TEXT NULL,
+  contact_email VARCHAR(254) NULL,
+
+  mother_maiden_surname TEXT NULL,
+  father_first_name TEXT NULL,
+  father_surname TEXT NULL,
+  basis_birth TINYINT(1) NOT NULL DEFAULT 0,
+  birth_certificate_pin TEXT NULL,
+  birth_certificate_number TEXT NULL,
+  birth_registration_date DATE NULL,
+  birth_registration_district TEXT NULL,
+  basis_descent TINYINT(1) NOT NULL DEFAULT 0,
+  descent_certificate_number TEXT NULL,
+  descent_certificate_issue_date DATE NULL,
+  basis_adoption TINYINT(1) NOT NULL DEFAULT 0,
+  adoption_certificate_number TEXT NULL,
+  adoption_certificate_issue_date DATE NULL,
+  basis_registration TINYINT(1) NOT NULL DEFAULT 0,
+  registration_certificate_number TEXT NULL,
+  registration_certificate_issue_date DATE NULL,
+  basis_naturalisation TINYINT(1) NOT NULL DEFAULT 0,
+  naturalisation_certificate_number TEXT NULL,
+  naturalisation_certificate_issue_date DATE NULL,
+  other_citizenship TINYINT(1) NULL,
+  other_citizenship_country TEXT NULL,
+  other_citizenship_acquired_by TEXT NULL,
+  other_citizenship_certificate_number TEXT NULL,
+  other_citizenship_issue_date DATE NULL,
+
+  previous_tt_document TINYINT(1) NULL,
+  prior_document_number TEXT NULL,
+  prior_document_issue_date DATE NULL,
+  prior_document_place TEXT NULL,
+
+  open_draft_key VARCHAR(64)
+    GENERATED ALWAYS AS (CASE WHEN status = 'DRAFT' THEN CONCAT(account_id, ':', application_type) ELSE NULL END) STORED,
+  created_at TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  updated_at TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_passport_application_key (application_key),
+  UNIQUE KEY uq_passport_one_open_draft (open_draft_key),
+  KEY ix_passport_applications_owner (account_id, application_type, status),
+  CONSTRAINT fk_passport_applications_account
+    FOREIGN KEY (account_id) REFERENCES citizen_accounts(id) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

@@ -1,0 +1,114 @@
+{
+  "meta": {},
+  "exec": {
+    "steps": [
+      {
+        "name": "require_citizen",
+        "module": "auth",
+        "action": "restrict",
+        "options": {
+          "provider": "citizen"
+        },
+        "output": false
+      },
+      {
+        "name": "identity",
+        "module": "auth",
+        "action": "identify",
+        "options": {
+          "provider": "citizen"
+        },
+        "output": false,
+        "meta": [
+          {
+            "name": "identity",
+            "type": "number"
+          }
+        ],
+        "outputType": "number"
+      },
+      {
+        "name": "profiles",
+        "module": "dbconnector",
+        "action": "select",
+        "options": {
+          "connection": "passport",
+          "sql": {
+            "type": "SELECT",
+            "table": {
+              "name": "applicant_profiles"
+            },
+            "primary": "account_id",
+            "columns": [
+              {
+                "table": "applicant_profiles",
+                "column": "account_id"
+              },
+              {
+                "table": "applicant_profiles",
+                "column": "first_name"
+              },
+              {
+                "table": "applicant_profiles",
+                "column": "surname"
+              },
+              {
+                "table": "applicant_profiles",
+                "column": "mobile_number"
+              },
+              {
+                "table": "applicant_profiles",
+                "column": "country_of_residence"
+              },
+              {
+                "table": "applicant_profiles",
+                "column": "updated_at"
+              }
+            ],
+            "wheres": {
+              "condition": "AND",
+              "rules": [
+                {
+                  "table": "applicant_profiles",
+                  "column": "account_id",
+                  "operator": "equal",
+                  "operation": "=",
+                  "value": "{{identity}}"
+                }
+              ]
+            },
+            "limit": 1
+          }
+        },
+        "output": true,
+        "meta": [
+          {
+            "name": "account_id",
+            "type": "text"
+          },
+          {
+            "name": "first_name",
+            "type": "text"
+          },
+          {
+            "name": "surname",
+            "type": "text"
+          },
+          {
+            "name": "mobile_number",
+            "type": "text"
+          },
+          {
+            "name": "country_of_residence",
+            "type": "text"
+          },
+          {
+            "name": "updated_at",
+            "type": "datetime"
+          }
+        ],
+        "outputType": "array"
+      }
+    ]
+  }
+}

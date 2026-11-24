@@ -132,14 +132,12 @@ test('public navigation toggles at mobile width and routes to sign-in', async ({
   await expect(page.getByRole('heading', { name: /sign in/i })).toBeVisible();
 });
 
-test('first-time application wizard controls change preview stage', async ({ page, baseURL }) => {
+test('first-time application screen protects draft data behind citizen sign-in', async ({ page, baseURL }) => {
   await page.goto(new URL('/citizen/apply/first-time', baseURL).toString(), { waitUntil: 'networkidle' });
-  await page.getByRole('button', { name: 'Go to personal details stage' }).click();
-  await expect(page.getByText(/Preview stage 2 of 9/)).toBeVisible();
-  await page.getByRole('button', { name: 'Continue' }).click();
-  await expect(page.getByText(/Preview stage 3 of 9/)).toBeVisible();
-  await page.getByRole('button', { name: 'Back' }).click();
-  await expect(page.getByText(/Preview stage 2 of 9/)).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Sign in to start or resume a draft' })).toBeVisible();
+  await expect(page.locator('#citizenDraftForm')).toBeHidden();
+  const protectedRead = await page.evaluate(async () => (await fetch('/api/citizen/application_current')).status);
+  expect(protectedRead).toBe(401);
 });
 
 test('back-office review tabs select each preview section', async ({ page, baseURL }) => {

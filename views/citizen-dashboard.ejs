@@ -1,30 +1,109 @@
 <!-- Wappler include head-page="layouts/main" bootstrap5="local" is="dmx-app" id="citizenDashboard" appConnect="local" -->
+<dmx-value id="citizenAuthenticated" dmx-bind:value="false"></dmx-value>
+<dmx-value id="profileSaved" dmx-bind:value="false"></dmx-value>
+<dmx-serverconnect id="citizenAuthState" url="/api/citizen/auth_state" dmx-on:success="citizenAuthenticated.setValue(citizenAuthState.data.authenticated);citizenAuthState.data.authenticated &amp;&amp; citizenProfile.load();citizenAuthState.data.authenticated &amp;&amp; citizenApplicationCurrent.load()"></dmx-serverconnect>
+<dmx-serverconnect id="citizenProfile" url="/api/citizen/profile_load" noload="true"></dmx-serverconnect>
+<dmx-serverconnect id="citizenApplicationCurrent" url="/api/citizen/application_current" noload="true"></dmx-serverconnect>
+
 <section class="page-section dashboard-backdrop" aria-labelledby="dashboard-heading">
   <div class="container-fluid page-container">
     <div class="page-title-row">
       <div>
-        <p class="section-kicker">Citizen portal preview</p>
+        <p class="section-kicker">Citizen portal · Development demonstration</p>
         <h1 id="dashboard-heading">Your passport dashboard</h1>
-        <p class="page-subtitle">A visual shell for future application tasks. No account or application data is connected.</p>
+        <p class="page-subtitle">Manage a local development profile and save a first-time application draft. No application is submitted here.</p>
       </div>
-      <a class="btn btn-primary-government" href="/citizen/apply/first-time">Start application preview</a>
+      <form id="citizenLogoutForm" is="dmx-serverconnect-form" method="post" action="/api/citizen/logout" dmx-show="citizenAuthenticated.value" dmx-on:success="citizenAuthenticated.setValue(false)">
+        <button class="btn btn-outline-crimson" type="submit" dmx-bind:disabled="citizenLogoutForm.state.executing">Sign out</button>
+      </form>
     </div>
+
     <div class="notice-alert notice-alert--warning mb-4" role="note">
-      <strong>No live account is connected</strong>
-      Application cards, status counts and correction requests will appear only after approved services are implemented.
+      <strong>Development records only</strong>
+      Use synthetic details. Account access, identity proofing, citizenship eligibility and passport decisions are separate. Email verification and account recovery are not configured.
     </div>
-    <div class="row g-3 mb-4">
-      <div class="col-md-4"><div class="stat-card"><span class="stat-value">—</span><span class="stat-label">Applications</span></div></div>
-      <div class="col-md-4"><div class="stat-card"><span class="stat-value">—</span><span class="stat-label">Drafts</span></div></div>
-      <div class="col-md-4"><div class="stat-card"><span class="stat-value">—</span><span class="stat-label">Actions needed</span></div></div>
+
+    <div class="content-panel mb-4" dmx-show="!citizenAuthenticated.value" aria-labelledby="dashboard-signin-heading">
+      <h2 id="dashboard-signin-heading">Sign in to continue</h2>
+      <p>This dashboard loads profile and application information only after a citizen account signs in.</p>
+      <div class="d-flex flex-wrap gap-2">
+        <a class="btn btn-primary-government" href="/account/sign-in">Sign in</a>
+        <a class="btn btn-outline-crimson" href="/account/register">Create a development account</a>
+      </div>
     </div>
-    <div class="content-panel">
-      <div class="section-heading"><h2>Applications</h2></div>
-      <div class="empty-state">
-        <span class="empty-mark" aria-hidden="true">—</span>
-        <h3>No application data is available</h3>
-        <p class="mb-3">This is a design preview with no connected application source.</p>
-        <a class="btn btn-outline-crimson" href="/citizen/track">View tracking preview</a>
+
+    <div dmx-show="citizenAuthenticated.value">
+      <div class="row g-3 mb-4" aria-label="Saved draft summary">
+        <div class="col-md-4"><div class="stat-card"><span class="stat-value" dmx-text="citizenApplicationCurrent.data.applications.length"></span><span class="stat-label">First-time draft</span></div></div>
+        <div class="col-md-4"><div class="stat-card"><span class="stat-value">REVIEW REQUIRED</span><span class="stat-label">Age screening, identity and citizenship</span></div></div>
+        <div class="col-md-4"><div class="stat-card"><span class="stat-value">DRAFT</span><span class="stat-label">Application state</span></div></div>
+      </div>
+
+      <div class="row g-4">
+        <div class="col-lg-7">
+          <section class="content-panel h-100" aria-labelledby="applications-heading">
+            <div class="section-heading"><h2 id="applications-heading">First-time passport application</h2></div>
+            <div class="notice-alert notice-alert--warning mb-3" role="note">
+              <strong>Draft only</strong>
+              Current official instructions require a scheduled in-person appointment. The online draft is not a completed or submitted passport application.
+            </div>
+            <div class="application-card" dmx-show="citizenApplicationCurrent.data.applications.length > 0">
+              <div class="d-flex flex-wrap justify-content-between gap-3 align-items-start">
+                <div>
+                  <span class="status-chip status-chip--neutral">First-time · Draft</span>
+                  <h3 class="mt-2">Saved application draft</h3>
+                  <p class="mb-1">Last saved <span dmx-text="citizenApplicationCurrent.data.applications[0].updated_at"></span></p>
+                  <p class="field-help mb-0">Age screening, identity and citizenship remain unverified and require review.</p>
+                </div>
+                <a class="btn btn-primary-government" href="/citizen/apply/first-time">Resume and review</a>
+              </div>
+            </div>
+            <div class="empty-state" dmx-show="citizenApplicationCurrent.data.applications.length == 0">
+              <span class="empty-mark" aria-hidden="true">—</span>
+              <h3>No first-time draft yet</h3>
+              <p class="mb-3">Start a synthetic development draft. It can be saved and resumed from this account.</p>
+              <form id="citizenCreateDraftForm" is="dmx-serverconnect-form" method="post" action="/api/citizen/application_create" dmx-on:success="citizenApplicationCurrent.load()">
+                <div class="notice-alert notice-alert--warning mb-3" role="alert" dmx-show="citizenCreateDraftForm.lastError.status">A draft could not be started. Sign in again and retry.</div>
+                <button class="btn btn-primary-government" type="submit" dmx-bind:disabled="citizenCreateDraftForm.state.executing">
+                  <span dmx-show="!citizenCreateDraftForm.state.executing">Start a first-time draft</span>
+                  <span dmx-show="citizenCreateDraftForm.state.executing">Starting…</span>
+                </button>
+              </form>
+            </div>
+            <div class="mt-4">
+              <a class="btn btn-outline-crimson" href="/citizen/track">View tracking information</a>
+              <p class="field-help mt-2 mb-0">Application tracking is not connected in this increment.</p>
+            </div>
+          </section>
+        </div>
+        <div class="col-lg-5">
+          <section class="content-panel" aria-labelledby="profile-heading">
+            <div class="section-heading"><h2 id="profile-heading">Applicant profile</h2></div>
+            <p class="field-help">This profile belongs to your account. Passport draft details are saved separately.</p>
+            <form id="citizenProfileForm" is="dmx-serverconnect-form" method="post" action="/api/citizen/profile_save" dmx-on:success="citizenProfile.load();profileSaved.setValue(true)">
+              <div class="mb-3">
+                <label class="form-label" for="profile-first-name">First name</label>
+                <input class="form-control" id="profile-first-name" name="first_name" type="text" dmx-bind:value="citizenProfile.data.profiles[0].first_name" autocomplete="given-name">
+              </div>
+              <div class="mb-3">
+                <label class="form-label" for="profile-surname">Surname</label>
+                <input class="form-control" id="profile-surname" name="surname" type="text" dmx-bind:value="citizenProfile.data.profiles[0].surname" autocomplete="family-name">
+              </div>
+              <div class="mb-3">
+                <label class="form-label" for="profile-mobile">Mobile number</label>
+                <input class="form-control" id="profile-mobile" name="mobile_number" type="tel" dmx-bind:value="citizenProfile.data.profiles[0].mobile_number" autocomplete="tel">
+              </div>
+              <div class="mb-3">
+                <label class="form-label" for="profile-residence">Country of residence</label>
+                <input class="form-control" id="profile-residence" name="country_of_residence" type="text" dmx-bind:value="citizenProfile.data.profiles[0].country_of_residence" autocomplete="country-name">
+                <div class="field-help mt-1">Domestic and overseas residents are supported; no jurisdiction is inferred from this profile.</div>
+              </div>
+              <div class="notice-alert mb-3" role="status" dmx-show="profileSaved.value">Profile saved to this Development account.</div>
+              <div class="notice-alert notice-alert--warning mb-3" role="alert" dmx-show="citizenProfileForm.lastError.status">The profile could not be saved. Sign in again and retry.</div>
+              <button class="btn btn-outline-crimson" type="submit" dmx-bind:disabled="citizenProfileForm.state.executing">Save profile</button>
+            </form>
+          </section>
+        </div>
       </div>
     </div>
   </div>

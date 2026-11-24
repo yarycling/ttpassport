@@ -1,0 +1,60 @@
+{
+  "meta": {
+    "$_POST": [
+      {
+        "name": "email",
+        "type": "text",
+        "fieldName": "email",
+        "options": {
+          "rules": {
+            "core:required": {},
+            "core:email": {}
+          }
+        }
+      },
+      {
+        "name": "password",
+        "type": "text",
+        "fieldName": "password",
+        "options": {
+          "rules": {
+            "core:required": {}
+          }
+        }
+      }
+    ]
+  },
+  "exec": {
+    "steps": [
+      {
+        "name": "sign_in",
+        "module": "auth",
+        "action": "login",
+        "options": {
+          "provider": "citizen",
+          "username": "{{$_POST.email}}",
+          "password": "{{$_POST.password}}",
+          "remember": false
+        },
+        "output": false
+      },
+      {
+        "name": "login_result",
+        "module": "core",
+        "action": "setvalue",
+        "options": {
+          "key": "loginResult",
+          "value": "SIGNED_IN"
+        },
+        "output": true,
+        "meta": [
+          {
+            "name": "loginResult",
+            "type": "text"
+          }
+        ],
+        "outputType": "text"
+      }
+    ]
+  }
+}

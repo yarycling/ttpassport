@@ -1,29 +1,39 @@
 <!-- Wappler include head-page="layouts/main" bootstrap5="local" is="dmx-app" id="accountRegister" appConnect="local" -->
+<dmx-value id="citizenRegistrationSaved" dmx-bind:value="false"></dmx-value>
 <section class="auth-page" aria-labelledby="register-heading">
   <div class="container-fluid page-container">
     <div class="auth-card">
-      <p class="section-kicker">Citizen account</p>
+      <p class="section-kicker">Citizen account · Development demonstration</p>
       <h1 id="register-heading">Create an account</h1>
       <div class="notice-alert notice-alert--warning mb-4" role="note">
-        <strong>Registration preview only</strong>
-        Account creation, email verification and privacy terms are not connected or approved. Do not enter personal information.
+        <strong>Development use only</strong>
+        Use synthetic test details. Email verification and password recovery are not configured; this account does not verify identity or citizenship.
       </div>
-      <form aria-describedby="register-preview-note">
+      <form id="citizenRegisterForm" is="dmx-serverconnect-form" method="post" action="/api/citizen/register" dmx-on:success="citizenRegistrationSaved.setValue(true)" aria-describedby="register-help">
         <div class="mb-3">
           <label class="form-label" for="register-email">Email address</label>
-          <input class="form-control" id="register-email" type="email" placeholder="Email address" disabled aria-describedby="register-preview-note">
+          <input class="form-control" id="register-email" name="email" type="email" autocomplete="username" required maxlength="254" aria-describedby="register-help">
         </div>
         <div class="mb-3">
           <label class="form-label" for="register-password">Create a password</label>
-          <input class="form-control" id="register-password" type="password" placeholder="Password" disabled aria-describedby="register-preview-note">
-          <div class="field-help mt-1">Password guidance will be supplied with the approved account policy.</div>
+          <input class="form-control" id="register-password" name="password" type="password" autocomplete="new-password" required minlength="12" maxlength="255" aria-describedby="register-help">
+          <div class="field-help mt-1">Use at least 12 characters for this local development account.</div>
         </div>
         <div class="mb-3">
           <label class="form-label" for="register-confirm">Confirm password</label>
-          <input class="form-control" id="register-confirm" type="password" placeholder="Confirm password" disabled aria-describedby="register-preview-note">
+          <input class="form-control" id="register-confirm" name="password_confirm" type="password" autocomplete="new-password" required maxlength="255" aria-describedby="register-help">
         </div>
-        <button class="btn btn-primary-government" type="button" disabled>Registration unavailable</button>
-        <p class="field-help mt-3 mb-0" id="register-preview-note">No data is accepted or stored by this screen.</p>
+        <div class="notice-alert mb-3" role="status" dmx-show="citizenRegistrationSaved.value">
+          Account created for this Development demonstration. Email remains unverified because no email delivery service is configured. <a href="/account/sign-in">Sign in</a> to continue.
+        </div>
+        <div class="notice-alert notice-alert--warning mb-3" role="alert" dmx-show="citizenRegisterForm.lastError.status">
+          The account could not be created. Check that the email is valid, the passwords match and the email has not already been used.
+        </div>
+        <button class="btn btn-primary-government" type="submit" dmx-bind:disabled="citizenRegisterForm.state.executing">
+          <span dmx-show="!citizenRegisterForm.state.executing">Create account</span>
+          <span dmx-show="citizenRegisterForm.state.executing">Creating account…</span>
+        </button>
+        <p class="field-help mt-3 mb-0" id="register-help">This local account is separate from the eKYC service, passport eligibility, identity proofing and citizenship decisions.</p>
       </form>
       <p class="mt-4 mb-0">Already have an account? <a href="/account/sign-in">Sign in</a></p>
     </div>

@@ -1,0 +1,40 @@
+{
+  "meta": {},
+  "exec": {
+    "steps": [
+      {
+        "name": "identity",
+        "module": "auth",
+        "action": "identify",
+        "options": {
+          "provider": "citizen"
+        },
+        "output": false,
+        "meta": [
+          {
+            "name": "identity",
+            "type": "number"
+          }
+        ],
+        "outputType": "number"
+      },
+      {
+        "name": "authenticated",
+        "module": "core",
+        "action": "setvalue",
+        "options": {
+          "key": "authenticated",
+          "value": "{{identity ? true : false}}"
+        },
+        "output": true,
+        "meta": [
+          {
+            "name": "authenticated",
+            "type": "boolean"
+          }
+        ],
+        "outputType": "boolean"
+      }
+    ]
+  }
+}

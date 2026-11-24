@@ -1,0 +1,240 @@
+{
+  "meta": {
+    "$_POST": [
+      {
+        "name": "first_name",
+        "type": "text",
+        "fieldName": "first_name"
+      },
+      {
+        "name": "surname",
+        "type": "text",
+        "fieldName": "surname"
+      },
+      {
+        "name": "mobile_number",
+        "type": "text",
+        "fieldName": "mobile_number"
+      },
+      {
+        "name": "country_of_residence",
+        "type": "text",
+        "fieldName": "country_of_residence"
+      }
+    ]
+  },
+  "exec": {
+    "steps": [
+      {
+        "name": "require_citizen",
+        "module": "auth",
+        "action": "restrict",
+        "options": {
+          "provider": "citizen"
+        },
+        "output": false
+      },
+      {
+        "name": "identity",
+        "module": "auth",
+        "action": "identify",
+        "options": {
+          "provider": "citizen"
+        },
+        "output": false,
+        "meta": [
+          {
+            "name": "identity",
+            "type": "number"
+          }
+        ],
+        "outputType": "number"
+      },
+      {
+        "name": "existing_profile",
+        "module": "dbconnector",
+        "action": "select",
+        "options": {
+          "connection": "passport",
+          "sql": {
+            "type": "SELECT",
+            "table": {
+              "name": "applicant_profiles"
+            },
+            "primary": "id",
+            "columns": [
+              {
+                "table": "applicant_profiles",
+                "column": "account_id"
+              }
+            ],
+            "wheres": {
+              "condition": "AND",
+              "rules": [
+                {
+                  "table": "applicant_profiles",
+                  "column": "account_id",
+                  "operator": "equal",
+                  "operation": "=",
+                  "value": "{{identity}}"
+                }
+              ]
+            },
+            "limit": 1
+          }
+        },
+        "output": false,
+        "meta": [
+          {
+            "name": "account_id",
+            "type": "text"
+          }
+        ],
+        "outputType": "array"
+      },
+      {
+        "name": "save_profile",
+        "module": "core",
+        "action": "condition",
+        "options": {
+          "if": "{{existing_profile.count() > 0}}",
+          "then": [
+            {
+              "name": "update_profile",
+              "module": "dbupdater",
+              "action": "update",
+              "options": {
+                "connection": "passport",
+                "sql": {
+                  "type": "UPDATE",
+                  "table": "applicant_profiles",
+                  "values": [
+                    {
+                      "column": "first_name",
+                      "value": "{{$_POST.first_name}}"
+                    },
+                    {
+                      "column": "surname",
+                      "value": "{{$_POST.surname}}"
+                    },
+                    {
+                      "column": "mobile_number",
+                      "value": "{{$_POST.mobile_number}}"
+                    },
+                    {
+                      "column": "country_of_residence",
+                      "value": "{{$_POST.country_of_residence}}"
+                    }
+                  ],
+                  "wheres": {
+                    "condition": "AND",
+                    "rules": [
+                      {
+                        "table": "applicant_profiles",
+                        "column": "account_id",
+                        "operator": "equal",
+                        "operation": "=",
+                        "value": "{{identity}}"
+                      }
+                    ]
+                  }
+                }
+              },
+              "output": false,
+              "meta": [
+                {
+                  "name": "affected",
+                  "type": "number"
+                }
+              ],
+              "outputType": "object"
+            },
+            {
+              "name": "profile_saved",
+              "module": "core",
+              "action": "setvalue",
+              "options": {
+                "key": "profileSaved",
+                "value": true
+              },
+              "output": true,
+              "meta": [
+                {
+                  "name": "profileSaved",
+                  "type": "boolean"
+                }
+              ],
+              "outputType": "boolean"
+            }
+          ],
+          "else": [
+            {
+              "name": "create_profile",
+              "module": "dbupdater",
+              "action": "insert",
+              "options": {
+                "connection": "passport",
+                "sql": {
+                  "type": "INSERT",
+                  "table": "applicant_profiles",
+                  "values": [
+                    {
+                      "column": "account_id",
+                      "value": "{{identity}}"
+                    },
+                    {
+                      "column": "first_name",
+                      "value": "{{$_POST.first_name}}"
+                    },
+                    {
+                      "column": "surname",
+                      "value": "{{$_POST.surname}}"
+                    },
+                    {
+                      "column": "mobile_number",
+                      "value": "{{$_POST.mobile_number}}"
+                    },
+                    {
+                      "column": "country_of_residence",
+                      "value": "{{$_POST.country_of_residence}}"
+                    }
+                  ]
+                }
+              },
+              "output": false,
+              "meta": [
+                {
+                  "name": "identity",
+                  "type": "number"
+                },
+                {
+                  "name": "affected",
+                  "type": "number"
+                }
+              ],
+              "outputType": "object"
+            },
+            {
+              "name": "profile_saved",
+              "module": "core",
+              "action": "setvalue",
+              "options": {
+                "key": "profileSaved",
+                "value": true
+              },
+              "output": true,
+              "meta": [
+                {
+                  "name": "profileSaved",
+                  "type": "boolean"
+                }
+              ],
+              "outputType": "boolean"
+            }
+          ]
+        },
+        "output": false
+      }
+    ]
+  }
+}

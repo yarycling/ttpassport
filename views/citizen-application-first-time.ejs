@@ -1,164 +1,165 @@
 <!-- Wappler include head-page="layouts/main" bootstrap5="local" is="dmx-app" id="firstTimeApplication" appConnect="local" -->
 <dmx-value id="wizardStep" dmx-bind:value="1"></dmx-value>
+<dmx-value id="citizenAuthenticated" dmx-bind:value="false"></dmx-value>
+<dmx-value id="draftSaved" dmx-bind:value="false"></dmx-value>
+<dmx-serverconnect id="citizenAuthState" url="/api/citizen/auth_state" dmx-on:success="citizenAuthenticated.setValue(citizenAuthState.data.authenticated);citizenAuthState.data.authenticated &amp;&amp; citizenApplicationCurrent.load()"></dmx-serverconnect>
+<dmx-serverconnect id="citizenApplicationCurrent" url="/api/citizen/application_current" noload="true"></dmx-serverconnect>
+
 <section class="page-section application-backdrop" aria-labelledby="application-heading">
   <div class="container-fluid page-container">
     <div class="page-title-row">
       <div>
-        <p class="section-kicker">First-time passport application · Design preview</p>
-        <h1 id="application-heading">Application overview</h1>
-        <p class="page-subtitle">This interactive shell demonstrates a possible sequence only. It is not an official form and does not save information.</p>
+        <p class="section-kicker">First-time passport application · Development draft</p>
+        <h1 id="application-heading">Application information</h1>
+        <p class="page-subtitle">Save and resume initial application details. This is not an official submitted application.</p>
       </div>
-      <span class="status-chip status-chip--neutral">Preview only</span>
-    </div>
-    <div class="notice-alert notice-alert--warning mb-4" role="note">
-      <strong>Do not enter personal information</strong>
-      Form fields, document uploads, photo capture, identity checks, declarations and payments are not connected.
+      <span class="status-chip status-chip--neutral" dmx-show="citizenAuthenticated.value &amp;&amp; citizenApplicationCurrent.data.applications.length > 0">First-time · Draft</span>
     </div>
 
-    <div class="wizard-grid" aria-label="Illustrative application stages">
+    <div class="notice-alert notice-alert--warning mb-4" role="note">
+      <strong>Development and synthetic information only</strong>
+      Do not enter real passport, identity or citizenship data. The current instructions require a scheduled in-person appointment; no online submission, identity proofing, citizenship decision, payment or official approval is available here.
+    </div>
+
+    <div class="content-panel mb-4" dmx-show="!citizenAuthenticated.value" aria-labelledby="application-signin-heading">
+      <h2 id="application-signin-heading">Sign in to start or resume a draft</h2>
+      <p>Application details are loaded only for the signed-in account that owns them.</p>
+      <div class="d-flex flex-wrap gap-2"><a class="btn btn-primary-government" href="/account/sign-in">Sign in</a><a class="btn btn-outline-crimson" href="/account/register">Create a development account</a></div>
+    </div>
+
+    <section class="content-panel mb-4" dmx-show="citizenAuthenticated.value &amp;&amp; citizenApplicationCurrent.data.applications.length == 0" aria-labelledby="start-draft-heading">
+      <h2 id="start-draft-heading">Begin a first-time draft</h2>
+      <p>This initial screen is designed for applicants aged 16 and over. The age group is self-reported and is not checked against an authoritative source. Applicants aged 16–17 need a separate guardian-consent step before any future submission.</p>
+      <form id="citizenStartDraftForm" is="dmx-serverconnect-form" method="post" action="/api/citizen/application_create" dmx-on:success="citizenApplicationCurrent.load()">
+        <div class="notice-alert notice-alert--warning mb-3" role="alert" dmx-show="citizenStartDraftForm.lastError.status">The draft could not be started. Sign in again and retry.</div>
+        <button class="btn btn-primary-government" type="submit" dmx-bind:disabled="citizenStartDraftForm.state.executing">Start draft</button>
+      </form>
+    </section>
+
+    <div class="wizard-grid" aria-label="First-time application stages" dmx-show="citizenAuthenticated.value &amp;&amp; citizenApplicationCurrent.data.applications.length > 0">
       <button class="wizard-step" type="button" aria-label="Go to eligibility stage" dmx-bind:class="{'is-active': wizardStep.value == 1}" dmx-on:click="wizardStep.setValue(1)"><span class="wizard-step-number">1</span>Eligibility</button>
       <button class="wizard-step" type="button" aria-label="Go to personal details stage" dmx-bind:class="{'is-active': wizardStep.value == 2}" dmx-on:click="wizardStep.setValue(2)"><span class="wizard-step-number">2</span>Personal</button>
-      <button class="wizard-step" type="button" aria-label="Go to citizenship and guardian stage" dmx-bind:class="{'is-active': wizardStep.value == 3}" dmx-on:click="wizardStep.setValue(3)"><span class="wizard-step-number">3</span>Citizenship</button>
-      <button class="wizard-step" type="button" aria-label="Go to recommender and references stage" dmx-bind:class="{'is-active': wizardStep.value == 4}" dmx-on:click="wizardStep.setValue(4)"><span class="wizard-step-number">4</span>Recommender</button>
-      <button class="wizard-step" type="button" aria-label="Go to documents stage" dmx-bind:class="{'is-active': wizardStep.value == 5}" dmx-on:click="wizardStep.setValue(5)"><span class="wizard-step-number">5</span>Documents</button>
-      <button class="wizard-step" type="button" aria-label="Go to photograph and identity guidance stage" dmx-bind:class="{'is-active': wizardStep.value == 6}" dmx-on:click="wizardStep.setValue(6)"><span class="wizard-step-number">6</span>Photo &amp; ID</button>
-      <button class="wizard-step" type="button" aria-label="Go to office and delivery stage" dmx-bind:class="{'is-active': wizardStep.value == 7}" dmx-on:click="wizardStep.setValue(7)"><span class="wizard-step-number">7</span>Office &amp; delivery</button>
-      <button class="wizard-step" type="button" aria-label="Go to review and declarations stage" dmx-bind:class="{'is-active': wizardStep.value == 8}" dmx-on:click="wizardStep.setValue(8)"><span class="wizard-step-number">8</span>Review</button>
-      <button class="wizard-step" type="button" aria-label="Go to payment and tracking stage" dmx-bind:class="{'is-active': wizardStep.value == 9}" dmx-on:click="wizardStep.setValue(9)"><span class="wizard-step-number">9</span>Payment</button>
+      <button class="wizard-step" type="button" aria-label="Go to citizenship and family stage" dmx-bind:class="{'is-active': wizardStep.value == 3}" dmx-on:click="wizardStep.setValue(3)"><span class="wizard-step-number">3</span>Citizenship</button>
+      <button class="wizard-step" type="button" aria-label="Recommender stage not available" disabled aria-disabled="true"><span class="wizard-step-number">4</span>Recommender</button>
+      <button class="wizard-step" type="button" aria-label="Supporting documents stage not available" disabled aria-disabled="true"><span class="wizard-step-number">5</span>Documents</button>
+      <button class="wizard-step" type="button" aria-label="Photo and identity stage not available" disabled aria-disabled="true"><span class="wizard-step-number">6</span>Photo &amp; ID</button>
+      <button class="wizard-step" type="button" aria-label="Office and delivery stage not available" disabled aria-disabled="true"><span class="wizard-step-number">7</span>Office</button>
+      <button class="wizard-step" type="button" aria-label="Review saved draft" dmx-bind:class="{'is-active': wizardStep.value == 8}" dmx-on:click="wizardStep.setValue(8)"><span class="wizard-step-number">8</span>Review</button>
+      <button class="wizard-step" type="button" aria-label="Payment and tracking stage not available" disabled aria-disabled="true"><span class="wizard-step-number">9</span>Payment</button>
     </div>
-    <p class="field-help mb-3" aria-live="polite">Preview stage <span dmx-text="wizardStep.value">1</span> of 9</p>
 
-    <div class="row g-3 align-items-start">
+    <div class="row g-4 mt-1" dmx-show="citizenAuthenticated.value &amp;&amp; citizenApplicationCurrent.data.applications.length > 0">
       <div class="col-lg-8">
-        <section class="content-panel" aria-label="Illustrative application stage content">
-          <div class="wizard-step-panels">
+        <section class="content-panel" aria-label="First-time application draft details">
+          <div class="notice-alert mb-3" role="status" dmx-show="draftSaved.value">Draft saved. You can return to this page from your dashboard.</div>
+          <div class="notice-alert notice-alert--warning mb-3" role="alert" dmx-show="citizenDraftForm.lastError.status">The draft could not be saved. Check the entered dates and retry. No application was submitted.</div>
+          <form id="citizenDraftForm" is="dmx-serverconnect-form" method="post" action="/api/citizen/application_save" dmx-on:success="citizenApplicationCurrent.load();draftSaved.setValue(true);wizardStep.setValue(wizardStep.value < 3 ? wizardStep.value + 1 : 8)">
+            <input type="hidden" name="application_key" dmx-bind:value="citizenApplicationCurrent.data.applications[0].application_key">
+            <input type="hidden" name="current_step" dmx-bind:value="wizardStep.value">
+
             <section dmx-show="wizardStep.value == 1" aria-labelledby="stage-one-heading">
-              <div class="panel-heading" id="stage-one-heading">1. Eligibility</div>
-              <p>This proposed first-time stream is scoped for citizens aged 16 and over. Official eligibility rules and application requirements have not been connected.</p>
-              <div class="row g-3" id="eligibility">
-                <div class="col-md-6">
-                  <label class="form-label" for="preview-age-group">Age group</label>
-                  <select class="form-select" id="preview-age-group" disabled><option selected>Choose an age group</option><option>16–17</option><option>18 or older</option></select>
-                  <div class="field-help mt-1">Illustrative control only. No eligibility is assessed.</div>
-                </div>
-                <div class="col-md-6">
-                  <div class="info-panel info-panel--gold h-100">
-                    <strong>Ages 16–17</strong>
-                    <p class="mb-0">A guardian-consent workflow is part of the approved design scope; its requirements are not implemented here.</p>
-                  </div>
-                </div>
+              <h2 class="panel-heading" id="stage-one-heading">1. Eligibility screening</h2>
+              <p>The first-time stream is designed for people aged 16 and over. Select your age group as a self-report, then enter your date of birth in Personal details.</p>
+              <div class="row g-3">
+                <div class="col-md-6"><label class="form-label" for="ageGroupSelfReported">Self-reported age group for this initial screen</label><select class="form-select" id="ageGroupSelfReported" name="age_group_self_reported" dmx-bind:value="citizenApplicationCurrent.data.applications[0].age_group_self_reported"><option value="">Select an answer (optional)</option><option value="UNDER_16">Under 16</option><option value="16_17">16–17</option><option value="18_PLUS">18 or older</option></select></div>
+                <fieldset class="col-md-6"><legend class="form-label fs-6">Have you ever applied for or been issued a Trinidad and Tobago passport or travel document?</legend><div class="form-check form-check-inline"><input class="form-check-input" id="app-previous_tt_document-1" type="radio" name="previous_tt_document" value="1" dmx-bind:checked="citizenApplicationCurrent.data.applications[0].previous_tt_document == 1"><label class="form-check-label" for="app-previous_tt_document-1">Yes</label></div><div class="form-check form-check-inline"><input class="form-check-input" id="app-previous_tt_document-0" type="radio" name="previous_tt_document" value="0" dmx-bind:checked="citizenApplicationCurrent.data.applications[0].previous_tt_document == 0"><label class="form-check-label" for="app-previous_tt_document-0">No</label></div></fieldset>
+              </div>
+              <div class="notice-alert notice-alert--warning mt-3" role="note">
+                <strong>Self-report only</strong>
+                A prior passport or travel-document answer does not automatically exclude you or change this draft to a renewal. An affirmative answer remains for human review. The screen does not verify age or first-issue eligibility.
+              </div>
+              <div class="notice-alert notice-alert--warning mt-3" role="note">
+                <strong dmx-show="ageGroupSelfReported.value == 'UNDER_16'">Under 16 is outside the current 16+ first-time screen</strong>
+                <span dmx-show="ageGroupSelfReported.value == 'UNDER_16'">You may keep a development draft, but this screen does not make an eligibility decision or allow submission.</span>
+                <strong dmx-show="ageGroupSelfReported.value == '16_17'">Applicants aged 16–17</strong>
+                <span dmx-show="ageGroupSelfReported.value == '16_17'">Guardian consent is required under the project’s approved design. The separate guardian workflow is not part of this increment, so these drafts cannot be submitted.</span>
+                <strong dmx-show="ageGroupSelfReported.value == '18_PLUS'">Applicants aged 18 or older</strong>
+                <span dmx-show="ageGroupSelfReported.value == '18_PLUS'">This is a self-report only. Age and eligibility remain subject to official review.</span>
+                <span dmx-show="!ageGroupSelfReported.value">Age is not yet self-reported. No eligibility outcome is available.</span>
               </div>
             </section>
 
             <section dmx-show="wizardStep.value == 2" aria-labelledby="stage-two-heading">
-              <div class="panel-heading" id="stage-two-heading">2. Personal details</div>
-              <p>Example field arrangement only. The official application form and field rules have not been supplied in this screen.</p>
-              <div class="row g-3">
-                <div class="col-md-6"><label class="form-label" for="preview-name">Full name</label><input class="form-control" id="preview-name" type="text" disabled aria-describedby="form-preview-note"></div>
-                <div class="col-md-6"><label class="form-label" for="preview-name-history">Other names, if applicable</label><input class="form-control" id="preview-name-history" type="text" disabled aria-describedby="form-preview-note"></div>
-                <div class="col-md-6"><label class="form-label" for="preview-place-birth">Place of birth</label><input class="form-control" id="preview-place-birth" type="text" disabled aria-describedby="form-preview-note"></div>
-                <div class="col-md-6"><label class="form-label" for="preview-contact">Contact email</label><input class="form-control" id="preview-contact" type="email" disabled aria-describedby="form-preview-note"></div>
-              </div>
-              <p id="form-preview-note" class="field-help mt-3 mb-0">Controls are disabled and do not accept or store applicant details.</p>
+              <h2 class="panel-heading" id="stage-two-heading">2. Personal information</h2>
+              <p>Fields follow the mapped first-time form. Individual requiredness and digital validation rules remain pending Immigration/legal approval; these draft fields are optional.</p>
+              <div class="row g-3"><div class="col-md-6"><label class="form-label" for="app-first_name">First name</label><input class="form-control" id="app-first_name" name="first_name" type="text" dmx-bind:value="citizenApplicationCurrent.data.applications[0].first_name"></div><div class="col-md-6"><label class="form-label" for="app-middle_names">Middle name(s)</label><input class="form-control" id="app-middle_names" name="middle_names" type="text" dmx-bind:value="citizenApplicationCurrent.data.applications[0].middle_names"></div><div class="col-md-6"><label class="form-label" for="app-surname">Surname</label><input class="form-control" id="app-surname" name="surname" type="text" dmx-bind:value="citizenApplicationCurrent.data.applications[0].surname"></div><div class="col-md-6"><label class="form-label" for="app-maiden_name">Maiden name, if applicable</label><input class="form-control" id="app-maiden_name" name="maiden_name" type="text" dmx-bind:value="citizenApplicationCurrent.data.applications[0].maiden_name"></div><div class="col-12"><label class="form-label" for="app-former_names">Other former name(s), if applicable</label><textarea class="form-control" id="app-former_names" name="former_names" rows="2" dmx-bind:value="citizenApplicationCurrent.data.applications[0].former_names"></textarea></div><div class="col-md-6"><label class="form-label" for="app-date_of_birth">Date of birth</label><input class="form-control" id="app-date_of_birth" name="date_of_birth" type="date" dmx-bind:value="citizenApplicationCurrent.data.applications[0].date_of_birth"></div><div class="col-md-6"><label class="form-label" for="app-sex_as_on_form">Sex (as shown on the printed form)</label><select class="form-select" id="app-sex_as_on_form" name="sex_as_on_form" dmx-bind:value="citizenApplicationCurrent.data.applications[0].sex_as_on_form"><option value="">Select an answer (optional)</option><option value="Male">Male</option><option value="Female">Female</option></select></div><div class="col-md-6"><label class="form-label" for="app-place_of_birth_town">Place of birth — town/city</label><input class="form-control" id="app-place_of_birth_town" name="place_of_birth_town" type="text" dmx-bind:value="citizenApplicationCurrent.data.applications[0].place_of_birth_town"></div><div class="col-md-6"><label class="form-label" for="app-place_of_birth_country">Place of birth — country</label><input class="form-control" id="app-place_of_birth_country" name="place_of_birth_country" type="text" dmx-bind:value="citizenApplicationCurrent.data.applications[0].place_of_birth_country"></div><div class="col-md-6"><label class="form-label" for="app-height_cm">Height in centimetres</label><input class="form-control" id="app-height_cm" name="height_cm" type="text" dmx-bind:value="citizenApplicationCurrent.data.applications[0].height_cm"></div><div class="col-md-6"><label class="form-label" for="app-eye_colour">Colour of eyes</label><input class="form-control" id="app-eye_colour" name="eye_colour" type="text" dmx-bind:value="citizenApplicationCurrent.data.applications[0].eye_colour"></div><div class="col-md-6"><label class="form-label" for="app-hair_colour">Hair colour</label><input class="form-control" id="app-hair_colour" name="hair_colour" type="text" dmx-bind:value="citizenApplicationCurrent.data.applications[0].hair_colour"></div><div class="col-md-6"><label class="form-label" for="app-marital_status">Marital status (as shown on the printed form)</label><select class="form-select" id="app-marital_status" name="marital_status" dmx-bind:value="citizenApplicationCurrent.data.applications[0].marital_status"><option value="">Select an answer (optional)</option><option value="Single">Single</option><option value="Married">Married</option><option value="Widowed">Widowed</option><option value="Divorced">Divorced</option><option value="Separated">Separated</option><option value="Other">Other</option></select></div><div class="col-md-6"><label class="form-label" for="app-occupation">Occupation / profession</label><input class="form-control" id="app-occupation" name="occupation" type="text" dmx-bind:value="citizenApplicationCurrent.data.applications[0].occupation"></div><div class="col-md-6"><label class="form-label" for="app-home_street">Home address — street</label><textarea class="form-control" id="app-home_street" name="home_street" rows="2" dmx-bind:value="citizenApplicationCurrent.data.applications[0].home_street"></textarea></div><div class="col-md-6"><label class="form-label" for="app-home_city">Home address — town/city</label><input class="form-control" id="app-home_city" name="home_city" type="text" dmx-bind:value="citizenApplicationCurrent.data.applications[0].home_city"></div><div class="col-md-6"><label class="form-label" for="app-home_postal_code">Home address — postal / ZIP code</label><input class="form-control" id="app-home_postal_code" name="home_postal_code" type="text" dmx-bind:value="citizenApplicationCurrent.data.applications[0].home_postal_code"></div><div class="col-md-6"><label class="form-label" for="app-home_country">Home address — country</label><input class="form-control" id="app-home_country" name="home_country" type="text" dmx-bind:value="citizenApplicationCurrent.data.applications[0].home_country"></div><fieldset class="col-md-6"><legend class="form-label fs-6">Is your mailing address different from your home address?</legend><div class="form-check form-check-inline"><input class="form-check-input" id="app-mailing_address_differs-1" type="radio" name="mailing_address_differs" value="1" dmx-bind:checked="citizenApplicationCurrent.data.applications[0].mailing_address_differs == 1"><label class="form-check-label" for="app-mailing_address_differs-1">Yes</label></div><div class="form-check form-check-inline"><input class="form-check-input" id="app-mailing_address_differs-0" type="radio" name="mailing_address_differs" value="0" dmx-bind:checked="citizenApplicationCurrent.data.applications[0].mailing_address_differs == 0"><label class="form-check-label" for="app-mailing_address_differs-0">No</label></div></fieldset><div class="col-md-6"><label class="form-label" for="app-mailing_street">Mailing address — street</label><textarea class="form-control" id="app-mailing_street" name="mailing_street" rows="2" dmx-bind:value="citizenApplicationCurrent.data.applications[0].mailing_street"></textarea></div><div class="col-md-6"><label class="form-label" for="app-mailing_city">Mailing address — town/city</label><input class="form-control" id="app-mailing_city" name="mailing_city" type="text" dmx-bind:value="citizenApplicationCurrent.data.applications[0].mailing_city"></div><div class="col-md-6"><label class="form-label" for="app-mailing_postal_code">Mailing address — postal / ZIP code</label><input class="form-control" id="app-mailing_postal_code" name="mailing_postal_code" type="text" dmx-bind:value="citizenApplicationCurrent.data.applications[0].mailing_postal_code"></div><div class="col-md-6"><label class="form-label" for="app-mailing_country">Mailing address — country</label><input class="form-control" id="app-mailing_country" name="mailing_country" type="text" dmx-bind:value="citizenApplicationCurrent.data.applications[0].mailing_country"></div><div class="col-md-6"><label class="form-label" for="app-work_local_street">Work address, or local address if resident overseas — street</label><textarea class="form-control" id="app-work_local_street" name="work_local_street" rows="2" dmx-bind:value="citizenApplicationCurrent.data.applications[0].work_local_street"></textarea></div><div class="col-md-6"><label class="form-label" for="app-work_local_city">Work / local address — town/city</label><input class="form-control" id="app-work_local_city" name="work_local_city" type="text" dmx-bind:value="citizenApplicationCurrent.data.applications[0].work_local_city"></div><div class="col-md-6"><label class="form-label" for="app-work_local_postal_code">Work / local address — postal / ZIP code</label><input class="form-control" id="app-work_local_postal_code" name="work_local_postal_code" type="text" dmx-bind:value="citizenApplicationCurrent.data.applications[0].work_local_postal_code"></div><div class="col-md-6"><label class="form-label" for="app-work_local_country">Work / local address — country</label><input class="form-control" id="app-work_local_country" name="work_local_country" type="text" dmx-bind:value="citizenApplicationCurrent.data.applications[0].work_local_country"></div><div class="col-md-6"><label class="form-label" for="app-firm_name">Firm / organization name</label><input class="form-control" id="app-firm_name" name="firm_name" type="text" dmx-bind:value="citizenApplicationCurrent.data.applications[0].firm_name"></div><div class="col-md-6"><label class="form-label" for="app-home_telephone">Home telephone</label><input class="form-control" id="app-home_telephone" name="home_telephone" type="tel" dmx-bind:value="citizenApplicationCurrent.data.applications[0].home_telephone"></div><div class="col-md-6"><label class="form-label" for="app-mobile_telephone">Mobile telephone</label><input class="form-control" id="app-mobile_telephone" name="mobile_telephone" type="tel" dmx-bind:value="citizenApplicationCurrent.data.applications[0].mobile_telephone"></div><div class="col-md-6"><label class="form-label" for="app-office_telephone">Office telephone</label><input class="form-control" id="app-office_telephone" name="office_telephone" type="tel" dmx-bind:value="citizenApplicationCurrent.data.applications[0].office_telephone"></div><div class="col-md-6"><label class="form-label" for="app-contact_email">Contact email</label><input class="form-control" id="app-contact_email" name="contact_email" type="email" dmx-bind:value="citizenApplicationCurrent.data.applications[0].contact_email"></div></div>
             </section>
 
             <section dmx-show="wizardStep.value == 3" aria-labelledby="stage-three-heading">
-              <div class="panel-heading" id="stage-three-heading">3. Citizenship and guardian</div>
-              <p>Citizenship categories and evidence requirements must follow approved Immigration instructions.</p>
-              <div class="row g-3">
-                <div class="col-md-6"><label class="form-label" for="preview-citizenship">Citizenship details</label><select class="form-select" id="preview-citizenship" disabled><option selected>Not connected</option></select></div>
-                <div class="col-md-6"><label class="form-label" for="preview-guardian">Guardian workflow</label><select class="form-select" id="preview-guardian" disabled><option selected>Not connected</option></select></div>
+              <h2 class="panel-heading" id="stage-three-heading">3. Citizenship and family information</h2>
+              <p>Record the basis or bases that match your understanding of the source documents. No mutually-exclusive rule or citizenship decision is applied.</p>
+              <fieldset class="row g-3">
+                <legend class="form-label fs-6">Citizenship basis (self-reported; choose any that apply)</legend>
+                <div class="col-md-6"><div class="form-check"><input class="form-check-input" id="app-basis_birth" type="checkbox" name="basis_birth" value="1" dmx-bind:checked="citizenApplicationCurrent.data.applications[0].basis_birth == 1"><label class="form-check-label" for="app-basis_birth">Citizenship by Birth</label></div></div><div class="col-md-6"><div class="form-check"><input class="form-check-input" id="app-basis_descent" type="checkbox" name="basis_descent" value="1" dmx-bind:checked="citizenApplicationCurrent.data.applications[0].basis_descent == 1"><label class="form-check-label" for="app-basis_descent">Citizenship by Descent</label></div></div><div class="col-md-6"><div class="form-check"><input class="form-check-input" id="app-basis_adoption" type="checkbox" name="basis_adoption" value="1" dmx-bind:checked="citizenApplicationCurrent.data.applications[0].basis_adoption == 1"><label class="form-check-label" for="app-basis_adoption">Citizenship by Adoption</label></div></div><div class="col-md-6"><div class="form-check"><input class="form-check-input" id="app-basis_registration" type="checkbox" name="basis_registration" value="1" dmx-bind:checked="citizenApplicationCurrent.data.applications[0].basis_registration == 1"><label class="form-check-label" for="app-basis_registration">Citizenship by Registration</label></div></div><div class="col-md-6"><div class="form-check"><input class="form-check-input" id="app-basis_naturalisation" type="checkbox" name="basis_naturalisation" value="1" dmx-bind:checked="citizenApplicationCurrent.data.applications[0].basis_naturalisation == 1"><label class="form-check-label" for="app-basis_naturalisation">Citizenship by Naturalisation</label></div></div>
+              </fieldset>
+              <div class="row g-3 mt-1">
+                <div class="col-12"><h3 class="h5">Birth evidence details</h3></div>
+                <div class="col-md-6"><label class="form-label" for="app-birth_certificate_pin">Birth certificate PIN</label><input class="form-control" id="app-birth_certificate_pin" name="birth_certificate_pin" type="text" dmx-bind:value="citizenApplicationCurrent.data.applications[0].birth_certificate_pin"></div><div class="col-md-6"><label class="form-label" for="app-birth_certificate_number">Birth certificate number</label><input class="form-control" id="app-birth_certificate_number" name="birth_certificate_number" type="text" dmx-bind:value="citizenApplicationCurrent.data.applications[0].birth_certificate_number"></div><div class="col-md-6"><label class="form-label" for="app-birth_registration_date">Birth registration date</label><input class="form-control" id="app-birth_registration_date" name="birth_registration_date" type="date" dmx-bind:value="citizenApplicationCurrent.data.applications[0].birth_registration_date"></div><div class="col-md-6"><label class="form-label" for="app-birth_registration_district">Birth registration district</label><input class="form-control" id="app-birth_registration_district" name="birth_registration_district" type="text" dmx-bind:value="citizenApplicationCurrent.data.applications[0].birth_registration_district"></div>
+                <div class="col-12"><h3 class="h5 mt-3">Other basis certificate details</h3></div>
+                <div class="col-md-6"><label class="form-label" for="app-descent_certificate_number">Descent certificate number</label><input class="form-control" id="app-descent_certificate_number" name="descent_certificate_number" type="text" dmx-bind:value="citizenApplicationCurrent.data.applications[0].descent_certificate_number"></div><div class="col-md-6"><label class="form-label" for="app-descent_certificate_issue_date">Descent certificate issue date</label><input class="form-control" id="app-descent_certificate_issue_date" name="descent_certificate_issue_date" type="date" dmx-bind:value="citizenApplicationCurrent.data.applications[0].descent_certificate_issue_date"></div><div class="col-md-6"><label class="form-label" for="app-adoption_certificate_number">Adoption certificate number</label><input class="form-control" id="app-adoption_certificate_number" name="adoption_certificate_number" type="text" dmx-bind:value="citizenApplicationCurrent.data.applications[0].adoption_certificate_number"></div><div class="col-md-6"><label class="form-label" for="app-adoption_certificate_issue_date">Adoption certificate issue date</label><input class="form-control" id="app-adoption_certificate_issue_date" name="adoption_certificate_issue_date" type="date" dmx-bind:value="citizenApplicationCurrent.data.applications[0].adoption_certificate_issue_date"></div><div class="col-md-6"><label class="form-label" for="app-registration_certificate_number">Registration certificate number</label><input class="form-control" id="app-registration_certificate_number" name="registration_certificate_number" type="text" dmx-bind:value="citizenApplicationCurrent.data.applications[0].registration_certificate_number"></div><div class="col-md-6"><label class="form-label" for="app-registration_certificate_issue_date">Registration certificate issue date</label><input class="form-control" id="app-registration_certificate_issue_date" name="registration_certificate_issue_date" type="date" dmx-bind:value="citizenApplicationCurrent.data.applications[0].registration_certificate_issue_date"></div><div class="col-md-6"><label class="form-label" for="app-naturalisation_certificate_number">Naturalisation certificate number</label><input class="form-control" id="app-naturalisation_certificate_number" name="naturalisation_certificate_number" type="text" dmx-bind:value="citizenApplicationCurrent.data.applications[0].naturalisation_certificate_number"></div><div class="col-md-6"><label class="form-label" for="app-naturalisation_certificate_issue_date">Naturalisation certificate issue date</label><input class="form-control" id="app-naturalisation_certificate_issue_date" name="naturalisation_certificate_issue_date" type="date" dmx-bind:value="citizenApplicationCurrent.data.applications[0].naturalisation_certificate_issue_date"></div>
+                <div class="col-12"><h3 class="h5 mt-3">Family details</h3></div>
+                <div class="col-md-6"><label class="form-label" for="app-mother_maiden_surname">Mother’s maiden surname</label><input class="form-control" id="app-mother_maiden_surname" name="mother_maiden_surname" type="text" dmx-bind:value="citizenApplicationCurrent.data.applications[0].mother_maiden_surname"></div><div class="col-md-6"><label class="form-label" for="app-father_first_name">Father’s first name</label><input class="form-control" id="app-father_first_name" name="father_first_name" type="text" dmx-bind:value="citizenApplicationCurrent.data.applications[0].father_first_name"></div><div class="col-md-6"><label class="form-label" for="app-father_surname">Father’s surname</label><input class="form-control" id="app-father_surname" name="father_surname" type="text" dmx-bind:value="citizenApplicationCurrent.data.applications[0].father_surname"></div>
+                <div class="col-12"><h3 class="h5 mt-3">Other citizenship</h3></div>
+                <fieldset class="col-md-6"><legend class="form-label fs-6">Are you now, or have you ever been, a citizen of another country?</legend><div class="form-check form-check-inline"><input class="form-check-input" id="app-other_citizenship-1" type="radio" name="other_citizenship" value="1" dmx-bind:checked="citizenApplicationCurrent.data.applications[0].other_citizenship == 1"><label class="form-check-label" for="app-other_citizenship-1">Yes</label></div><div class="form-check form-check-inline"><input class="form-check-input" id="app-other_citizenship-0" type="radio" name="other_citizenship" value="0" dmx-bind:checked="citizenApplicationCurrent.data.applications[0].other_citizenship == 0"><label class="form-check-label" for="app-other_citizenship-0">No</label></div></fieldset><div class="col-md-6"><label class="form-label" for="app-other_citizenship_country">Other citizenship — country</label><input class="form-control" id="app-other_citizenship_country" name="other_citizenship_country" type="text" dmx-bind:value="citizenApplicationCurrent.data.applications[0].other_citizenship_country"></div><div class="col-md-6"><label class="form-label" for="app-other_citizenship_acquired_by">Other citizenship — how acquired</label><input class="form-control" id="app-other_citizenship_acquired_by" name="other_citizenship_acquired_by" type="text" dmx-bind:value="citizenApplicationCurrent.data.applications[0].other_citizenship_acquired_by"></div><div class="col-md-6"><label class="form-label" for="app-other_citizenship_certificate_number">Other citizenship certificate number</label><input class="form-control" id="app-other_citizenship_certificate_number" name="other_citizenship_certificate_number" type="text" dmx-bind:value="citizenApplicationCurrent.data.applications[0].other_citizenship_certificate_number"></div><div class="col-md-6"><label class="form-label" for="app-other_citizenship_issue_date">Other citizenship certificate issue date</label><input class="form-control" id="app-other_citizenship_issue_date" name="other_citizenship_issue_date" type="date" dmx-bind:value="citizenApplicationCurrent.data.applications[0].other_citizenship_issue_date"></div>
+                <div class="col-12"><h3 class="h5 mt-3">Prior Trinidad and Tobago document (if applicable)</h3></div>
+                <div class="col-md-6"><label class="form-label" for="app-prior_document_number">Prior passport / travel-document number</label><input class="form-control" id="app-prior_document_number" name="prior_document_number" type="text" dmx-bind:value="citizenApplicationCurrent.data.applications[0].prior_document_number"></div><div class="col-md-6"><label class="form-label" for="app-prior_document_issue_date">Prior document issue date</label><input class="form-control" id="app-prior_document_issue_date" name="prior_document_issue_date" type="date" dmx-bind:value="citizenApplicationCurrent.data.applications[0].prior_document_issue_date"></div><div class="col-md-6"><label class="form-label" for="app-prior_document_place">Prior document place of issue</label><input class="form-control" id="app-prior_document_place" name="prior_document_place" type="text" dmx-bind:value="citizenApplicationCurrent.data.applications[0].prior_document_place"></div>
               </div>
-              <div class="notice-alert mt-3"><strong>Separate participants</strong>Any future guardian interaction must identify and authenticate the guardian as themselves.</div>
-            </section>
-
-            <section dmx-show="wizardStep.value == 4" aria-labelledby="stage-four-heading">
-              <div class="panel-heading" id="stage-four-heading">4. Recommender and references</div>
-              <p>The reference layout keeps applicant, recommender and reference contacts as distinct participants.</p>
-              <div class="row g-3">
-                <div class="col-md-6"><label class="form-label" for="preview-recommender">Recommender details</label><input class="form-control" id="preview-recommender" type="text" disabled></div>
-                <div class="col-md-6"><label class="form-label" for="preview-reference">Reference details</label><input class="form-control" id="preview-reference" type="text" disabled></div>
+              <div class="notice-alert notice-alert--warning mt-3" role="note">
+                <strong>Review required</strong>
+                Applicant-entered information and certificate references do not verify identity, citizenship, document authenticity or eligibility. Authoritative source checks and approved government rules are not connected.
               </div>
-              <p class="field-help mt-3 mb-0">No people or contact data are shown or collected in this preview.</p>
-            </section>
-
-            <section dmx-show="wizardStep.value == 5" aria-labelledby="stage-five-heading" id="requirements">
-              <div class="panel-heading" id="stage-five-heading">5. Supporting documents</div>
-              <div class="notice-alert notice-alert--warning mb-3"><strong>Official document list unavailable</strong>Do not use this preview as a checklist for a real application.</div>
-              <label class="form-label" for="preview-document-upload">Document upload layout</label>
-              <input class="form-control" id="preview-document-upload" type="file" disabled aria-describedby="upload-preview-note">
-              <p id="upload-preview-note" class="field-help mt-2 mb-0">File upload, private storage, scanning and review are not connected.</p>
-            </section>
-
-            <section dmx-show="wizardStep.value == 6" aria-labelledby="stage-six-heading">
-              <div class="panel-heading" id="stage-six-heading">6. Photograph and identity guidance</div>
-              <div class="row g-3 align-items-center">
-                <div class="col-md-5"><div class="capture-guide"><div><div class="capture-guide-shape" aria-hidden="true">Photo guide</div><p>Illustrative position guide. No camera or photo is active.</p></div></div></div>
-                <div class="col-md-7">
-                  <h3>Photo and identity steps</h3>
-                  <ul class="guidance-list">
-                    <li>Official photo specifications are not connected.</li>
-                    <li>Identity evidence and passport-print photography remain separate.</li>
-                    <li>No biometric inference or verification is performed.</li>
-                  </ul>
-                  <label class="form-label" for="preview-photo-upload">Photo upload control</label>
-                  <input class="form-control" id="preview-photo-upload" type="file" disabled>
-                </div>
-              </div>
-            </section>
-
-            <section dmx-show="wizardStep.value == 7" aria-labelledby="stage-seven-heading">
-              <div class="panel-heading" id="stage-seven-heading">7. Office and delivery preference</div>
-              <p>Office selection is a preference and remains subject to eligible service capability and routing.</p>
-              <div class="row g-3">
-                <div class="col-md-6"><label class="form-label" for="preview-office">Preferred office</label><select class="form-select" id="preview-office" disabled><option selected>Office options are not connected</option></select></div>
-                <div class="col-md-6"><label class="form-label" for="preview-delivery">Fulfilment preference</label><select class="form-select" id="preview-delivery" disabled><option selected>Options are not connected</option></select></div>
-              </div>
-              <div class="international-service-panel mt-3">
-                <strong>Local and overseas service paths</strong>
-                <p class="mb-0">The design considers citizens living in Trinidad &amp; Tobago and overseas. Office and mission options are not confirmed or connected.</p>
-              </div>
-              <p class="field-help mt-3 mb-0">No courier coverage, appointment or office service capability is represented.</p>
             </section>
 
             <section dmx-show="wizardStep.value == 8" aria-labelledby="stage-eight-heading">
-              <div class="panel-heading" id="stage-eight-heading">8. Review and declarations</div>
-              <div class="empty-state"><span class="empty-mark" aria-hidden="true">—</span><h3>No application details to review</h3><p class="mb-0">This preview has no saved information, declaration or signature step.</p></div>
+              <h2 class="panel-heading" id="stage-eight-heading">8. Review saved draft</h2>
+              <p>Review the last saved values. To include edits, save them from the relevant step first.</p>
+              <div class="row g-3">
+                <div class="col-md-6"><strong>Draft status</strong><p dmx-text="citizenApplicationCurrent.data.applications[0].status"></p></div>
+                <div class="col-md-6"><strong>Self-reported age group</strong><p dmx-text="citizenApplicationCurrent.data.applications[0].age_group_self_reported"></p></div>
+                <div class="col-md-6"><strong>Applicant name</strong><p><span dmx-text="citizenApplicationCurrent.data.applications[0].first_name"></span> <span dmx-text="citizenApplicationCurrent.data.applications[0].middle_names"></span> <span dmx-text="citizenApplicationCurrent.data.applications[0].surname"></span></p></div>
+                <div class="col-md-6"><strong>Date of birth</strong><p dmx-text="citizenApplicationCurrent.data.applications[0].date_of_birth"></p></div>
+                <div class="col-md-6"><strong>Home address</strong><p><span dmx-text="citizenApplicationCurrent.data.applications[0].home_street"></span> <span dmx-text="citizenApplicationCurrent.data.applications[0].home_city"></span> <span dmx-text="citizenApplicationCurrent.data.applications[0].home_country"></span></p></div>
+                <div class="col-md-6"><strong>Citizenship basis</strong><p>Self-reported; no basis is treated as verified.</p></div>
+                <div class="col-md-6"><strong>Identity status</strong><p dmx-text="citizenApplicationCurrent.data.applications[0].identity_status"></p></div>
+                <div class="col-md-6"><strong>Citizenship status</strong><p dmx-text="citizenApplicationCurrent.data.applications[0].citizenship_status"></p></div>
+                <div class="col-md-6"><strong>Age screening status</strong><p dmx-text="citizenApplicationCurrent.data.applications[0].age_screening_status"></p></div>
+              </div>
+              <div class="notice-alert notice-alert--warning" role="note">
+                <strong>Not submitted</strong>
+                This saved draft is not an application submission, identity assertion, citizenship finding, approval or passport request.
+              </div>
             </section>
 
-            <section dmx-show="wizardStep.value == 9" aria-labelledby="stage-nine-heading">
-              <div class="panel-heading" id="stage-nine-heading">9. Payment and tracking</div>
-              <div class="notice-alert notice-alert--warning"><strong>Payment is not available</strong>No fee, payment timing, gateway or transaction has been configured.</div>
-              <p class="mt-3 mb-0">Tracking will only display an application after the approved account and application services exist.</p>
-            </section>
-          </div>
-
-          <div class="wizard-actions mt-4">
-            <div class="wizard-actions-group">
-              <a class="btn btn-outline-crimson" href="/">Exit preview</a>
-              <button class="btn btn-outline-crimson" type="button" dmx-show="wizardStep.value > 1" dmx-on:click="wizardStep.setValue(wizardStep.value - 1)">Back</button>
+            <div class="wizard-actions mt-4">
+              <div class="wizard-actions-group">
+                <a class="btn btn-outline-crimson" href="/citizen/dashboard">Return to dashboard</a>
+                <button class="btn btn-outline-crimson" type="button" dmx-show="wizardStep.value > 1" dmx-on:click="wizardStep.setValue(wizardStep.value == 8 ? 3 : wizardStep.value - 1)">Back</button>
+              </div>
+              <div class="wizard-actions-group">
+                <button class="btn btn-primary-government" type="submit" dmx-bind:disabled="citizenDraftForm.state.executing">
+                  <span dmx-show="wizardStep.value < 3">Save and continue</span>
+                  <span dmx-show="wizardStep.value == 3">Save and review</span>
+                  <span dmx-show="wizardStep.value == 8">Save draft</span>
+                </button>
+              </div>
             </div>
-            <div class="wizard-actions-group">
-              <button class="btn btn-outline-crimson" type="button" disabled>Save draft unavailable</button>
-              <button class="btn btn-primary-government" type="button" dmx-show="wizardStep.value < 9" dmx-on:click="wizardStep.setValue(wizardStep.value + 1)">Continue</button>
-            </div>
-          </div>
+          </form>
         </section>
       </div>
       <aside class="col-lg-4" aria-labelledby="guidance-heading">
         <div class="content-panel mb-3">
-          <div class="panel-heading" id="guidance-heading">Application guidance</div>
+          <h2 class="panel-heading" id="guidance-heading">Application guidance</h2>
           <ul class="guidance-list">
-            <li>Use this page to review visual hierarchy only.</li>
-            <li>Official forms, instructions and document lists must be confirmed before implementation.</li>
-            <li>Applicants aged 16–17 require the approved guardian-consent workflow.</li>
-            <li>Online proofing remains subject to legal, identity and biometric approvals.</li>
+            <li>The mapped paper form is the source for the fields shown; field-level requiredness remains pending confirmation.</li>
+            <li>Trinidad &amp; Tobago and overseas residence are supported through international address fields.</li>
+            <li>Guardian consent, recommender, evidence upload, official photo, office selection, declarations and payment are not implemented in this increment.</li>
+            <li>Save each step before leaving. The dashboard provides a resume link for the saved draft.</li>
           </ul>
         </div>
         <div class="info-panel info-panel--gold">
-          <h2>Service state</h2>
-          <p class="mb-2"><span class="status-chip status-chip--neutral">Not connected</span></p>
-          <p class="mb-0">No application is being created, submitted, saved or reviewed.</p>
+          <h2>Separate checks</h2>
+          <p>Account sign-in is not identity verification. Identity and citizenship remain <strong>REVIEW_REQUIRED</strong> until approved evidence and checks exist.</p>
+          <p class="mb-0">Local OCR and biometric demonstration results remain in the separate IVP workflow; this draft does not duplicate or consume them.</p>
         </div>
       </aside>
     </div>
