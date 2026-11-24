@@ -41,15 +41,20 @@
           <span class="status-chip status-chip--neutral" dmx-text="verificationReviewSession.data.session.status"></span>
         </div>
         <ul class="step-bullet-list mt-3 mb-0">
-          <li dmx-repeat:repeatChecks="verificationReviewSession.data.checks">
+          <li dmx-repeat:repeatChecks="verificationReviewSession.data.checks" dmx-bind:data-check-code="check_code">
             <span class="step-bullet" aria-hidden="true">•</span>
-            <span class="d-flex flex-wrap justify-content-between align-items-start gap-2 w-100">
-              <strong dmx-text="check_code"></strong>
-              <span class="status-chip status-chip--neutral" dmx-text="status"></span>
-            </span>
+            <div class="check-row-content">
+              <div class="d-flex flex-wrap justify-content-between align-items-start gap-2">
+                <strong dmx-text="check_code"></strong>
+                <span class="status-chip status-chip--neutral" dmx-text="status"></span>
+              </div>
+              <small class="d-block text-secondary mt-1" dmx-show="check_code == 'FACE_COMPARISON' &amp;&amp; details_json.similarity_score != null" dmx-text="'Cosine similarity (descriptive only): ' + details_json.similarity_score_display"></small>
+              <small class="d-block text-secondary mt-1" dmx-show="check_code == 'FACE_COMPARISON' &amp;&amp; details_json.error_message" dmx-text="details_json.error_message"></small>
+              <small class="d-block text-secondary mt-1" dmx-show="check_code == 'LIVENESS'" dmx-text="'Not performed: the evaluated candidate classifies single images and does not establish genuine liveness.'"></small>
+            </div>
           </li>
         </ul>
-        <p class="field-help mt-3 mb-0">`COMPLETED` means that named capture or extraction step ran. It is not a legal identity assertion.</p>
+        <p class="field-help mt-3 mb-0">A completed face comparison means a local similarity score was calculated. No approved match threshold is configured; the score is not a match decision or legal identity assertion.</p>
       </section>
 
       <div class="row g-3">
@@ -102,8 +107,8 @@
       </div>
 
       <div class="notice-alert notice-alert--warning mt-4" role="note">
-        <strong>Checks not performed or unavailable</strong>
-        Face comparison and liveness are not performed. Document authenticity and authoritative identity checks are unavailable. The session remains pending or review-required accordingly.
+        <strong>Identity and citizenship remain REVIEW_REQUIRED</strong>
+        The face score is descriptive only. Liveness, document authenticity, and authoritative identity checks are not performed or unavailable. This demonstration cannot verify identity, citizenship, or document authenticity.
       </div>
     </div>
 

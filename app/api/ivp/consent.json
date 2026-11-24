@@ -243,7 +243,7 @@
                                   },
                                   {
                                     "column": "consent_version",
-                                    "value": "TTP-DEV-CONSENT-1.0"
+                                    "value": "TTP-DEV-CONSENT-1.1-FACE-POC"
                                   },
                                   {
                                     "column": "accepted",

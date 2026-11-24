@@ -1,5 +1,7 @@
 # Node dependencies and generated test output
 node_modules/
+__pycache__/
+*.py[cod]
 coverage/
 *.log
 !docs/evidence/TTP-2B/*.log
@@ -22,6 +24,7 @@ pnpm-debug.log*
 /db/
 /uploads/
 /storage/
+/selfie/
 /tmp/
 /temp/
 *.sqlite
@@ -32,6 +35,8 @@ pnpm-debug.log*
 /tests/playwright-report/
 /tests/.cache/
 /docs/evidence/TTP-2B/private/
+/docs/evidence/TTP-3G-3H-BIOMETRIC-POC-01/private/
+/docs/evidence/TTP-3G-3H-BIOMETRIC-POC-01/screenshots/
 /infra/stage2b/secrets/
 
 # Wappler machine-local/cache output

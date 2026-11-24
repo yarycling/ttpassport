@@ -1,0 +1,76 @@
+{
+  "type": "ivp_face_compare",
+  "module": "ivp_face_compare",
+  "action": "compare",
+  "groupTitle": "IVP Face Comparison",
+  "groupIcon": "fas fa-lg fa-user-check comp-images",
+  "title": "Compare private portrait and selfie locally",
+  "icon": "fas fa-lg fa-user-check comp-images",
+  "serverModel": ["node"],
+  "dataScheme": [
+    { "name": "status", "type": "text" },
+    { "name": "providerName", "type": "text" },
+    { "name": "modelVersion", "type": "text" },
+    { "name": "scoreType", "type": "text" },
+    { "name": "similarityScore", "type": "number" },
+    { "name": "faceCountReference", "type": "number" },
+    { "name": "faceCountSelfie", "type": "number" },
+    { "name": "errorCode", "type": "text" },
+    { "name": "errorMessage", "type": "text" },
+    { "name": "detailsJson", "type": "text" }
+  ],
+  "dataPickObject": true,
+  "properties": [
+    {
+      "group": "Private image inputs",
+      "variables": [
+        {
+          "name": "name",
+          "optionName": "name",
+          "title": "Step name",
+          "type": "text",
+          "required": true,
+          "defaultValue": "face_comparison"
+        },
+        {
+          "name": "referenceImagePath",
+          "optionName": "referenceImagePath",
+          "title": "Reference portrait file path",
+          "type": "text",
+          "required": true,
+          "defaultValue": "",
+          "serverDataBindings": true,
+          "help": "Pass only the storage key read from this user's owned document evidence on the server. The adapter resolves it under private IVP evidence storage."
+        },
+        {
+          "name": "selfieImagePath",
+          "optionName": "selfieImagePath",
+          "title": "Selfie file path",
+          "type": "text",
+          "required": true,
+          "defaultValue": "",
+          "serverDataBindings": true,
+          "help": "Pass only the storage key created by the validated private selfie upload. Never bind a browser-supplied filesystem path or URL."
+        },
+        {
+          "name": "referenceEvidenceId",
+          "optionName": "referenceEvidenceId",
+          "title": "Reference evidence ID",
+          "type": "text",
+          "required": false,
+          "defaultValue": "",
+          "serverDataBindings": true
+        },
+        {
+          "name": "selfieEvidenceId",
+          "optionName": "selfieEvidenceId",
+          "title": "Selfie evidence ID",
+          "type": "text",
+          "required": false,
+          "defaultValue": "",
+          "serverDataBindings": true
+        }
+      ]
+    }
+  ]
+}

@@ -1131,6 +1131,18 @@ h3 {
   display: flex;
   align-items: start;
   gap: .65rem;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.check-row-content {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.check-row-content strong {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .step-bullet {

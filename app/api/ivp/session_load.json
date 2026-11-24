@@ -224,6 +224,10 @@
                     {
                       "table": "ivp_checks",
                       "column": "created_at"
+                    },
+                    {
+                      "table": "ivp_checks",
+                      "column": "details_json"
                     }
                   ],
                   "wheres": {
@@ -275,6 +279,10 @@
                 {
                   "name": "created_at",
                   "type": "text"
+                },
+                {
+                  "name": "details_json",
+                  "type": "object"
                 }
               ],
               "outputType": "array"

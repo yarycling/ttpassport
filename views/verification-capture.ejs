@@ -10,7 +10,7 @@
     <div class="verification-hero mb-4">
       <p class="section-kicker">Identity verification · Development demonstration</p>
       <h1 id="verification-heading">Identity evidence steps</h1>
-      <p class="page-subtitle">Create a verification session, review local OCR results and save synthetic evidence. OCR is for human review; it does not verify document authenticity or legal identity.</p>
+      <p class="page-subtitle">Create a test session, review local OCR, and compare a specimen portrait with a separate selfie. The score is descriptive only; it does not establish identity or citizenship.</p>
     </div>
 
     <div class="notice-alert notice-alert--warning mb-4" role="note">
@@ -103,12 +103,12 @@
 
       <div class="mt-4" dmx-show="ivpSessionLatest.data.session.status == 'CONSENT_REQUIRED'">
         <h3>1. Record explicit test consent</h3>
-        <p>Consent applies to this synthetic Development demonstration, including private local evidence storage and local OCR. It does not authorise legal identity verification.</p>
+        <p>Consent applies to this Development demonstration: private local storage of test evidence, local OCR, and a local one-to-one face-similarity calculation using YuNet and SFace. Images are not sent to an external provider. No match threshold, liveness check, document-authenticity check, or authoritative identity or citizenship verification is performed.</p>
         <form id="ivpConsentForm" is="dmx-serverconnect-form" method="post" action="/api/ivp/consent" dmx-on:success="ivpSessionLatest.load()">
           <input type="hidden" name="session_id" dmx-bind:value="ivpSessionLatest.data.session.session_id">
           <div class="form-check mb-3">
             <input class="form-check-input" id="ivpConsentAccepted" name="consent_accepted" type="checkbox" value="1" required>
-            <label class="form-check-label" for="ivpConsentAccepted">I consent to this synthetic test session and understand its checks are not legal identity verification.</label>
+            <label class="form-check-label" for="ivpConsentAccepted">I consent to this local test session, including face-similarity processing, and understand it does not verify legal identity or citizenship.</label>
           </div>
           <div class="notice-alert notice-alert--warning mb-3" role="alert" dmx-show="ivpConsentForm.lastError.status">Consent was not recorded. Please select the checkbox and try again.</div>
           <button class="btn btn-primary-government" type="submit" dmx-bind:disabled="ivpConsentForm.state.executing">Record test consent</button>
@@ -181,7 +181,7 @@
           <div class="mb-3">
             <label class="form-label" for="ivpSelfieFile">Synthetic selfie image</label>
             <input class="form-control" id="ivpSelfieFile" name="selfie_file" type="file" accept="image/png,image/jpeg" capture="user" required aria-describedby="ivpSelfieHelp">
-            <p id="ivpSelfieHelp" class="field-help mt-2">JPEG or PNG, up to 5 MB. Mobile browsers may offer the front camera; permission is controlled by your browser.</p>
+            <p id="ivpSelfieHelp" class="field-help mt-2">JPEG or PNG, up to 5 MB. The selfie is compared locally with the specimen portrait; the result is a score only, with no match decision. Liveness is not performed. Mobile browsers may offer the front camera; permission is controlled by your browser.</p>
           </div>
           <div class="notice-alert notice-alert--warning mb-3" role="alert" dmx-show="ivpSelfieUploadForm.lastError.status">The synthetic selfie could not be saved. Check the image and try again.</div>
           <button class="btn btn-primary-government" type="submit" dmx-bind:disabled="ivpSelfieUploadForm.state.executing">

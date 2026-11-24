@@ -1,4 +1,4 @@
-import { mkdir, readdir } from 'node:fs/promises';
+import { mkdir, readdir, writeFile } from 'node:fs/promises';
 import crypto from 'node:crypto';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -273,7 +273,7 @@ test('CT-3B-001 / CT-3C-001 / CT-3D-001 / CT-3E-001 / CT-3E-002 / CT-3E-008 / CT
   await expect(page.locator('#ivpSelfieUploadForm')).toBeVisible();
   await expect(page.locator('#ivpSelfieFile')).toHaveAttribute('capture', 'user');
   await expect(page.locator('#ivpSelfieFile')).toHaveAttribute('accept', 'image/png,image/jpeg');
-  await page.locator('#ivpSelfieFile').setInputFiles({ name: 'synthetic-selfie.png', mimeType: 'image/png', buffer: images.selfie });
+  await page.locator('#ivpSelfieFile').setInputFiles({ name: 'synthetic-selfie.png', mimeType: 'image/png', buffer: images.blank });
   await page.getByRole('button', { name: 'Save synthetic selfie evidence' }).click();
   await expect(page.locator('[role="status"]').filter({ hasText: 'Session status:' })).toContainText('REVIEW_REQUIRED');
   const saved = await sessionSnapshot(page);
@@ -284,16 +284,19 @@ test('CT-3B-001 / CT-3C-001 / CT-3D-001 / CT-3E-001 / CT-3E-002 / CT-3E-008 / CT
   expect(checks.OCR_EXTRACTION).toBe('COMPLETED');
   expect(checks.OCR_REVIEW).toBe('COMPLETED');
   expect(checks.SELFIE_CAPTURE).toBe('COMPLETED');
+  const faceComparisonCheck = saved.body.checks.find(check => check.check_code === 'FACE_COMPARISON');
+  const faceComparisonDetails = typeof faceComparisonCheck.details_json === 'string' ? JSON.parse(faceComparisonCheck.details_json) : faceComparisonCheck.details_json;
+  expect(faceComparisonDetails.error_code).toBe('NO_FACE');
   expect(checks.DOCUMENT_AUTHENTICITY).toBe('UNAVAILABLE');
   expect(checks.AUTHORITATIVE_IDENTITY).toBe('UNAVAILABLE');
-  expect(checks.FACE_COMPARISON).toBe('NOT_PERFORMED');
+  expect(checks.FACE_COMPARISON).toBe('FAILED');
   expect(checks.LIVENESS).toBe('NOT_PERFORMED');
 
   await page.getByRole('link', { name: 'View saved verification results' }).click();
   await expect(page.getByRole('heading', { name: 'Completed and pending checks' })).toBeVisible();
-  await expect(page.locator('li').filter({ hasText: 'FACE_COMPARISON' })).toContainText('NOT_PERFORMED');
-  await expect(page.locator('li').filter({ hasText: 'LIVENESS' })).toContainText('NOT_PERFORMED');
-  await expect(page.locator('li').filter({ hasText: 'DOCUMENT_AUTHENTICITY' })).toContainText('UNAVAILABLE');
+  await expect(page.locator('li[data-check-code="FACE_COMPARISON"]')).toContainText('FAILED');
+  await expect(page.locator('li[data-check-code="LIVENESS"]')).toContainText('NOT_PERFORMED');
+  await expect(page.locator('li[data-check-code="DOCUMENT_AUTHENTICITY"]')).toContainText('UNAVAILABLE');
   await expect(page.getByRole('heading', { name: 'Human-corrected fields' })).toBeVisible();
   await expect(page.locator('pre').first()).toContainText('NAME: SAMPLE PERSON');
   await expect(page.locator('dl').last()).toContainText('SAMPLE PERSON CORRECTED');
@@ -357,5 +360,90 @@ test('CT-3B-001 / CT-3C-001 / CT-3D-001 / CT-3E-001 / CT-3E-002 / CT-3E-008 / CT
   expect(email).toMatch(/@example\.test$/);
   await guestContext.close();
   await otherContext.close();
+  await context.close();
+});
+
+test('CT-3G-003 / CT-3G-004 — Wappler persists a local YuNet/SFace score without an identity assertion', async ({ browser, baseURL }) => {
+  const documentPath = process.env.IVP_FACE_TEST_DOCUMENT_PATH;
+  const selfiePath = process.env.IVP_FACE_TEST_SELFIE_PATH;
+  test.skip(!documentPath || !selfiePath, 'Requires the owner-approved local specimen and consented selfie paths.');
+  test.setTimeout(120_000);
+
+  const context = await browser.newContext();
+  const page = await context.newPage();
+  const pageErrors = [];
+  page.on('pageerror', error => pageErrors.push(error.message));
+  await registerAndSignIn(page, baseURL);
+  await page.getByRole('button', { name: 'Start a new test session' }).click();
+  await expect(page.locator('#ivpConsentForm')).toBeVisible();
+  const sessionId = await page.locator('#ivpConsentForm input[name="session_id"]').inputValue();
+  await page.locator('#ivpConsentAccepted').check();
+  await page.getByRole('button', { name: 'Record test consent' }).click();
+  await expect(page.locator('#ivpDocumentUploadForm')).toBeVisible();
+
+  await page.locator('#ivpDocumentFile').setInputFiles(documentPath);
+  const documentResponsePromise = page.waitForResponse(response => new URL(response.url()).pathname === '/api/ivp/document_upload');
+  await page.getByRole('button', { name: 'Upload and run local OCR' }).click();
+  expect((await documentResponsePromise).status()).toBe(200);
+  await expect(page.locator('#ivpReviewForm')).toBeVisible({ timeout: 60_000 });
+  await page.locator('#ivpReviewName').fill('SAMPLE PERSON A');
+  await page.locator('#ivpReviewDocumentNumber').fill('SAMPLE-0001');
+  await page.locator('#ivpReviewDateOfBirth').fill('2000 01 01');
+  await page.locator('#ivpReviewNationality').fill('SYNTHETIC');
+  const reviewResponsePromise = page.waitForResponse(response => new URL(response.url()).pathname === '/api/ivp/review');
+  await page.getByRole('button', { name: 'Save reviewed fields' }).click();
+  expect((await reviewResponsePromise).status()).toBe(200);
+  await expect(page.locator('#ivpSelfieUploadForm')).toBeVisible();
+
+  await page.locator('#ivpSelfieFile').setInputFiles(selfiePath);
+  const selfieResponsePromise = page.waitForResponse(response => new URL(response.url()).pathname === '/api/ivp/selfie_upload');
+  await page.getByRole('button', { name: 'Save synthetic selfie evidence' }).click();
+  expect((await selfieResponsePromise).status()).toBe(200);
+  const saved = await sessionSnapshot(page);
+  expect(saved.body.session.session_id).toBe(sessionId);
+  expect(saved.body.session.status).toBe('REVIEW_REQUIRED');
+  const faceCheck = saved.body.checks.find(check => check.check_code === 'FACE_COMPARISON');
+  const faceDetails = typeof faceCheck.details_json === 'string' ? JSON.parse(faceCheck.details_json) : faceCheck.details_json;
+  const evidence = Object.fromEntries(saved.body.evidence.map(item => [item.evidence_type, item.evidence_id]));
+  expect(faceCheck.status).toBe('COMPLETED');
+  expect(typeof faceDetails.similarity_score).toBe('number');
+  expect(faceDetails.score_type).toBe('cosine_similarity');
+  expect(faceDetails.decision).toBe('NO_THRESHOLD_CONFIGURED');
+  expect(faceDetails.match_classification).toBeNull();
+  expect(faceDetails.identity_assertion).toBe(false);
+  expect(faceDetails.citizenship_assertion).toBe(false);
+  expect(faceDetails.reference_evidence_id).toBe(evidence.DOCUMENT);
+  expect(faceDetails.selfie_evidence_id).toBe(evidence.SELFIE);
+  expect(saved.body.checks.find(check => check.check_code === 'LIVENESS').status).toBe('NOT_PERFORMED');
+
+  const privateResultDirectory = path.join(evidenceRoot, 'TTP-3G-3H-BIOMETRIC-POC-01/private');
+  await mkdir(privateResultDirectory, { recursive: true });
+  await writeFile(path.join(privateResultDirectory, 'wappler-integration-result.json'), JSON.stringify({
+    recorded_at: new Date().toISOString(),
+    environment: 'local Wappler Development / IVP Development',
+    status: faceCheck.status,
+    provider: faceCheck.provider_name,
+    model_version: faceCheck.model_version,
+    score_type: faceDetails.score_type,
+    similarity_score: faceDetails.similarity_score,
+    match_classification: faceDetails.match_classification,
+    decision: faceDetails.decision,
+    identity_assertion: faceDetails.identity_assertion,
+    citizenship_assertion: faceDetails.citizenship_assertion,
+    liveness_status: saved.body.checks.find(check => check.check_code === 'LIVENESS').status,
+    session_status: saved.body.session.status,
+    evidence_references_persisted: Boolean(faceDetails.reference_evidence_id && faceDetails.selfie_evidence_id),
+  }, null, 2) + '\n');
+
+  await page.goto(new URL('/verification/preview/review', baseURL).toString(), { waitUntil: 'networkidle' });
+  await expect(page.getByRole('heading', { name: 'Completed and pending checks' })).toBeVisible();
+  await expect(page.locator('li[data-check-code="FACE_COMPARISON"]')).toContainText('COMPLETED');
+  await expect(page.locator('body')).toContainText('Cosine similarity (descriptive only)');
+  await expect(page.locator('body')).toContainText('Identity and citizenship remain REVIEW_REQUIRED');
+  await checkResponsiveScreens(page, path.join(evidenceRoot, 'TTP-3G-3H-BIOMETRIC-POC-01/private/screenshots/face-results'), 'Completed and pending checks');
+  await page.keyboard.press('Tab');
+  const focused = await page.evaluate(() => ({ visible: Boolean(document.activeElement?.getClientRects().length), tag: document.activeElement?.tagName }));
+  expect(focused.visible).toBe(true);
+  expect(pageErrors).toEqual([]);
   await context.close();
 });
