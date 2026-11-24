@@ -37,6 +37,8 @@ pnpm-debug.log*
 # Wappler machine-local/cache output
 .wappler/cache/
 .wappler/logs/
+.wappler/targets/Development/
+app/modules/connections/ivp.json
 
 # OS/editor detritus
 .DS_Store

@@ -1,0 +1,53 @@
+{
+  "type": "ivp_ocr_recognize",
+  "module": "ivp_ocr",
+  "action": "recognize",
+  "groupTitle": "IVP OCR",
+  "groupIcon": "fas fa-lg fa-file-lines comp-images",
+  "title": "Extract private image text for review",
+  "icon": "fas fa-lg fa-file-lines comp-images",
+  "serverModel": ["node"],
+  "usedModules": {
+    "node": {
+      "tesseract.js": "7.0.0"
+    }
+  },
+  "dataScheme": [
+    { "name": "text", "type": "text" },
+    { "name": "ocrConfidence", "type": "number" },
+    { "name": "documentReadable", "type": "boolean" },
+    { "name": "status", "type": "text" },
+    { "name": "engine", "type": "text" },
+    { "name": "language", "type": "text" },
+    { "name": "modelRevision", "type": "text" },
+    { "name": "imageFormat", "type": "text" },
+    { "name": "authenticityVerified", "type": "boolean" },
+    { "name": "identityVerified", "type": "boolean" }
+  ],
+  "dataPickObject": true,
+  "properties": [
+    {
+      "group": "OCR input",
+      "variables": [
+        {
+          "name": "name",
+          "optionName": "name",
+          "title": "Step name",
+          "type": "text",
+          "required": true,
+          "defaultValue": "ocr"
+        },
+        {
+          "name": "imagePath",
+          "optionName": "imagePath",
+          "title": "Private evidence path",
+          "type": "text",
+          "required": true,
+          "defaultValue": "",
+          "serverDataBindings": true,
+          "help": "Pass a server-side path from a validated private upload. The file must resolve below IVP_OCR_EVIDENCE_ROOT. Never pass a public URL or a browser-supplied filesystem path."
+        }
+      ]
+    }
+  ]
+}
