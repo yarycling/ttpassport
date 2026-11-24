@@ -3,7 +3,7 @@
 - **Date:** 2026-11-24
 - **Starting commit:** `0f8018e9cdc61cc0a8d3931fe04c32446aaa7d34`
 - **Environment:** Wappler 7.9.9, Node.js v23.6.0, application `http://127.0.0.1:3002`, macOS, synthetic-only OCR fixtures.
-- **Disposition:** Approved additive database connectivity and local OCR evaluation passed. Stage 2C remains in progress; no schema or eKYC session work was authorized here.
+- **Disposition:** Approved additive database connectivity and local OCR evaluation passed. Stage 2C remains `NOT_STARTED` in the project register and is not closed; this is a partial approved prerequisite evaluation. No schema or eKYC session work was authorized here.
 
 ## Database prerequisite
 
@@ -49,7 +49,7 @@ Test command: `node tests/ocr/run-evaluation.mjs`. Output and the editable human
 | CT-2C-003 | Wappler Server Connect `Database Single Query` via `ivp` | Read-only probe returned `ivp-boundary-synthetic`; identity matched approved Development target. | PASS |
 | CT-2C-004 | Remove `ivp` connection and driver rollback | Not run because it would undo the approved Development prerequisite; no destructive rollback was requested. | BLOCKED / NOT EXECUTED |
 | CT-2C-005 | `npm --prefix tests run test:api:inventory` | 15 GUI routes, zero Server Connect API files; loopback GET succeeds and non-loopback/authority-override inputs are rejected. | PASS |
-| CT-2C-006 | `npm --prefix tests run test:security` | Scanned 12 changed/untracked files and diff against `origin/main`; no configured secret/private-file patterns found. | PASS |
+| CT-2C-006 | `npm --prefix tests run test:security` | Scanned 13 changed/untracked files and diff against `origin/main`; no configured secret/private-file patterns found. | PASS |
 | CT-2C-007 | Wappler 7.9.9 UI after project restart | IVP OCR custom Server Connect action appeared in the action catalog. | PASS |
 
 Visual regression comparison against a new baseline is `N/A` because no TTPASSPORT screen was changed. The screenshot is from the OCR review harness, not an accepted application screen. Stage 2B remains `TESTING`; its original CT-2B-007 failure remains preserved in the Recovery 03 evidence.
