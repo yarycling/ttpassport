@@ -1,12 +1,12 @@
-# Stage 2B test-only harness
+# TTPASSPORT automated test harness
 
 The harness is isolated under `tests/`; the Wappler application manifest and runtime dependencies are not changed. Install it with `npm --prefix tests ci`, then install the Chromium and Firefox browsers once with `npm --prefix tests exec playwright install chromium firefox`.
 
 ## Browser tests
 
-With the Wappler Development app already running through Wappler Run at port 3002, execute `npm --prefix tests run test:gui`. The target defaults to `http://127.0.0.1:3002`; an override is accepted only when it is loopback. The suite validates the approved 15-route map, HTTP and asset responses, browser errors, horizontal overflow, basic accessible names and keyboard focus at 1440, 1024, 768 and 375 CSS px. It saves one full-page screenshot per route and viewport under `docs/evidence/TTP-2B/screenshots/` and tests the existing public navigation, first-time wizard preview and back-office review tabs.
+With the Wappler Development app already running through Wappler Run at port 3002, execute `npm --prefix tests run test:gui`. The target defaults to `http://127.0.0.1:3002`; an override is accepted only when it is loopback. The suite validates the approved 15-route map, HTTP and asset responses, browser errors, horizontal overflow, basic accessible names and keyboard focus at 1440, 1024, 768 and 375 CSS px. Current screenshots are saved under `docs/evidence/TTP-3D/screenshots/`; the accepted Stage 2B screenshots remain unchanged under `docs/evidence/TTP-2B/screenshots/`. The suite also covers the local eKYC session, consent, synthetic document upload, OCR field review, selfie evidence, saved results and ownership controls.
 
-Run `npm --prefix tests run test:visual` to compare home and back-office review against the accepted Stage 2A screenshots at their matching 1440×900 and 375×900 viewports. It waits for network idle and fonts before capture, uses Playwright Firefox, retains the four comparison screenshots, checks the primary heading and allows up to 1% pixel difference for cross-version font rasterization. The other 11 routes have no prior approved screenshots at those sizes; the 60 responsive Playwright captures remain retained as the current baseline for those routes. Human visual and business acceptance remains pending.
+Run `npm --prefix tests run test:visual` to compare home and back-office review against the accepted Stage 2A screenshots at their matching 1440×900 and 375×900 viewports. It waits for network idle and fonts before capture, uses Playwright Firefox, retains the four current comparison screenshots under `docs/evidence/TTP-3E/screenshots/visual-baseline/`, checks the primary heading and allows up to 1% pixel difference for cross-version font rasterization. The other 11 routes have no prior approved screenshots at those sizes; the 60 responsive Playwright captures remain retained as the current baseline for those routes. Human visual and business acceptance remains pending.
 
 ## MySQL setup and tests
 
@@ -20,7 +20,11 @@ See `infra/stage2b/README.md`. Credentials and connection JSON stay outside the 
 
 ## API scope
 
-`tests/api/client.mjs` is a reusable loopback-only API request helper. `npm --prefix tests run test:api:inventory` verifies it can request the existing Wappler `/` route and rejects a non-loopback base URL or authority-overriding path, then reports configured Server Connect files. There are no business API actions in the current Wappler scaffold, so business API assertions are N/A; do not add a route merely to create a passing API test.
+`tests/api/client.mjs` is a reusable loopback-only API request helper. `npm --prefix tests run test:api:inventory` verifies it can request the existing Wappler `/` route, rejects a non-loopback base URL or authority-overriding path, and checks that only the eleven approved Wappler-native IVP actions are present. Runtime behavior is exercised by the eKYC browser workflow tests.
+
+## Local OCR
+
+Run `node tests/ocr/run-evaluation.mjs` to test synthetic readable/unreadable images, the pinned local Tesseract.js model, extracted fields, file restrictions and the human-correction preview. The preview screenshot is written under `docs/evidence/TTP-3E/screenshots/`; no document is sent to an external OCR provider.
 
 ## Security and audit
 
@@ -28,4 +32,4 @@ Run `npm --prefix tests run test:security` to scan the current diff from `origin
 
 ## Cleanup and rollback
 
-Stop only Stage 2B services through the documented Compose wrapper. Restore the prior application state by closing/removing only the temporary Wappler test connection/action (if used) and verifying the original `db` connection, port 3002 and route inventory. Never prune all Docker resources or change MAMP. Test volumes and database dumps are explicitly synthetic and package-owned; preserve backups until evidence and rollback review are complete.
+Stop only Stage 2B services through the documented Compose wrapper. The `ivp` Development connection and IVP schema are now used by the owner-authorized eKYC slice; do not treat them as temporary or remove them as part of Stage 2B cleanup. The migration rollback was exercised only on disposable Test. Reverting application files would not remove Development records, schema or private evidence; any such rollback requires a separate owner-approved plan. Verify the original SQLite `db` connection, port 3002 and route inventory after changes. Never prune all Docker resources or change MAMP. Test volumes and database dumps are synthetic and package-owned; preserve backups until evidence and rollback review are complete.

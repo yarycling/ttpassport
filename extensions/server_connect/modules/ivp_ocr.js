@@ -2,6 +2,7 @@
 
 const fs = require('node:fs/promises');
 const path = require('node:path');
+const crypto = require('node:crypto');
 const { createWorker, OEM } = require('tesseract.js');
 
 const MODEL_DIR = path.join(__dirname, 'tessdata');
@@ -76,8 +77,51 @@ async function readPrivateImage(imagePath) {
   }
   if (width * height > MAX_PIXELS) throw new Error('The image dimensions exceed the OCR evaluation limit.');
 
-  return { buffer, format, width, height };
+  return {
+    buffer,
+    format,
+    width,
+    height,
+    byteSize: info.size,
+    sha256: crypto.createHash('sha256').update(buffer).digest('hex'),
+  };
 }
+
+function extractFields(text) {
+  const field = pattern => text.match(pattern)?.[1]?.trim() || null;
+  return {
+    name: field(/^NAME\s*:\s*(.+)$/im),
+    documentNumber: field(/^DOCUMENT\s*(?:NO\.?|NUMBER)\s*:\s*(.+)$/im),
+    dateOfBirth: field(/^(?:DOB|DATE OF BIRTH)\s*:\s*(.+)$/im),
+    nationality: field(/^NATIONALITY\s*:\s*(.+)$/im),
+  };
+}
+
+exports.inspect = async function inspect(options) {
+  const sourcePath = this.parse(options.imagePath);
+  try {
+    const image = await readPrivateImage(sourcePath);
+    return {
+      valid: true,
+      imageFormat: image.format,
+      imageWidth: image.width,
+      imageHeight: image.height,
+      byteSize: image.byteSize,
+      sha256: image.sha256,
+      errorMessage: '',
+    };
+  } catch {
+    return {
+      valid: false,
+      imageFormat: '',
+      imageWidth: 0,
+      imageHeight: 0,
+      byteSize: 0,
+      sha256: '',
+      errorMessage: 'Choose a valid JPEG or PNG image no larger than 5 MB and at least 320 × 200 pixels.',
+    };
+  }
+};
 
 exports.recognize = async function recognize(options) {
   const sourcePath = this.parse(options.imagePath);
@@ -93,9 +137,12 @@ exports.recognize = async function recognize(options) {
     });
     const { data } = await worker.recognize(image.buffer);
     const text = String(data.text || '').trim();
+    const extractedFields = extractFields(text);
 
     return {
       text,
+      extractedFields,
+      extractedFieldsJson: JSON.stringify(extractedFields),
       ocrConfidence: Number(data.confidence || 0),
       documentReadable: text.length > 0,
       status: text.length > 0 ? 'REVIEW_REQUIRED' : 'UNREADABLE',
@@ -103,6 +150,10 @@ exports.recognize = async function recognize(options) {
       language: 'eng',
       modelRevision: MODEL_REVISION,
       imageFormat: image.format,
+      imageWidth: image.width,
+      imageHeight: image.height,
+      byteSize: image.byteSize,
+      sha256: image.sha256,
       authenticityVerified: false,
       identityVerified: false,
     };

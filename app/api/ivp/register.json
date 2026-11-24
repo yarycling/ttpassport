@@ -1,0 +1,310 @@
+{
+  "meta": {
+    "$_POST": [
+      {
+        "name": "username",
+        "type": "text",
+        "fieldName": "username",
+        "options": {
+          "rules": {
+            "core:required": {},
+            "core:email": {},
+            "core:maxlength": { "param": 254 }
+          }
+        }
+      },
+      {
+        "name": "password",
+        "type": "text",
+        "fieldName": "password",
+        "options": {
+          "rules": {
+            "core:required": {},
+            "core:minlength": { "param": 12 },
+            "core:maxlength": { "param": 255 }
+          }
+        }
+      },
+      {
+        "name": "password_confirm",
+        "type": "text",
+        "fieldName": "password_confirm",
+        "options": {
+          "rules": {
+            "core:required": {}
+          }
+        }
+      }
+    ]
+  },
+  "exec": {
+    "steps": [
+      {
+        "name": "passwords_match",
+        "module": "core",
+        "action": "condition",
+        "options": {
+          "if": "{{$_POST.password == $_POST.password_confirm}}",
+          "then": [
+            {
+              "name": "password_hash",
+              "module": "crypto",
+              "action": "passwordHash",
+              "options": {
+                "password": "{{$_POST.password}}",
+                "algo": "argon2id"
+              },
+              "output": false,
+              "meta": [
+                {
+                  "name": "password_hash",
+                  "type": "text"
+                }
+              ],
+              "outputType": "text"
+            },
+            {
+              "name": "clients",
+              "module": "dbconnector",
+              "action": "select",
+              "options": {
+                "connection": "ivp",
+                "sql": {
+                  "type": "SELECT",
+                  "table": {
+                    "name": "ivp_clients"
+                  },
+                  "primary": "client_id",
+                  "columns": [
+                    {
+                      "table": "ivp_clients",
+                      "column": "client_id"
+                    },
+                    {
+                      "table": "ivp_clients",
+                      "column": "client_key"
+                    },
+                    {
+                      "table": "ivp_clients",
+                      "column": "status"
+                    }
+                  ],
+                  "wheres": {
+                    "condition": "AND",
+                    "rules": [
+                      {
+                        "table": "ivp_clients",
+                        "column": "client_key",
+                        "operator": "equal",
+                        "operation": "=",
+                        "value": "ttpassport-dev"
+                      }
+                    ]
+                  },
+                  "limit": 2
+                }
+              },
+              "output": false,
+              "meta": [
+                {
+                  "name": "client_id",
+                  "type": "number"
+                },
+                {
+                  "name": "client_key",
+                  "type": "text"
+                },
+                {
+                  "name": "status",
+                  "type": "text"
+                }
+              ],
+              "outputType": "array"
+            },
+            {
+              "name": "seed_client_if_missing",
+              "module": "core",
+              "action": "condition",
+              "options": {
+                "if": "{{clients.count() == 0}}",
+                "then": [
+                  {
+                    "name": "seed_development_client",
+                    "module": "dbupdater",
+                    "action": "insert",
+                    "options": {
+                      "connection": "ivp",
+                      "sql": {
+                        "type": "INSERT",
+                        "table": "ivp_clients",
+                        "values": [
+                          {
+                            "column": "client_key",
+                            "value": "ttpassport-dev"
+                          },
+                          {
+                            "column": "display_name",
+                            "value": "TTPASSPORT Development"
+                          },
+                          {
+                            "column": "status",
+                            "value": "ACTIVE"
+                          }
+                        ]
+                      }
+                    },
+                    "output": false,
+                    "meta": [
+                      {
+                        "name": "identity",
+                        "type": "text"
+                      },
+                      {
+                        "name": "affected",
+                        "type": "number"
+                      }
+                    ],
+                    "outputType": "object"
+                  }
+                ],
+                "else": []
+              },
+              "output": false
+            },
+            {
+              "name": "client",
+              "module": "dbconnector",
+              "action": "single",
+              "options": {
+                "connection": "ivp",
+                "sql": {
+                  "type": "SELECT",
+                  "table": {
+                    "name": "ivp_clients"
+                  },
+                  "primary": "client_id",
+                  "columns": [
+                    {
+                      "table": "ivp_clients",
+                      "column": "client_id"
+                    },
+                    {
+                      "table": "ivp_clients",
+                      "column": "client_key"
+                    },
+                    {
+                      "table": "ivp_clients",
+                      "column": "status"
+                    }
+                  ],
+                  "wheres": {
+                    "condition": "AND",
+                    "rules": [
+                      {
+                        "table": "ivp_clients",
+                        "column": "client_key",
+                        "operator": "equal",
+                        "operation": "=",
+                        "value": "ttpassport-dev"
+                      },
+                      {
+                        "table": "ivp_clients",
+                        "column": "status",
+                        "operator": "equal",
+                        "operation": "=",
+                        "value": "ACTIVE"
+                      }
+                    ]
+                  },
+                  "limit": 1
+                }
+              },
+              "output": false,
+              "meta": [
+                {
+                  "name": "client_id",
+                  "type": "number"
+                },
+                {
+                  "name": "client_key",
+                  "type": "text"
+                },
+                {
+                  "name": "status",
+                  "type": "text"
+                }
+              ],
+              "outputType": "object"
+            },
+            {
+              "name": "create_demo_user",
+              "module": "dbupdater",
+              "action": "insert",
+              "options": {
+                "connection": "ivp",
+                "sql": {
+                  "type": "INSERT",
+                  "table": "ivp_demo_users",
+                  "values": [
+                    {
+                      "column": "client_id",
+                      "value": "{{client.client_id}}"
+                    },
+                    {
+                      "column": "username",
+                      "value": "{{$_POST.username}}"
+                    },
+                    {
+                      "column": "password",
+                      "value": "{{password_hash}}"
+                    },
+                    {
+                      "column": "status",
+                      "value": "ACTIVE"
+                    }
+                  ]
+                }
+              },
+              "output": false,
+              "meta": [
+                {
+                  "name": "identity",
+                  "type": "text"
+                },
+                {
+                  "name": "affected",
+                  "type": "number"
+                }
+              ],
+              "outputType": "object"
+            },
+            {
+              "name": "registration_result",
+              "module": "core",
+              "action": "setvalue",
+              "options": {
+                "key": "registrationResult",
+                "value": "DEMO_ACCOUNT_CREATED"
+              },
+              "output": true,
+              "outputType": "text"
+            }
+          ],
+          "else": [
+            {
+              "name": "password_mismatch",
+              "module": "core",
+              "action": "response",
+              "options": {
+                "status": 400,
+                "data": { "message": "Passwords do not match." }
+              },
+              "output": false
+            }
+          ]
+        },
+        "output": false
+      }
+    ]
+  }
+}

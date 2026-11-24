@@ -1,38 +1,112 @@
 <!-- Wappler include head-page="layouts/main" bootstrap5="local" is="dmx-app" id="verificationReview" appConnect="local" -->
+<dmx-value id="verificationReviewAuthenticated" dmx-bind:value="false"></dmx-value>
+<dmx-serverconnect id="verificationReviewAuthState" url="/api/ivp/auth_state" dmx-on:success="verificationReviewAuthenticated.setValue(verificationReviewAuthState.data.authenticated);verificationReviewAuthState.data.authenticated &amp;&amp; verificationReviewSession.load()"></dmx-serverconnect>
+<dmx-serverconnect id="verificationReviewSession" url="/api/ivp/session_latest" noload="true" dmx-on:success="verificationReviewAuthenticated.setValue(true)" dmx-on:error="verificationReviewAuthenticated.setValue(false)"></dmx-serverconnect>
+
 <section class="page-section" aria-labelledby="verification-review-heading">
   <div class="container-fluid page-container">
     <div class="page-title-row">
       <div>
-        <p class="section-kicker">Identity verification · Visual preview</p>
-        <h1 id="verification-review-heading">Verification review status</h1>
-        <p class="page-subtitle">A neutral status layout for future evidence review. No identity session or assertion exists.</p>
+        <p class="section-kicker">Identity verification · Development demonstration</p>
+        <h1 id="verification-review-heading">Verification results</h1>
+        <p class="page-subtitle">Saved results for the latest session belonging to your signed-in test account.</p>
       </div>
-      <span class="status-chip status-chip--neutral">Not started</span>
+      <span class="status-chip status-chip--neutral" dmx-show="verificationReviewAuthenticated.value &amp;&amp; verificationReviewSession.data.session.session_id" dmx-text="verificationReviewSession.data.session.status"></span>
     </div>
+
     <div class="notice-alert notice-alert--warning mb-4" role="note">
-      <strong>No identity check has run</strong>
-      This preview does not claim a person is verified and does not perform biometric or registry checks.
+      <strong>Development result only</strong>
+      OCR extraction and selfie capture do not establish document authenticity, legal identity, citizenship, face match or liveness.
     </div>
-    <div class="row g-3">
-      <div class="col-lg-7">
-        <section class="content-panel" aria-labelledby="checklist-heading">
-          <h2 id="checklist-heading">Review checklist</h2>
-          <ul class="step-bullet-list mb-0">
-            <li><span class="step-bullet" aria-hidden="true">1</span><span><strong>Document validity</strong><br><span class="field-help">Not assessed · source unavailable</span></span></li>
-            <li><span class="step-bullet" aria-hidden="true">2</span><span><strong>Person-to-evidence review</strong><br><span class="field-help">Not assessed · no evidence uploaded</span></span></li>
-            <li><span class="step-bullet" aria-hidden="true">3</span><span><strong>Citizenship eligibility</strong><br><span class="field-help">Separate future policy check · not assessed</span></span></li>
-          </ul>
-        </section>
-      </div>
-      <aside class="col-lg-5">
-        <div class="content-panel h-100">
-          <h2>Review status</h2>
-          <p><span class="status-chip status-chip--neutral">Not assessed</span></p>
-          <p>Any future result must identify the evidence, source and policy checks actually completed.</p>
-          <div class="notice-alert"><strong>Retry and help</strong>If a future capture is interrupted, use the documented support route. This preview cannot restart a session.</div>
+
+    <div class="content-panel mb-4" dmx-show="!verificationReviewAuthenticated.value">
+      <h2>Sign in to view your saved results</h2>
+      <p>Only the test account that created a session can retrieve its evidence and results.</p>
+      <a class="btn btn-primary-government" href="/verification/preview">Continue to the development sign-in</a>
+    </div>
+
+    <div class="content-panel mb-4" dmx-show="verificationReviewAuthenticated.value &amp;&amp; !verificationReviewSession.data.session.session_id">
+      <h2>No verification session found</h2>
+      <p>Start a test session and complete the consent step before returning here.</p>
+      <a class="btn btn-primary-government" href="/verification/preview">Start a test session</a>
+    </div>
+
+    <div dmx-show="verificationReviewAuthenticated.value &amp;&amp; verificationReviewSession.data.session.session_id">
+      <section class="content-panel mb-4" aria-labelledby="review-checks-heading">
+        <div class="page-title-row">
+          <div>
+            <h2 id="review-checks-heading">Completed and pending checks</h2>
+            <p class="field-help mb-0">Each status reflects an action actually recorded for this session.</p>
+          </div>
+          <span class="status-chip status-chip--neutral" dmx-text="verificationReviewSession.data.session.status"></span>
         </div>
-      </aside>
+        <ul class="step-bullet-list mt-3 mb-0">
+          <li dmx-repeat:repeatChecks="verificationReviewSession.data.checks">
+            <span class="step-bullet" aria-hidden="true">•</span>
+            <span class="d-flex flex-wrap justify-content-between align-items-start gap-2 w-100">
+              <strong dmx-text="check_code"></strong>
+              <span class="status-chip status-chip--neutral" dmx-text="status"></span>
+            </span>
+          </li>
+        </ul>
+        <p class="field-help mt-3 mb-0">`COMPLETED` means that named capture or extraction step ran. It is not a legal identity assertion.</p>
+      </section>
+
+      <div class="row g-3">
+        <div class="col-lg-7">
+          <section class="content-panel h-100" aria-labelledby="ocr-results-heading">
+            <h2 id="ocr-results-heading">OCR extraction and human review</h2>
+            <div dmx-show="!verificationReviewSession.data.ocr_results[0].ocr_result_id">
+              <p class="mb-0">No document image has been processed in this session.</p>
+            </div>
+            <div class="notice-alert notice-alert--warning mt-3" role="alert" dmx-show="verificationReviewSession.data.ocr_results[0].ocr_result_id &amp;&amp; !verificationReviewSession.data.ocr_results[0].original_text">
+              OCR could not read the document image. Upload a clearer synthetic image to try OCR again. No extracted fields are available for review.
+            </div>
+            <div dmx-show="verificationReviewSession.data.ocr_results[0].ocr_result_id &amp;&amp; verificationReviewSession.data.ocr_results[0].original_text">
+              <p class="field-help">Original extracted text is preserved. Human corrections are recorded separately.</p>
+              <h3 class="h5 mt-3">Original OCR text</h3>
+              <pre class="border rounded p-3 text-wrap" dmx-text="verificationReviewSession.data.ocr_results[0].original_text"></pre>
+              <h3 class="h5 mt-3">Extracted fields</h3>
+              <dl class="row mb-3">
+                <dt class="col-sm-4">Name</dt><dd class="col-sm-8" dmx-text="verificationReviewSession.data.ocr_results[0].extracted_fields.name"></dd>
+                <dt class="col-sm-4">Document number</dt><dd class="col-sm-8" dmx-text="verificationReviewSession.data.ocr_results[0].extracted_fields.documentNumber"></dd>
+                <dt class="col-sm-4">Date of birth</dt><dd class="col-sm-8" dmx-text="verificationReviewSession.data.ocr_results[0].extracted_fields.dateOfBirth"></dd>
+                <dt class="col-sm-4">Nationality</dt><dd class="col-sm-8" dmx-text="verificationReviewSession.data.ocr_results[0].extracted_fields.nationality"></dd>
+              </dl>
+              <div dmx-show="verificationReviewSession.data.ocr_results[0].reviewed_at">
+                <h3 class="h5 mt-3">Human-corrected fields</h3>
+                <dl class="row mb-0">
+                  <dt class="col-sm-4">Name</dt><dd class="col-sm-8" dmx-text="verificationReviewSession.data.ocr_results[0].corrected_fields.name"></dd>
+                  <dt class="col-sm-4">Document number</dt><dd class="col-sm-8" dmx-text="verificationReviewSession.data.ocr_results[0].corrected_fields.documentNumber"></dd>
+                  <dt class="col-sm-4">Date of birth</dt><dd class="col-sm-8" dmx-text="verificationReviewSession.data.ocr_results[0].corrected_fields.dateOfBirth"></dd>
+                  <dt class="col-sm-4">Nationality</dt><dd class="col-sm-8" dmx-text="verificationReviewSession.data.ocr_results[0].corrected_fields.nationality"></dd>
+                </dl>
+              </div>
+              <p class="field-help mt-3 mb-0" dmx-show="verificationReviewSession.data.ocr_results[0].reviewed_at" dmx-text="'Reviewed at ' + verificationReviewSession.data.ocr_results[0].reviewed_at"></p>
+            </div>
+          </section>
+        </div>
+        <div class="col-lg-5">
+          <section class="content-panel h-100" aria-labelledby="evidence-heading">
+            <h2 id="evidence-heading">Private evidence saved</h2>
+            <p class="field-help">Evidence is listed by type and metadata only. No public file link is provided.</p>
+            <ul class="guidance-list mb-0" dmx-show="verificationReviewSession.data.evidence[0].evidence_id">
+              <li dmx-repeat:repeatEvidence="verificationReviewSession.data.evidence">
+                <strong dmx-text="evidence_type"></strong>
+                <span dmx-text="mime_type + ' · ' + byte_size + ' bytes'"></span>
+              </li>
+            </ul>
+            <p class="mb-0" dmx-show="!verificationReviewSession.data.evidence[0].evidence_id">No evidence has been saved.</p>
+          </section>
+        </div>
+      </div>
+
+      <div class="notice-alert notice-alert--warning mt-4" role="note">
+        <strong>Checks not performed or unavailable</strong>
+        Face comparison and liveness are not performed. Document authenticity and authoritative identity checks are unavailable. The session remains pending or review-required accordingly.
+      </div>
     </div>
-    <div class="mt-4"><a class="btn btn-outline-crimson" href="/verification/preview">Return to capture guidance</a></div>
+
+    <div class="mt-4"><a class="btn btn-outline-crimson" href="/verification/preview">Return to identity evidence steps</a></div>
   </div>
 </section>

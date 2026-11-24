@@ -14,6 +14,8 @@
   },
   "dataScheme": [
     { "name": "text", "type": "text" },
+    { "name": "extractedFields", "type": "object" },
+    { "name": "extractedFieldsJson", "type": "text" },
     { "name": "ocrConfidence", "type": "number" },
     { "name": "documentReadable", "type": "boolean" },
     { "name": "status", "type": "text" },
@@ -21,6 +23,10 @@
     { "name": "language", "type": "text" },
     { "name": "modelRevision", "type": "text" },
     { "name": "imageFormat", "type": "text" },
+    { "name": "imageWidth", "type": "number" },
+    { "name": "imageHeight", "type": "number" },
+    { "name": "byteSize", "type": "number" },
+    { "name": "sha256", "type": "text" },
     { "name": "authenticityVerified", "type": "boolean" },
     { "name": "identityVerified", "type": "boolean" }
   ],

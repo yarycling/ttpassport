@@ -9,7 +9,7 @@ const require = createRequire(import.meta.url);
 const here = path.dirname(fileURLToPath(import.meta.url));
 const repo = path.resolve(here, '../..');
 const sampleDir = path.join(repo, 'tests/.cache/ocr/samples');
-const evidencePath = path.join(repo, 'docs/evidence/TTP-2C/OCR_HUMAN_REVIEW_PREVIEW.png');
+const evidencePath = path.join(repo, 'docs/evidence/TTP-3E/screenshots/ocr-human-review-2026-11-24.png');
 const modelPath = path.join(repo, 'extensions/server_connect/modules/tessdata/eng.traineddata');
 
 await fs.mkdir(sampleDir, { recursive: true });
@@ -63,6 +63,7 @@ require('./network-guard.cjs');
 process.env.IVP_OCR_EVIDENCE_ROOT = sampleDir;
 const ocr = require('../../extensions/server_connect/modules/ivp_ocr.js');
 const runAction = (imagePath) => ocr.recognize.call({ parse: (value) => value }, { imagePath }, 'ocrEvaluation');
+const inspectAction = (imagePath) => ocr.inspect.call({ parse: (value) => value }, { imagePath }, 'inspectEvaluation');
 
 assert.equal(require('tesseract.js/package.json').version, '7.0.0');
 assert.equal(require('tesseract.js-core/package.json').version, '7.0.0');
@@ -74,6 +75,20 @@ assert.equal(readable.authenticityVerified, false);
 assert.equal(readable.identityVerified, false);
 assert.match(readable.text, /SAMPLE PERSON/i);
 assert.match(readable.text, /TEST/i);
+assert.deepEqual(readable.extractedFields, {
+  name: 'SAMPLE PERSON',
+  documentNumber: 'TEST 000042',
+  dateOfBirth: '2000 01 01',
+  nationality: 'SYNTHETIC',
+});
+assert.equal(readable.extractedFieldsJson, JSON.stringify(readable.extractedFields));
+assert.equal(readable.sha256.length, 64);
+assert.ok(readable.imageWidth >= 320 && readable.imageHeight >= 200);
+
+const inspected = await inspectAction('synthetic-readable.png');
+assert.equal(inspected.valid, true);
+assert.equal(inspected.imageFormat, 'png');
+assert.equal(inspected.sha256, readable.sha256);
 
 const unreadable = await runAction('synthetic-unreadable.png');
 assert.equal(unreadable.status, 'UNREADABLE');
@@ -83,6 +98,8 @@ assert.equal(unreadable.identityVerified, false);
 
 await assert.rejects(() => runAction('invalid-image.txt'), /Unsupported image format/);
 await assert.rejects(() => runAction('../../../.env'), /outside the configured private evidence area/);
+assert.equal((await inspectAction('invalid-image.txt')).valid, false);
+assert.equal((await inspectAction('../../../.env')).valid, false);
 
 const escapeHtml = (value) => value.replace(/[&<>"']/g, (character) => ({
   '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
@@ -106,6 +123,8 @@ console.log(JSON.stringify({
   modelBytes: (await fs.stat(modelPath)).size,
   tests: {
     readableExtraction: 'PASS',
+    supportedFieldExtraction: 'PASS',
+    privateImageInspectionAndDigest: 'PASS',
     humanCorrectionEditable: 'PASS',
     unreadableImage: 'PASS',
     invalidFileRejected: 'PASS',

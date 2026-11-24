@@ -1,47 +1,204 @@
 <!-- Wappler include head-page="layouts/main" bootstrap5="local" is="dmx-app" id="verificationCapture" appConnect="local" -->
+<dmx-value id="ivpAuthenticated" dmx-bind:value="false"></dmx-value>
+<dmx-value id="ivpRegistrationSaved" dmx-bind:value="false"></dmx-value>
+<dmx-serverconnect id="ivpAuthState" url="/api/ivp/auth_state" dmx-on:success="ivpAuthenticated.setValue(ivpAuthState.data.authenticated);ivpAuthState.data.authenticated &amp;&amp; ivpSessionLatest.load()"></dmx-serverconnect>
+<dmx-serverconnect id="ivpSessionLatest" url="/api/ivp/session_latest" noload="true" dmx-on:success="ivpAuthenticated.setValue(true)" dmx-on:error="ivpAuthenticated.setValue(false)"></dmx-serverconnect>
+<dmx-serverconnect id="ivpCreateSession" url="/api/ivp/session_create" noload="true" dmx-on:success="ivpSessionLatest.load()"></dmx-serverconnect>
+
 <section class="page-section" aria-labelledby="verification-heading">
   <div class="container-fluid page-container">
     <div class="verification-hero mb-4">
-      <p class="section-kicker">Identity verification · Visual preview</p>
+      <p class="section-kicker">Identity verification · Development demonstration</p>
       <h1 id="verification-heading">Identity evidence steps</h1>
-      <p class="page-subtitle">A reusable interface concept for future document and photo capture. No capture, comparison or authoritative source checks are active.</p>
+      <p class="page-subtitle">Create a verification session, review local OCR results and save synthetic evidence. OCR is for human review; it does not verify document authenticity or legal identity.</p>
     </div>
+
     <div class="notice-alert notice-alert--warning mb-4" role="note">
-      <strong>Do not upload real identity evidence</strong>
-      This page has no private storage, camera, document review or identity verification service.
+      <strong>Development demonstration only</strong>
+      Use synthetic test material only. Do not submit real identity documents or personal information. Evidence is stored privately on this Development machine.
     </div>
-    <div class="verification-steps mb-4">
-      <article class="verification-step"><span class="status-chip status-chip--neutral">Not connected</span><h2 class="mt-3">1. Prepare</h2><p class="mb-0">Approved document guidance will be supplied separately.</p></article>
-      <article class="verification-step"><span class="status-chip status-chip--neutral">Not connected</span><h2 class="mt-3">2. Capture evidence</h2><p class="mb-0">Camera and secure document upload are not available.</p></article>
-      <article class="verification-step"><span class="status-chip status-chip--neutral">Not connected</span><h2 class="mt-3">3. Review status</h2><p class="mb-0">No comparison, liveness or registry check is performed.</p></article>
-    </div>
-    <div class="row g-3">
-      <div class="col-lg-7">
-        <section class="content-panel" aria-labelledby="capture-heading">
-          <h2 id="capture-heading">Document and photo capture</h2>
-          <div class="capture-guide mb-3">
-            <div><div class="capture-guide-shape" aria-hidden="true">Position guide</div><p>Placeholder only. No face image or camera preview is shown.</p></div>
-          </div>
-          <label class="form-label" for="verification-document">Document upload</label>
-          <input class="form-control" id="verification-document" type="file" disabled aria-describedby="verification-upload-note">
-          <p id="verification-upload-note" class="field-help mt-2">Upload is disabled. Do not select or submit a real document.</p>
+
+    <div dmx-show="!ivpAuthenticated.value" class="row g-3 mb-4" aria-label="Development sign in and account creation">
+      <div class="col-lg-6">
+        <section class="content-panel h-100" aria-labelledby="demo-signin-heading">
+          <h2 id="demo-signin-heading">Sign in to your test account</h2>
+          <p class="field-help">This local account is separate from identity proofing and passport decisions.</p>
+          <form id="ivpLoginForm" is="dmx-serverconnect-form" method="post" action="/api/ivp/login" dmx-on:success="ivpSessionLatest.load()">
+            <div class="mb-3">
+              <label class="form-label" for="ivpLoginUsername">Email address</label>
+              <input class="form-control" id="ivpLoginUsername" name="username" type="email" autocomplete="username" required maxlength="254" aria-describedby="ivpLoginHelp">
+            </div>
+            <div class="mb-3">
+              <label class="form-label" for="ivpLoginPassword">Password</label>
+              <input class="form-control" id="ivpLoginPassword" name="password" type="password" autocomplete="current-password" required maxlength="255" aria-describedby="ivpLoginHelp">
+            </div>
+            <div class="notice-alert notice-alert--warning mb-3" role="alert" dmx-show="ivpLoginForm.lastError.status">
+              Sign in could not be completed. Check the test account details and try again.
+            </div>
+            <button class="btn btn-primary-government" type="submit" dmx-bind:disabled="ivpLoginForm.state.executing">
+              <span dmx-show="!ivpLoginForm.state.executing">Sign in</span>
+              <span dmx-show="ivpLoginForm.state.executing">Signing in…</span>
+            </button>
+            <p id="ivpLoginHelp" class="field-help mt-3 mb-0">Use a test account created on this Development application.</p>
+          </form>
         </section>
       </div>
-      <aside class="col-lg-5">
-        <div class="content-panel h-100">
-          <h2>Capture guidance</h2>
-          <ul class="guidance-list">
-            <li>Use clear, even lighting for any future capture flow.</li>
-            <li>Keep the original evidence separate from any passport-print photograph.</li>
-            <li>Use the accessible retry and support path if a future capture is interrupted.</li>
-          </ul>
-          <div class="notice-alert mt-3"><strong>Camera state</strong>No camera permission is requested by this preview.</div>
-        </div>
-      </aside>
+      <div class="col-lg-6">
+        <section class="content-panel h-100" aria-labelledby="demo-register-heading">
+          <h2 id="demo-register-heading">Create a local test account</h2>
+          <p class="field-help">Account registration is enabled only for this Development demonstration.</p>
+          <form id="ivpRegisterForm" is="dmx-serverconnect-form" method="post" action="/api/ivp/register" dmx-on:success="ivpRegistrationSaved.setValue(true)">
+            <div class="mb-3">
+              <label class="form-label" for="ivpRegisterUsername">Email address</label>
+              <input class="form-control" id="ivpRegisterUsername" name="username" type="email" autocomplete="username" required maxlength="254" aria-describedby="ivpRegisterHelp">
+            </div>
+            <div class="mb-3">
+              <label class="form-label" for="ivpRegisterPassword">Create a password</label>
+              <input class="form-control" id="ivpRegisterPassword" name="password" type="password" autocomplete="new-password" required minlength="12" maxlength="255" aria-describedby="ivpRegisterHelp">
+            </div>
+            <div class="mb-3">
+              <label class="form-label" for="ivpRegisterConfirm">Confirm password</label>
+              <input class="form-control" id="ivpRegisterConfirm" name="password_confirm" type="password" autocomplete="new-password" required maxlength="255" aria-describedby="ivpRegisterHelp">
+            </div>
+            <div class="notice-alert mb-3" role="status" dmx-show="ivpRegistrationSaved.value">
+              Test account created. Sign in using the same email and password.
+            </div>
+            <div class="notice-alert notice-alert--warning mb-3" role="alert" dmx-show="ivpRegisterForm.lastError.status">
+              The test account could not be created. Check the details or use another email address.
+            </div>
+            <button class="btn btn-outline-crimson" type="submit" dmx-bind:disabled="ivpRegisterForm.state.executing">
+              <span dmx-show="!ivpRegisterForm.state.executing">Create test account</span>
+              <span dmx-show="ivpRegisterForm.state.executing">Creating account…</span>
+            </button>
+            <p id="ivpRegisterHelp" class="field-help mt-3 mb-0">Passwords must contain at least 12 characters. Use a test email address only.</p>
+          </form>
+        </section>
+      </div>
     </div>
+
+    <section class="content-panel mb-4" dmx-show="ivpAuthenticated.value" aria-labelledby="session-heading">
+      <div class="d-flex flex-wrap justify-content-between align-items-start gap-3">
+        <div>
+          <p class="section-kicker mb-1">Private development session</p>
+          <h2 id="session-heading">Verification session</h2>
+          <p class="field-help mb-0">Session access is limited to the signed-in test account.</p>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+          <button class="btn btn-primary-government" type="button" dmx-bind:disabled="ivpCreateSession.state.executing" dmx-on:click="ivpCreateSession.load()">
+            <span dmx-show="!ivpCreateSession.state.executing">Start a new test session</span>
+            <span dmx-show="ivpCreateSession.state.executing">Starting…</span>
+          </button>
+          <form id="ivpLogoutForm" is="dmx-serverconnect-form" method="post" action="/api/ivp/logout" dmx-on:success="ivpAuthenticated.setValue(false)">
+            <button class="btn btn-outline-crimson" type="submit" dmx-bind:disabled="ivpLogoutForm.state.executing">Sign out</button>
+          </form>
+        </div>
+      </div>
+
+      <div class="notice-alert mt-3" role="status" dmx-show="ivpSessionLatest.data.session.session_id">
+        Session status: <strong dmx-text="ivpSessionLatest.data.session.status"></strong>
+      </div>
+      <div class="notice-alert mt-3" role="status" dmx-show="!ivpSessionLatest.data.session.session_id">
+        No test session exists for this account yet. Start a session to continue.
+      </div>
+
+      <div class="mt-4" dmx-show="ivpSessionLatest.data.session.status == 'CONSENT_REQUIRED'">
+        <h3>1. Record explicit test consent</h3>
+        <p>Consent applies to this synthetic Development demonstration, including private local evidence storage and local OCR. It does not authorise legal identity verification.</p>
+        <form id="ivpConsentForm" is="dmx-serverconnect-form" method="post" action="/api/ivp/consent" dmx-on:success="ivpSessionLatest.load()">
+          <input type="hidden" name="session_id" dmx-bind:value="ivpSessionLatest.data.session.session_id">
+          <div class="form-check mb-3">
+            <input class="form-check-input" id="ivpConsentAccepted" name="consent_accepted" type="checkbox" value="1" required>
+            <label class="form-check-label" for="ivpConsentAccepted">I consent to this synthetic test session and understand its checks are not legal identity verification.</label>
+          </div>
+          <div class="notice-alert notice-alert--warning mb-3" role="alert" dmx-show="ivpConsentForm.lastError.status">Consent was not recorded. Please select the checkbox and try again.</div>
+          <button class="btn btn-primary-government" type="submit" dmx-bind:disabled="ivpConsentForm.state.executing">Record test consent</button>
+        </form>
+      </div>
+
+      <div class="mt-4" dmx-show="ivpSessionLatest.data.session.status == 'IN_PROGRESS'">
+        <h3>2. Capture a synthetic document image</h3>
+        <p>Choose a synthetic JPEG or PNG image. The image is checked for format, file size and usable dimensions before local OCR.</p>
+        <form id="ivpDocumentUploadForm" is="dmx-serverconnect-form" method="post" action="/api/ivp/document_upload" enctype="multipart/form-data" dmx-on:success="ivpSessionLatest.load()">
+          <input type="hidden" name="session_id" dmx-bind:value="ivpSessionLatest.data.session.session_id">
+          <div class="mb-3">
+            <label class="form-label" for="ivpDocumentFile">Synthetic identity document image</label>
+            <input class="form-control" id="ivpDocumentFile" name="document_file" type="file" accept="image/png,image/jpeg" required aria-describedby="ivpDocumentHelp">
+            <p id="ivpDocumentHelp" class="field-help mt-2">JPEG or PNG, up to 5 MB. Do not upload a real document.</p>
+          </div>
+          <div class="notice-alert notice-alert--warning mb-3" role="alert" dmx-show="ivpDocumentUploadForm.lastError.status">The image could not be processed. Choose a valid JPEG or PNG test image under 5 MB and try again.</div>
+          <button class="btn btn-primary-government" type="submit" dmx-bind:disabled="ivpDocumentUploadForm.state.executing">
+            <span dmx-show="!ivpDocumentUploadForm.state.executing">Upload and run local OCR</span>
+            <span dmx-show="ivpDocumentUploadForm.state.executing">Checking image and reading text…</span>
+          </button>
+        </form>
+      </div>
+
+      <div class="notice-alert notice-alert--warning mt-3" role="alert" dmx-show="ivpSessionLatest.data.ocr_results[0].ocr_result_id &amp;&amp; !ivpSessionLatest.data.ocr_results[0].original_text">
+        <strong>OCR could not read the document.</strong> Choose a clearer synthetic image and upload it again. Field review is available only after readable text is extracted.
+      </div>
+
+      <div class="mt-4" dmx-show="ivpSessionLatest.data.ocr_results[0].ocr_result_id &amp;&amp; ivpSessionLatest.data.ocr_results[0].original_text">
+        <h3>3. Review extracted fields</h3>
+        <p class="field-help">These values came from local OCR. Check and correct them; they do not establish authenticity, identity or citizenship.</p>
+        <div class="notice-alert notice-alert--warning mb-3" role="note">
+          <strong>Original OCR text</strong>
+          <pre class="mb-0 mt-2 text-wrap" dmx-text="ivpSessionLatest.data.ocr_results[0].original_text"></pre>
+        </div>
+        <form id="ivpReviewForm" is="dmx-serverconnect-form" method="post" action="/api/ivp/review" dmx-on:success="ivpSessionLatest.load()">
+          <input type="hidden" name="session_id" dmx-bind:value="ivpSessionLatest.data.session.session_id">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label" for="ivpReviewName">Name</label>
+              <input class="form-control" id="ivpReviewName" name="name" type="text" maxlength="160" dmx-bind:value="ivpSessionLatest.data.ocr_results[0].corrected_fields.name || ivpSessionLatest.data.ocr_results[0].extracted_fields.name">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="ivpReviewDocumentNumber">Document number</label>
+              <input class="form-control" id="ivpReviewDocumentNumber" name="document_number" type="text" maxlength="100" dmx-bind:value="ivpSessionLatest.data.ocr_results[0].corrected_fields.documentNumber || ivpSessionLatest.data.ocr_results[0].extracted_fields.documentNumber">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="ivpReviewDateOfBirth">Date of birth</label>
+              <input class="form-control" id="ivpReviewDateOfBirth" name="date_of_birth" type="text" maxlength="40" dmx-bind:value="ivpSessionLatest.data.ocr_results[0].corrected_fields.dateOfBirth || ivpSessionLatest.data.ocr_results[0].extracted_fields.dateOfBirth">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="ivpReviewNationality">Nationality</label>
+              <input class="form-control" id="ivpReviewNationality" name="nationality" type="text" maxlength="80" dmx-bind:value="ivpSessionLatest.data.ocr_results[0].corrected_fields.nationality || ivpSessionLatest.data.ocr_results[0].extracted_fields.nationality">
+            </div>
+          </div>
+          <div class="notice-alert mt-3" role="status" dmx-show="ivpSessionLatest.data.ocr_results[0].reviewed_at">Your corrected fields are saved. The original OCR text remains preserved.</div>
+          <div class="notice-alert notice-alert--warning mt-3" role="alert" dmx-show="ivpReviewForm.lastError.status">The review could not be saved. Check the fields and try again.</div>
+          <button class="btn btn-primary-government mt-3" type="submit" dmx-bind:disabled="ivpReviewForm.state.executing">
+            <span dmx-show="!ivpReviewForm.state.executing">Save reviewed fields</span>
+            <span dmx-show="ivpReviewForm.state.executing">Saving review…</span>
+          </button>
+        </form>
+      </div>
+
+      <div class="mt-4" dmx-show="ivpSessionLatest.data.ocr_results[0].reviewed_at">
+        <h3>4. Capture a separate synthetic selfie</h3>
+        <p>Use a synthetic test image or the device camera option. No face comparison or liveness check is run in this milestone.</p>
+        <form id="ivpSelfieUploadForm" is="dmx-serverconnect-form" method="post" action="/api/ivp/selfie_upload" enctype="multipart/form-data" dmx-on:success="ivpSessionLatest.load()">
+          <input type="hidden" name="session_id" dmx-bind:value="ivpSessionLatest.data.session.session_id">
+          <div class="mb-3">
+            <label class="form-label" for="ivpSelfieFile">Synthetic selfie image</label>
+            <input class="form-control" id="ivpSelfieFile" name="selfie_file" type="file" accept="image/png,image/jpeg" capture="user" required aria-describedby="ivpSelfieHelp">
+            <p id="ivpSelfieHelp" class="field-help mt-2">JPEG or PNG, up to 5 MB. Mobile browsers may offer the front camera; permission is controlled by your browser.</p>
+          </div>
+          <div class="notice-alert notice-alert--warning mb-3" role="alert" dmx-show="ivpSelfieUploadForm.lastError.status">The synthetic selfie could not be saved. Check the image and try again.</div>
+          <button class="btn btn-primary-government" type="submit" dmx-bind:disabled="ivpSelfieUploadForm.state.executing">
+            <span dmx-show="!ivpSelfieUploadForm.state.executing">Save synthetic selfie evidence</span>
+            <span dmx-show="ivpSelfieUploadForm.state.executing">Saving evidence…</span>
+          </button>
+        </form>
+      </div>
+
+      <div class="mt-4 d-flex flex-wrap gap-2" dmx-show="ivpSessionLatest.data.session.session_id">
+        <a class="btn btn-outline-crimson" href="/verification/preview/review">View saved verification results</a>
+      </div>
+    </section>
+
     <div class="d-flex flex-wrap justify-content-between gap-2 mt-4">
       <a class="btn btn-outline-crimson" href="/">Return to citizen preview</a>
-      <a class="btn btn-primary-government" href="/verification/preview/review">View review status layout</a>
+      <a class="btn btn-primary-government" href="/verification/preview/review">View verification results</a>
     </div>
   </div>
 </section>

@@ -18,7 +18,7 @@ const cases = [
 ];
 const widths = [1440, 375];
 const baselineDir = path.join(repoRoot, 'docs/evidence/TTP-2A/screenshots');
-const evidenceDir = path.join(repoRoot, 'docs/evidence/TTP-2B/visual-regression');
+const evidenceDir = path.join(repoRoot, 'docs/evidence/TTP-3E/screenshots/visual-baseline');
 await mkdir(evidenceDir, { recursive: true });
 const failures = [];
 const maxDifferentPixelRatio = 0.01;

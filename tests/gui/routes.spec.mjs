@@ -10,7 +10,7 @@ const routeConfig = JSON.parse(await readFile(routesPath, 'utf8'));
 const routes = routeConfig.routes;
 const acceptedRoutes = JSON.parse(await readFile(path.join(testDir, '../fixtures/accepted-route-map.json'), 'utf8'));
 const widths = [1440, 1024, 768, 375];
-const evidenceDir = path.join(repoRoot, 'docs/evidence/TTP-2B/screenshots');
+const evidenceDir = path.join(repoRoot, 'docs/evidence/TTP-3D/screenshots');
 
 function routeSlug(route) {
   return route.path === '/' ? 'home' : route.path.replace(/^\//, '').replaceAll('/', '__');
@@ -45,7 +45,11 @@ for (const route of routes) {
         }
       });
       page.on('response', response => {
-        if (response.status() >= 400) badResponses.push(`${response.status()} ${response.url()}`);
+        const pathname = new URL(response.url()).pathname;
+        const expectedAnonymousSessionDenial = response.status() === 401
+          && pathname === '/api/ivp/session_latest'
+          && route.path.startsWith('/verification/');
+        if (response.status() >= 400 && !expectedAnonymousSessionDenial) badResponses.push(`${response.status()} ${response.url()}`);
       });
 
       const response = await page.goto(new URL(route.path, baseURL).toString(), { waitUntil: 'networkidle' });

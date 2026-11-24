@@ -1,0 +1,53 @@
+{
+  "meta": {
+    "$_POST": [
+      {
+        "name": "username",
+        "type": "text",
+        "fieldName": "username",
+        "options": {
+          "rules": {
+            "core:required": {}
+          }
+        }
+      },
+      {
+        "name": "password",
+        "type": "text",
+        "fieldName": "password",
+        "options": {
+          "rules": {
+            "core:required": {}
+          }
+        }
+      }
+    ]
+  },
+  "exec": {
+    "steps": [
+      {
+        "name": "sign_in",
+        "module": "auth",
+        "action": "login",
+        "options": {
+          "provider": "ivpDemo",
+          "username": "{{$_POST.username}}",
+          "password": "{{$_POST.password}}",
+          "remember": false
+        },
+        "output": false
+      },
+      {
+        "name": "login_result",
+        "module": "core",
+        "action": "setvalue",
+        "options": {
+          "key": "loginResult",
+          "value": "SIGNED_IN"
+        },
+        "output": true,
+        "outputType": "text"
+      }
+    ]
+  }
+}

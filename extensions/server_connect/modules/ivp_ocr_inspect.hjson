@@ -1,0 +1,44 @@
+{
+  "type": "ivp_ocr_inspect",
+  "module": "ivp_ocr",
+  "action": "inspect",
+  "groupTitle": "IVP OCR",
+  "groupIcon": "fas fa-lg fa-file-lines comp-images",
+  "title": "Validate private evidence image",
+  "icon": "fas fa-lg fa-file-lines comp-images",
+  "serverModel": ["node"],
+  "dataScheme": [
+    { "name": "valid", "type": "boolean" },
+    { "name": "imageFormat", "type": "text" },
+    { "name": "imageWidth", "type": "number" },
+    { "name": "imageHeight", "type": "number" },
+    { "name": "byteSize", "type": "number" },
+    { "name": "sha256", "type": "text" },
+    { "name": "errorMessage", "type": "text" }
+  ],
+  "dataPickObject": true,
+  "properties": [
+    {
+      "group": "Image input",
+      "variables": [
+        {
+          "name": "name",
+          "optionName": "name",
+          "title": "Step name",
+          "type": "text",
+          "required": true,
+          "defaultValue": "image_inspection"
+        },
+        {
+          "name": "imagePath",
+          "optionName": "imagePath",
+          "title": "Private evidence filename",
+          "type": "text",
+          "required": true,
+          "serverDataBindings": true,
+          "help": "Pass only a server-generated filename below IVP_OCR_EVIDENCE_ROOT. Never pass a browser-supplied path or public URL."
+        }
+      ]
+    }
+  ]
+}

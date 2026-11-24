@@ -1,0 +1,510 @@
+{
+  "meta": {},
+  "exec": {
+    "steps": [
+      {
+        "name": "require_user",
+        "module": "auth",
+        "action": "restrict",
+        "options": {
+          "provider": "ivpDemo"
+        },
+        "output": false
+      },
+      {
+        "name": "identity",
+        "module": "auth",
+        "action": "identify",
+        "options": {
+          "provider": "ivpDemo"
+        },
+        "output": false,
+        "meta": [
+          {
+            "name": "identity",
+            "type": "text"
+          }
+        ],
+        "outputType": "text"
+      },
+      {
+        "name": "client",
+        "module": "dbconnector",
+        "action": "single",
+        "options": {
+          "connection": "ivp",
+          "sql": {
+            "type": "SELECT",
+            "table": {
+              "name": "ivp_clients"
+            },
+            "primary": "client_id",
+            "columns": [
+              {
+                "table": "ivp_clients",
+                "column": "client_id"
+              },
+              {
+                "table": "ivp_clients",
+                "column": "client_key"
+              },
+              {
+                "table": "ivp_clients",
+                "column": "status"
+              }
+            ],
+            "wheres": {
+              "condition": "AND",
+              "rules": [
+                {
+                  "table": "ivp_clients",
+                  "column": "client_key",
+                  "operator": "equal",
+                  "operation": "=",
+                  "value": "ttpassport-dev"
+                },
+                {
+                  "table": "ivp_clients",
+                  "column": "status",
+                  "operator": "equal",
+                  "operation": "=",
+                  "value": "ACTIVE"
+                }
+              ]
+            },
+            "limit": 1
+          }
+        },
+        "output": false,
+        "meta": [
+          {
+            "name": "client_id",
+            "type": "number"
+          },
+          {
+            "name": "client_key",
+            "type": "text"
+          },
+          {
+            "name": "status",
+            "type": "text"
+          }
+        ],
+        "outputType": "object"
+      },
+      {
+        "name": "session",
+        "module": "dbconnector",
+        "action": "single",
+        "options": {
+          "connection": "ivp",
+          "sql": {
+            "type": "SELECT",
+            "table": {
+              "name": "ivp_sessions"
+            },
+            "primary": "session_id",
+            "columns": [
+              {
+                "table": "ivp_sessions",
+                "column": "session_id"
+              },
+              {
+                "table": "ivp_sessions",
+                "column": "status"
+              },
+              {
+                "table": "ivp_sessions",
+                "column": "policy_version"
+              },
+              {
+                "table": "ivp_sessions",
+                "column": "created_at"
+              }
+            ],
+            "wheres": {
+              "condition": "AND",
+              "rules": [
+                {
+                  "table": "ivp_sessions",
+                  "column": "client_id",
+                  "operator": "equal",
+                  "operation": "=",
+                  "value": "{{client.client_id}}"
+                },
+                {
+                  "table": "ivp_sessions",
+                  "column": "created_by_user_id",
+                  "operator": "equal",
+                  "operation": "=",
+                  "value": "{{identity}}"
+                }
+              ]
+            },
+            "orders": [
+              {
+                "table": "ivp_sessions",
+                "column": "created_at",
+                "direction": "DESC"
+              }
+            ],
+            "limit": 1
+          }
+        },
+        "output": true,
+        "meta": [
+          {
+            "name": "session_id",
+            "type": "text"
+          },
+          {
+            "name": "status",
+            "type": "text"
+          },
+          {
+            "name": "policy_version",
+            "type": "text"
+          },
+          {
+            "name": "created_at",
+            "type": "text"
+          }
+        ],
+        "outputType": "object"
+      },
+      {
+        "name": "load_owned_session_details",
+        "module": "core",
+        "action": "condition",
+        "options": {
+          "if": "{{session && session.session_id}}",
+          "then": [
+            {
+              "name": "checks",
+              "module": "dbconnector",
+              "action": "select",
+              "options": {
+                "connection": "ivp",
+                "sql": {
+                  "type": "SELECT",
+                  "table": {
+                    "name": "ivp_checks"
+                  },
+                  "primary": "check_code",
+                  "columns": [
+                    {
+                      "table": "ivp_checks",
+                      "column": "check_code"
+                    },
+                    {
+                      "table": "ivp_checks",
+                      "column": "status"
+                    },
+                    {
+                      "table": "ivp_checks",
+                      "column": "provider_name"
+                    },
+                    {
+                      "table": "ivp_checks",
+                      "column": "model_version"
+                    },
+                    {
+                      "table": "ivp_checks",
+                      "column": "created_at"
+                    }
+                  ],
+                  "wheres": {
+                    "condition": "AND",
+                    "rules": [
+                      {
+                        "table": "ivp_checks",
+                        "column": "client_id",
+                        "operator": "equal",
+                        "operation": "=",
+                        "value": "{{client.client_id}}"
+                      },
+                      {
+                        "table": "ivp_checks",
+                        "column": "session_id",
+                        "operator": "equal",
+                        "operation": "=",
+                        "value": "{{session.session_id}}"
+                      }
+                    ]
+                  },
+                  "orders": [
+                    {
+                      "table": "ivp_checks",
+                      "column": "check_id",
+                      "direction": "ASC"
+                    }
+                  ]
+                }
+              },
+              "output": true,
+              "meta": [
+                {
+                  "name": "check_code",
+                  "type": "text"
+                },
+                {
+                  "name": "status",
+                  "type": "text"
+                },
+                {
+                  "name": "provider_name",
+                  "type": "text"
+                },
+                {
+                  "name": "model_version",
+                  "type": "text"
+                },
+                {
+                  "name": "created_at",
+                  "type": "text"
+                }
+              ],
+              "outputType": "array"
+            },
+            {
+              "name": "ocr_results",
+              "module": "dbconnector",
+              "action": "select",
+              "options": {
+                "connection": "ivp",
+                "sql": {
+                  "type": "SELECT",
+                  "table": {
+                    "name": "ivp_ocr_results"
+                  },
+                  "primary": "ocr_result_id",
+                  "columns": [
+                    {
+                      "table": "ivp_ocr_results",
+                      "column": "ocr_result_id"
+                    },
+                    {
+                      "table": "ivp_ocr_results",
+                      "column": "original_text"
+                    },
+                    {
+                      "table": "ivp_ocr_results",
+                      "column": "extracted_fields"
+                    },
+                    {
+                      "table": "ivp_ocr_results",
+                      "column": "corrected_fields"
+                    },
+                    {
+                      "table": "ivp_ocr_results",
+                      "column": "confidence"
+                    },
+                    {
+                      "table": "ivp_ocr_results",
+                      "column": "engine_version"
+                    },
+                    {
+                      "table": "ivp_ocr_results",
+                      "column": "model_revision"
+                    },
+                    {
+                      "table": "ivp_ocr_results",
+                      "column": "reviewed_at"
+                    }
+                  ],
+                  "wheres": {
+                    "condition": "AND",
+                    "rules": [
+                      {
+                        "table": "ivp_ocr_results",
+                        "column": "client_id",
+                        "operator": "equal",
+                        "operation": "=",
+                        "value": "{{client.client_id}}"
+                      },
+                      {
+                        "table": "ivp_ocr_results",
+                        "column": "session_id",
+                        "operator": "equal",
+                        "operation": "=",
+                        "value": "{{session.session_id}}"
+                      }
+                    ]
+                  },
+                  "orders": [
+                    {
+                      "table": "ivp_ocr_results",
+                      "column": "created_at",
+                      "direction": "DESC"
+                    }
+                  ],
+                  "limit": 10
+                }
+              },
+              "output": true,
+              "meta": [
+                {
+                  "name": "ocr_result_id",
+                  "type": "number"
+                },
+                {
+                  "name": "original_text",
+                  "type": "text"
+                },
+                {
+                  "name": "extracted_fields",
+                  "type": "object"
+                },
+                {
+                  "name": "corrected_fields",
+                  "type": "object"
+                },
+                {
+                  "name": "confidence",
+                  "type": "number"
+                },
+                {
+                  "name": "engine_version",
+                  "type": "text"
+                },
+                {
+                  "name": "model_revision",
+                  "type": "text"
+                },
+                {
+                  "name": "reviewed_at",
+                  "type": "text"
+                }
+              ],
+              "outputType": "array"
+            },
+            {
+              "name": "evidence",
+              "module": "dbconnector",
+              "action": "select",
+              "options": {
+                "connection": "ivp",
+                "sql": {
+                  "type": "SELECT",
+                  "table": {
+                    "name": "ivp_evidence"
+                  },
+                  "primary": "evidence_id",
+                  "columns": [
+                    {
+                      "table": "ivp_evidence",
+                      "column": "evidence_id"
+                    },
+                    {
+                      "table": "ivp_evidence",
+                      "column": "evidence_type"
+                    },
+                    {
+                      "table": "ivp_evidence",
+                      "column": "mime_type"
+                    },
+                    {
+                      "table": "ivp_evidence",
+                      "column": "byte_size"
+                    },
+                    {
+                      "table": "ivp_evidence",
+                      "column": "created_at"
+                    }
+                  ],
+                  "wheres": {
+                    "condition": "AND",
+                    "rules": [
+                      {
+                        "table": "ivp_evidence",
+                        "column": "client_id",
+                        "operator": "equal",
+                        "operation": "=",
+                        "value": "{{client.client_id}}"
+                      },
+                      {
+                        "table": "ivp_evidence",
+                        "column": "session_id",
+                        "operator": "equal",
+                        "operation": "=",
+                        "value": "{{session.session_id}}"
+                      }
+                    ]
+                  },
+                  "orders": [
+                    {
+                      "table": "ivp_evidence",
+                      "column": "created_at",
+                      "direction": "DESC"
+                    }
+                  ],
+                  "limit": 10
+                }
+              },
+              "output": true,
+              "meta": [
+                {
+                  "name": "evidence_id",
+                  "type": "text"
+                },
+                {
+                  "name": "evidence_type",
+                  "type": "text"
+                },
+                {
+                  "name": "mime_type",
+                  "type": "text"
+                },
+                {
+                  "name": "byte_size",
+                  "type": "number"
+                },
+                {
+                  "name": "created_at",
+                  "type": "text"
+                }
+              ],
+              "outputType": "array"
+            }
+          ],
+          "else": [
+            {
+              "name": "empty_checks",
+              "module": "core",
+              "action": "setvalue",
+              "options": {
+                "key": "checks",
+                "value": []
+              },
+              "output": true,
+              "outputType": "array"
+            },
+            {
+              "name": "empty_ocr_results",
+              "module": "core",
+              "action": "setvalue",
+              "options": {
+                "key": "ocr_results",
+                "value": []
+              },
+              "output": true,
+              "outputType": "array"
+            },
+            {
+              "name": "empty_evidence",
+              "module": "core",
+              "action": "setvalue",
+              "options": {
+                "key": "evidence",
+                "value": []
+              },
+              "output": true,
+              "outputType": "array"
+            }
+          ]
+        },
+        "output": false
+      }
+    ]
+  }
+}

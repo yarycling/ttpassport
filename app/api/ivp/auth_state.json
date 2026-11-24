@@ -1,0 +1,24 @@
+{
+  "exec": {
+    "steps": [
+      {
+        "name": "identity",
+        "module": "auth",
+        "action": "identify",
+        "options": { "provider": "ivpDemo" },
+        "output": false,
+        "meta": [{ "name": "identity", "type": "text" }],
+        "outputType": "text"
+      },
+      {
+        "name": "authenticated",
+        "module": "core",
+        "action": "setvalue",
+        "options": { "value": "{{identity ? true : false}}" },
+        "output": true,
+        "meta": [{ "name": "authenticated", "type": "boolean" }],
+        "outputType": "boolean"
+      }
+    ]
+  }
+}

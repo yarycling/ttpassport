@@ -1,0 +1,763 @@
+{
+  "meta": {},
+  "exec": {
+    "steps": [
+      {
+        "name": "require_user",
+        "module": "auth",
+        "action": "restrict",
+        "options": {
+          "provider": "ivpDemo"
+        },
+        "output": false
+      },
+      {
+        "name": "identity",
+        "module": "auth",
+        "action": "identify",
+        "options": {
+          "provider": "ivpDemo"
+        },
+        "output": false,
+        "meta": [
+          {
+            "name": "identity",
+            "type": "text"
+          }
+        ],
+        "outputType": "text"
+      },
+      {
+        "name": "clients",
+        "module": "dbconnector",
+        "action": "select",
+        "options": {
+          "connection": "ivp",
+          "sql": {
+            "type": "SELECT",
+            "table": {
+              "name": "ivp_clients"
+            },
+            "primary": "client_id",
+            "columns": [
+              {
+                "table": "ivp_clients",
+                "column": "client_id"
+              },
+              {
+                "table": "ivp_clients",
+                "column": "client_key"
+              },
+              {
+                "table": "ivp_clients",
+                "column": "status"
+              }
+            ],
+            "wheres": {
+              "condition": "AND",
+              "rules": [
+                {
+                  "table": "ivp_clients",
+                  "column": "client_key",
+                  "operator": "equal",
+                  "operation": "=",
+                  "value": "ttpassport-dev"
+                }
+              ]
+            },
+            "limit": 2
+          }
+        },
+        "output": false,
+        "meta": [
+          {
+            "name": "client_id",
+            "type": "number"
+          },
+          {
+            "name": "client_key",
+            "type": "text"
+          },
+          {
+            "name": "status",
+            "type": "text"
+          }
+        ],
+        "outputType": "array"
+      },
+      {
+        "name": "seed_client_if_missing",
+        "module": "core",
+        "action": "condition",
+        "options": {
+          "if": "{{clients.count() == 0}}",
+          "then": [
+            {
+              "name": "seed_development_client",
+              "module": "dbupdater",
+              "action": "insert",
+              "options": {
+                "connection": "ivp",
+                "sql": {
+                  "type": "INSERT",
+                  "table": "ivp_clients",
+                  "values": [
+                    {
+                      "column": "client_key",
+                      "value": "ttpassport-dev"
+                    },
+                    {
+                      "column": "display_name",
+                      "value": "TTPASSPORT Development"
+                    },
+                    {
+                      "column": "status",
+                      "value": "ACTIVE"
+                    }
+                  ]
+                }
+              },
+              "output": false,
+              "meta": [
+                {
+                  "name": "identity",
+                  "type": "text"
+                },
+                {
+                  "name": "affected",
+                  "type": "number"
+                }
+              ],
+              "outputType": "object"
+            }
+          ],
+          "else": []
+        },
+        "output": false
+      },
+      {
+        "name": "client",
+        "module": "dbconnector",
+        "action": "single",
+        "options": {
+          "connection": "ivp",
+          "sql": {
+            "type": "SELECT",
+            "table": {
+              "name": "ivp_clients"
+            },
+            "primary": "client_id",
+            "columns": [
+              {
+                "table": "ivp_clients",
+                "column": "client_id"
+              },
+              {
+                "table": "ivp_clients",
+                "column": "client_key"
+              },
+              {
+                "table": "ivp_clients",
+                "column": "status"
+              }
+            ],
+            "wheres": {
+              "condition": "AND",
+              "rules": [
+                {
+                  "table": "ivp_clients",
+                  "column": "client_key",
+                  "operator": "equal",
+                  "operation": "=",
+                  "value": "ttpassport-dev"
+                },
+                {
+                  "table": "ivp_clients",
+                  "column": "status",
+                  "operator": "equal",
+                  "operation": "=",
+                  "value": "ACTIVE"
+                }
+              ]
+            },
+            "limit": 1
+          }
+        },
+        "output": false,
+        "meta": [
+          {
+            "name": "client_id",
+            "type": "number"
+          },
+          {
+            "name": "client_key",
+            "type": "text"
+          },
+          {
+            "name": "status",
+            "type": "text"
+          }
+        ],
+        "outputType": "object"
+      },
+      {
+        "name": "subject",
+        "module": "dbconnector",
+        "action": "single",
+        "options": {
+          "connection": "ivp",
+          "sql": {
+            "type": "SELECT",
+            "table": {
+              "name": "ivp_subjects"
+            },
+            "primary": "subject_id",
+            "columns": [
+              {
+                "table": "ivp_subjects",
+                "column": "subject_id"
+              }
+            ],
+            "wheres": {
+              "condition": "AND",
+              "rules": [
+                {
+                  "table": "ivp_subjects",
+                  "column": "client_id",
+                  "operator": "equal",
+                  "operation": "=",
+                  "value": "{{client.client_id}}"
+                },
+                {
+                  "table": "ivp_subjects",
+                  "column": "owner_user_id",
+                  "operator": "equal",
+                  "operation": "=",
+                  "value": "{{identity}}"
+                }
+              ]
+            },
+            "limit": 1
+          }
+        },
+        "output": false,
+        "meta": [
+          {
+            "name": "subject_id",
+            "type": "text"
+          }
+        ],
+        "outputType": "object"
+      },
+      {
+        "name": "new_session_id",
+        "module": "crypto",
+        "action": "uuid",
+        "options": {},
+        "output": false
+      },
+      {
+        "name": "create_session_transaction",
+        "module": "dbupdater",
+        "action": "transaction",
+        "options": {
+          "connection": "ivp",
+          "exec": {
+            "steps": [
+              {
+                "name": "resolve_subject",
+                "module": "core",
+                "action": "condition",
+                "options": {
+                  "if": "{{subject && subject.subject_id}}",
+                  "then": [
+                    {
+                      "name": "use_existing_subject",
+                      "module": "core",
+                      "action": "setvalue",
+                      "options": {
+                        "key": "subjectId",
+                        "value": "{{subject.subject_id}}"
+                      },
+                      "output": false,
+                      "outputType": "text"
+                    }
+                  ],
+                  "else": [
+                    {
+                      "name": "new_subject_id",
+                      "module": "crypto",
+                      "action": "uuid",
+                      "options": {},
+                      "output": false
+                    },
+                    {
+                      "name": "insert_subject",
+                      "module": "dbupdater",
+                      "action": "insert",
+                      "options": {
+                        "connection": "ivp",
+                        "sql": {
+                          "type": "INSERT",
+                          "table": "ivp_subjects",
+                          "values": [
+                            {
+                              "column": "subject_id",
+                              "value": "{{new_subject_id}}"
+                            },
+                            {
+                              "column": "client_id",
+                              "value": "{{client.client_id}}"
+                            },
+                            {
+                              "column": "owner_user_id",
+                              "value": "{{identity}}"
+                            }
+                          ]
+                        }
+                      },
+                      "output": false,
+                      "meta": [
+                        {
+                          "name": "identity",
+                          "type": "text"
+                        },
+                        {
+                          "name": "affected",
+                          "type": "number"
+                        }
+                      ],
+                      "outputType": "object"
+                    },
+                    {
+                      "name": "use_new_subject",
+                      "module": "core",
+                      "action": "setvalue",
+                      "options": {
+                        "key": "subjectId",
+                        "value": "{{new_subject_id}}"
+                      },
+                      "output": false,
+                      "outputType": "text"
+                    }
+                  ]
+                },
+                "output": false
+              },
+              {
+                "name": "insert_session",
+                "module": "dbupdater",
+                "action": "insert",
+                "options": {
+                  "connection": "ivp",
+                  "sql": {
+                    "type": "INSERT",
+                    "table": "ivp_sessions",
+                    "values": [
+                      {
+                        "column": "session_id",
+                        "value": "{{new_session_id}}"
+                      },
+                      {
+                        "column": "client_id",
+                        "value": "{{client.client_id}}"
+                      },
+                      {
+                        "column": "subject_id",
+                        "value": "{{subjectId}}"
+                      },
+                      {
+                        "column": "created_by_user_id",
+                        "value": "{{identity}}"
+                      },
+                      {
+                        "column": "status",
+                        "value": "CONSENT_REQUIRED"
+                      },
+                      {
+                        "column": "policy_version",
+                        "value": "DEV-DEMO-1.0"
+                      }
+                    ]
+                  }
+                },
+                "output": false,
+                "meta": [
+                  {
+                    "name": "identity",
+                    "type": "text"
+                  },
+                  {
+                    "name": "affected",
+                    "type": "number"
+                  }
+                ],
+                "outputType": "object"
+              },
+              {
+                "name": "initialize_document_capture",
+                "module": "dbupdater",
+                "action": "insert",
+                "options": {
+                  "connection": "ivp",
+                  "sql": {
+                    "type": "INSERT",
+                    "table": "ivp_checks",
+                    "values": [
+                      {
+                        "column": "client_id",
+                        "value": "{{client.client_id}}"
+                      },
+                      {
+                        "column": "session_id",
+                        "value": "{{new_session_id}}"
+                      },
+                      {
+                        "column": "check_code",
+                        "value": "DOCUMENT_CAPTURE"
+                      },
+                      {
+                        "column": "status",
+                        "value": "PENDING"
+                      }
+                    ]
+                  }
+                },
+                "output": false,
+                "meta": [
+                  {
+                    "name": "identity",
+                    "type": "text"
+                  },
+                  {
+                    "name": "affected",
+                    "type": "number"
+                  }
+                ],
+                "outputType": "object"
+              },
+              {
+                "name": "initialize_ocr_extraction",
+                "module": "dbupdater",
+                "action": "insert",
+                "options": {
+                  "connection": "ivp",
+                  "sql": {
+                    "type": "INSERT",
+                    "table": "ivp_checks",
+                    "values": [
+                      {
+                        "column": "client_id",
+                        "value": "{{client.client_id}}"
+                      },
+                      {
+                        "column": "session_id",
+                        "value": "{{new_session_id}}"
+                      },
+                      {
+                        "column": "check_code",
+                        "value": "OCR_EXTRACTION"
+                      },
+                      {
+                        "column": "status",
+                        "value": "PENDING"
+                      }
+                    ]
+                  }
+                },
+                "output": false,
+                "meta": [
+                  {
+                    "name": "identity",
+                    "type": "text"
+                  },
+                  {
+                    "name": "affected",
+                    "type": "number"
+                  }
+                ],
+                "outputType": "object"
+              },
+              {
+                "name": "initialize_ocr_review",
+                "module": "dbupdater",
+                "action": "insert",
+                "options": {
+                  "connection": "ivp",
+                  "sql": {
+                    "type": "INSERT",
+                    "table": "ivp_checks",
+                    "values": [
+                      {
+                        "column": "client_id",
+                        "value": "{{client.client_id}}"
+                      },
+                      {
+                        "column": "session_id",
+                        "value": "{{new_session_id}}"
+                      },
+                      {
+                        "column": "check_code",
+                        "value": "OCR_REVIEW"
+                      },
+                      {
+                        "column": "status",
+                        "value": "PENDING"
+                      }
+                    ]
+                  }
+                },
+                "output": false,
+                "meta": [
+                  {
+                    "name": "identity",
+                    "type": "text"
+                  },
+                  {
+                    "name": "affected",
+                    "type": "number"
+                  }
+                ],
+                "outputType": "object"
+              },
+              {
+                "name": "initialize_document_authenticity",
+                "module": "dbupdater",
+                "action": "insert",
+                "options": {
+                  "connection": "ivp",
+                  "sql": {
+                    "type": "INSERT",
+                    "table": "ivp_checks",
+                    "values": [
+                      {
+                        "column": "client_id",
+                        "value": "{{client.client_id}}"
+                      },
+                      {
+                        "column": "session_id",
+                        "value": "{{new_session_id}}"
+                      },
+                      {
+                        "column": "check_code",
+                        "value": "DOCUMENT_AUTHENTICITY"
+                      },
+                      {
+                        "column": "status",
+                        "value": "UNAVAILABLE"
+                      }
+                    ]
+                  }
+                },
+                "output": false,
+                "meta": [
+                  {
+                    "name": "identity",
+                    "type": "text"
+                  },
+                  {
+                    "name": "affected",
+                    "type": "number"
+                  }
+                ],
+                "outputType": "object"
+              },
+              {
+                "name": "initialize_selfie_capture",
+                "module": "dbupdater",
+                "action": "insert",
+                "options": {
+                  "connection": "ivp",
+                  "sql": {
+                    "type": "INSERT",
+                    "table": "ivp_checks",
+                    "values": [
+                      {
+                        "column": "client_id",
+                        "value": "{{client.client_id}}"
+                      },
+                      {
+                        "column": "session_id",
+                        "value": "{{new_session_id}}"
+                      },
+                      {
+                        "column": "check_code",
+                        "value": "SELFIE_CAPTURE"
+                      },
+                      {
+                        "column": "status",
+                        "value": "PENDING"
+                      }
+                    ]
+                  }
+                },
+                "output": false,
+                "meta": [
+                  {
+                    "name": "identity",
+                    "type": "text"
+                  },
+                  {
+                    "name": "affected",
+                    "type": "number"
+                  }
+                ],
+                "outputType": "object"
+              },
+              {
+                "name": "initialize_face_comparison",
+                "module": "dbupdater",
+                "action": "insert",
+                "options": {
+                  "connection": "ivp",
+                  "sql": {
+                    "type": "INSERT",
+                    "table": "ivp_checks",
+                    "values": [
+                      {
+                        "column": "client_id",
+                        "value": "{{client.client_id}}"
+                      },
+                      {
+                        "column": "session_id",
+                        "value": "{{new_session_id}}"
+                      },
+                      {
+                        "column": "check_code",
+                        "value": "FACE_COMPARISON"
+                      },
+                      {
+                        "column": "status",
+                        "value": "NOT_PERFORMED"
+                      }
+                    ]
+                  }
+                },
+                "output": false,
+                "meta": [
+                  {
+                    "name": "identity",
+                    "type": "text"
+                  },
+                  {
+                    "name": "affected",
+                    "type": "number"
+                  }
+                ],
+                "outputType": "object"
+              },
+              {
+                "name": "initialize_liveness",
+                "module": "dbupdater",
+                "action": "insert",
+                "options": {
+                  "connection": "ivp",
+                  "sql": {
+                    "type": "INSERT",
+                    "table": "ivp_checks",
+                    "values": [
+                      {
+                        "column": "client_id",
+                        "value": "{{client.client_id}}"
+                      },
+                      {
+                        "column": "session_id",
+                        "value": "{{new_session_id}}"
+                      },
+                      {
+                        "column": "check_code",
+                        "value": "LIVENESS"
+                      },
+                      {
+                        "column": "status",
+                        "value": "NOT_PERFORMED"
+                      }
+                    ]
+                  }
+                },
+                "output": false,
+                "meta": [
+                  {
+                    "name": "identity",
+                    "type": "text"
+                  },
+                  {
+                    "name": "affected",
+                    "type": "number"
+                  }
+                ],
+                "outputType": "object"
+              },
+              {
+                "name": "initialize_authoritative_identity",
+                "module": "dbupdater",
+                "action": "insert",
+                "options": {
+                  "connection": "ivp",
+                  "sql": {
+                    "type": "INSERT",
+                    "table": "ivp_checks",
+                    "values": [
+                      {
+                        "column": "client_id",
+                        "value": "{{client.client_id}}"
+                      },
+                      {
+                        "column": "session_id",
+                        "value": "{{new_session_id}}"
+                      },
+                      {
+                        "column": "check_code",
+                        "value": "AUTHORITATIVE_IDENTITY"
+                      },
+                      {
+                        "column": "status",
+                        "value": "UNAVAILABLE"
+                      }
+                    ]
+                  }
+                },
+                "output": false,
+                "meta": [
+                  {
+                    "name": "identity",
+                    "type": "text"
+                  },
+                  {
+                    "name": "affected",
+                    "type": "number"
+                  }
+                ],
+                "outputType": "object"
+              }
+            ]
+          }
+        },
+        "output": false
+      },
+      {
+        "name": "created",
+        "module": "core",
+        "action": "setvalue",
+        "options": {
+          "value": {
+            "session_id": "{{new_session_id}}",
+            "status": "CONSENT_REQUIRED"
+          }
+        },
+        "output": true,
+        "meta": [
+          {
+            "name": "session_id",
+            "type": "text"
+          },
+          {
+            "name": "status",
+            "type": "text"
+          }
+        ],
+        "outputType": "object"
+      }
+    ]
+  }
+}

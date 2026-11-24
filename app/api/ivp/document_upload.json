@@ -1,0 +1,861 @@
+{
+  "meta": {
+    "$_POST": [
+      {
+        "name": "session_id",
+        "type": "text",
+        "fieldName": "session_id",
+        "options": {
+          "rules": {
+            "core:required": {}
+          }
+        }
+      },
+      {
+        "name": "document_file",
+        "type": "file",
+        "fieldName": "document_file",
+        "options": {
+          "rules": {
+            "core:required": {},
+            "upload:accept": { "param": ".png,.jpg,.jpeg" },
+            "upload:maxsize": { "param": "5242880" }
+          }
+        },
+        "sub": [
+          {
+            "name": "name",
+            "type": "text"
+          },
+          {
+            "name": "type",
+            "type": "text"
+          },
+          {
+            "name": "size",
+            "type": "number"
+          },
+          {
+            "name": "error",
+            "type": "text"
+          }
+        ]
+      }
+    ]
+  },
+  "exec": {
+    "steps": [
+      {
+        "name": "require_user",
+        "module": "auth",
+        "action": "restrict",
+        "options": {
+          "provider": "ivpDemo"
+        },
+        "output": false
+      },
+      {
+        "name": "identity",
+        "module": "auth",
+        "action": "identify",
+        "options": {
+          "provider": "ivpDemo"
+        },
+        "output": false,
+        "meta": [
+          {
+            "name": "identity",
+            "type": "text"
+          }
+        ],
+        "outputType": "text"
+      },
+      {
+        "name": "client",
+        "module": "dbconnector",
+        "action": "single",
+        "options": {
+          "connection": "ivp",
+          "sql": {
+            "type": "SELECT",
+            "table": {
+              "name": "ivp_clients"
+            },
+            "primary": "client_id",
+            "columns": [
+              {
+                "table": "ivp_clients",
+                "column": "client_id"
+              },
+              {
+                "table": "ivp_clients",
+                "column": "client_key"
+              },
+              {
+                "table": "ivp_clients",
+                "column": "status"
+              }
+            ],
+            "wheres": {
+              "condition": "AND",
+              "rules": [
+                {
+                  "table": "ivp_clients",
+                  "column": "client_key",
+                  "operator": "equal",
+                  "operation": "=",
+                  "value": "ttpassport-dev"
+                },
+                {
+                  "table": "ivp_clients",
+                  "column": "status",
+                  "operator": "equal",
+                  "operation": "=",
+                  "value": "ACTIVE"
+                }
+              ]
+            },
+            "limit": 1
+          }
+        },
+        "output": false,
+        "meta": [
+          {
+            "name": "client_id",
+            "type": "number"
+          },
+          {
+            "name": "client_key",
+            "type": "text"
+          },
+          {
+            "name": "status",
+            "type": "text"
+          }
+        ],
+        "outputType": "object"
+      },
+      {
+        "name": "owned_session",
+        "module": "dbconnector",
+        "action": "single",
+        "options": {
+          "connection": "ivp",
+          "sql": {
+            "type": "SELECT",
+            "table": {
+              "name": "ivp_sessions"
+            },
+            "primary": "session_id",
+            "columns": [
+              {
+                "table": "ivp_sessions",
+                "column": "session_id"
+              },
+              {
+                "table": "ivp_sessions",
+                "column": "status"
+              }
+            ],
+            "wheres": {
+              "condition": "AND",
+              "rules": [
+                {
+                  "table": "ivp_sessions",
+                  "column": "client_id",
+                  "operator": "equal",
+                  "operation": "=",
+                  "value": "{{client.client_id}}"
+                },
+                {
+                  "table": "ivp_sessions",
+                  "column": "session_id",
+                  "operator": "equal",
+                  "operation": "=",
+                  "value": "{{$_POST.session_id}}"
+                },
+                {
+                  "table": "ivp_sessions",
+                  "column": "created_by_user_id",
+                  "operator": "equal",
+                  "operation": "=",
+                  "value": "{{identity}}"
+                },
+                {
+                  "table": "ivp_sessions",
+                  "column": "status",
+                  "operator": "equal",
+                  "operation": "=",
+                  "value": "IN_PROGRESS"
+                }
+              ]
+            },
+            "limit": 1
+          }
+        },
+        "output": false,
+        "meta": [
+          {
+            "name": "session_id",
+            "type": "text"
+          },
+          {
+            "name": "status",
+            "type": "text"
+          }
+        ],
+        "outputType": "object"
+      },
+      {
+        "name": "authorize_document_upload",
+        "module": "core",
+        "action": "condition",
+        "options": {
+          "if": "{{owned_session && owned_session.session_id}}",
+          "then": [
+            {
+              "name": "document_upload",
+              "module": "upload",
+              "action": "upload",
+              "options": {
+                "fields": "{{$_POST.document_file}}",
+                "path": "/storage/ivp_dev/evidence",
+                "template": "{guid}",
+                "createPath": true,
+                "throwErrors": true
+              },
+              "output": false,
+              "meta": [
+                { "name": "name", "type": "text" },
+                { "name": "path", "type": "text" },
+                { "name": "url", "type": "text" },
+                { "name": "type", "type": "text" },
+                { "name": "size", "type": "number" },
+                { "name": "error", "type": "number" }
+              ],
+              "outputType": "object"
+            },
+            {
+              "name": "accept_document_mime_and_size",
+              "module": "core",
+              "action": "condition",
+              "options": {
+                "if": "{{document_upload.size <= 5242880 && (document_upload.type == 'image/png' || document_upload.type == 'image/jpeg')}}",
+                "then": [
+                  {
+                    "name": "document_inspection",
+                    "module": "ivp_ocr",
+                    "action": "inspect",
+                    "options": {
+                      "imagePath": "{{document_upload.name}}"
+                    },
+                    "output": false,
+                    "meta": [
+                      {
+                        "name": "valid",
+                        "type": "boolean"
+                      },
+                      {
+                        "name": "imageFormat",
+                        "type": "text"
+                      },
+                      {
+                        "name": "imageWidth",
+                        "type": "number"
+                      },
+                      {
+                        "name": "imageHeight",
+                        "type": "number"
+                      },
+                      {
+                        "name": "byteSize",
+                        "type": "number"
+                      },
+                      {
+                        "name": "sha256",
+                        "type": "text"
+                      },
+                      {
+                        "name": "errorMessage",
+                        "type": "text"
+                      }
+                    ],
+                    "outputType": "object"
+                  },
+                  {
+                    "name": "accept_inspected_document",
+                    "module": "core",
+                    "action": "condition",
+                    "options": {
+                      "if": "{{document_inspection.valid}}",
+                      "then": [
+                        {
+                          "name": "document_evidence_id",
+                          "module": "crypto",
+                          "action": "uuid",
+                          "options": {},
+                          "output": false
+                        },
+                        {
+                          "name": "ocr_check",
+                          "module": "dbconnector",
+                          "action": "single",
+                          "options": {
+                            "connection": "ivp",
+                            "sql": {
+                              "type": "SELECT",
+                              "table": {
+                                "name": "ivp_checks"
+                              },
+                              "primary": "check_id",
+                              "columns": [
+                                {
+                                  "table": "ivp_checks",
+                                  "column": "check_id"
+                                }
+                              ],
+                              "wheres": {
+                                "condition": "AND",
+                                "rules": [
+                                  {
+                                    "table": "ivp_checks",
+                                    "column": "client_id",
+                                    "operator": "equal",
+                                    "operation": "=",
+                                    "value": "{{client.client_id}}"
+                                  },
+                                  {
+                                    "table": "ivp_checks",
+                                    "column": "session_id",
+                                    "operator": "equal",
+                                    "operation": "=",
+                                    "value": "{{$_POST.session_id}}"
+                                  },
+                                  {
+                                    "table": "ivp_checks",
+                                    "column": "check_code",
+                                    "operator": "equal",
+                                    "operation": "=",
+                                    "value": "OCR_EXTRACTION"
+                                  }
+                                ]
+                              },
+                              "limit": 1
+                            }
+                          },
+                          "output": false,
+                          "meta": [
+                            {
+                              "name": "check_id",
+                              "type": "number"
+                            }
+                          ],
+                          "outputType": "object"
+                        },
+                        {
+                          "name": "ocr_result",
+                          "module": "ivp_ocr",
+                          "action": "recognize",
+                          "options": {
+                            "imagePath": "{{document_upload.name}}"
+                          },
+                          "output": false,
+                          "meta": [
+                            {
+                              "name": "text",
+                              "type": "text"
+                            },
+                            {
+                              "name": "extractedFields",
+                              "type": "object"
+                            },
+                            {
+                              "name": "extractedFieldsJson",
+                              "type": "text"
+                            },
+                            {
+                              "name": "ocrConfidence",
+                              "type": "number"
+                            },
+                            {
+                              "name": "documentReadable",
+                              "type": "boolean"
+                            },
+                            {
+                              "name": "status",
+                              "type": "text"
+                            },
+                            {
+                              "name": "engine",
+                              "type": "text"
+                            },
+                            {
+                              "name": "language",
+                              "type": "text"
+                            },
+                            {
+                              "name": "modelRevision",
+                              "type": "text"
+                            },
+                            {
+                              "name": "imageFormat",
+                              "type": "text"
+                            },
+                            {
+                              "name": "imageWidth",
+                              "type": "number"
+                            },
+                            {
+                              "name": "imageHeight",
+                              "type": "number"
+                            },
+                            {
+                              "name": "byteSize",
+                              "type": "number"
+                            },
+                            {
+                              "name": "sha256",
+                              "type": "text"
+                            },
+                            {
+                              "name": "authenticityVerified",
+                              "type": "boolean"
+                            },
+                            {
+                              "name": "identityVerified",
+                              "type": "boolean"
+                            }
+                          ],
+                          "outputType": "object"
+                        },
+                        {
+                          "name": "ocr_details",
+                          "module": "core",
+                          "action": "setvalue",
+                          "options": {
+                            "value": {
+                              "confidence": "{{ocr_result.ocrConfidence}}",
+                              "readable": "{{ocr_result.documentReadable}}",
+                              "imageFormat": "{{ocr_result.imageFormat}}",
+                              "imageWidth": "{{ocr_result.imageWidth}}",
+                              "imageHeight": "{{ocr_result.imageHeight}}"
+                            }
+                          },
+                          "output": false,
+                          "outputType": "object"
+                        },
+                        {
+                          "name": "document_results_transaction",
+                          "module": "dbupdater",
+                          "action": "transaction",
+                          "options": {
+                            "connection": "ivp",
+                            "exec": {
+                              "steps": [
+                                {
+                                  "name": "save_document_evidence",
+                                  "module": "dbupdater",
+                                  "action": "insert",
+                                  "options": {
+                                    "connection": "ivp",
+                                    "sql": {
+                                      "type": "INSERT",
+                                      "table": "ivp_evidence",
+                                      "values": [
+                                        {
+                                          "column": "evidence_id",
+                                          "value": "{{document_evidence_id}}"
+                                        },
+                                        {
+                                          "column": "client_id",
+                                          "value": "{{client.client_id}}"
+                                        },
+                                        {
+                                          "column": "session_id",
+                                          "value": "{{$_POST.session_id}}"
+                                        },
+                                        {
+                                          "column": "owner_user_id",
+                                          "value": "{{identity}}"
+                                        },
+                                        {
+                                          "column": "evidence_type",
+                                          "value": "DOCUMENT"
+                                        },
+                                        {
+                                          "column": "storage_key",
+                                          "value": "{{document_upload.name}}"
+                                        },
+                                        {
+                                          "column": "mime_type",
+                                          "value": "{{'image/' + document_inspection.imageFormat}}"
+                                        },
+                                        {
+                                          "column": "byte_size",
+                                          "value": "{{document_inspection.byteSize}}"
+                                        },
+                                        {
+                                          "column": "sha256",
+                                          "value": "{{document_inspection.sha256}}"
+                                        }
+                                      ]
+                                    }
+                                  },
+                                  "output": false,
+                                  "meta": [
+                                    {
+                                      "name": "identity",
+                                      "type": "text"
+                                    },
+                                    {
+                                      "name": "affected",
+                                      "type": "number"
+                                    }
+                                  ],
+                                  "outputType": "object"
+                                },
+                                {
+                                  "name": "mark_document_captured",
+                                  "module": "dbupdater",
+                                  "action": "update",
+                                  "options": {
+                                    "connection": "ivp",
+                                    "sql": {
+                                      "type": "UPDATE",
+                                      "table": "ivp_checks",
+                                      "values": [
+                                        {
+                                          "column": "status",
+                                          "value": "COMPLETED"
+                                        },
+                                        {
+                                          "column": "provider_name",
+                                          "value": "Wappler File Upload"
+                                        },
+                                        {
+                                          "column": "model_version",
+                                          "value": "local-private-storage"
+                                        }
+                                      ],
+                                      "wheres": {
+                                        "condition": "AND",
+                                        "rules": [
+                                          {
+                                            "table": "ivp_checks",
+                                            "column": "client_id",
+                                            "operator": "equal",
+                                            "operation": "=",
+                                            "value": "{{client.client_id}}"
+                                          },
+                                          {
+                                            "table": "ivp_checks",
+                                            "column": "session_id",
+                                            "operator": "equal",
+                                            "operation": "=",
+                                            "value": "{{$_POST.session_id}}"
+                                          },
+                                          {
+                                            "table": "ivp_checks",
+                                            "column": "check_code",
+                                            "operator": "equal",
+                                            "operation": "=",
+                                            "value": "DOCUMENT_CAPTURE"
+                                          }
+                                        ]
+                                      }
+                                    }
+                                  },
+                                  "output": false,
+                                  "meta": [
+                                    {
+                                      "name": "affected",
+                                      "type": "number"
+                                    }
+                                  ],
+                                  "outputType": "object"
+                                },
+                                {
+                                  "name": "save_ocr_check",
+                                  "module": "dbupdater",
+                                  "action": "update",
+                                  "options": {
+                                    "connection": "ivp",
+                                    "sql": {
+                                      "type": "UPDATE",
+                                      "table": "ivp_checks",
+                                      "values": [
+                                        {
+                                          "column": "status",
+                                          "value": "{{ocr_result.documentReadable ? 'COMPLETED' : 'FAILED'}}"
+                                        },
+                                        {
+                                          "column": "provider_name",
+                                          "value": "Tesseract.js 7.0.0"
+                                        },
+                                        {
+                                          "column": "model_version",
+                                          "value": "{{ocr_result.modelRevision}}"
+                                        },
+                                        {
+                                          "column": "details_json",
+                                          "value": "{{ocr_details.toJSON()}}"
+                                        }
+                                      ],
+                                      "wheres": {
+                                        "condition": "AND",
+                                        "rules": [
+                                          {
+                                            "table": "ivp_checks",
+                                            "column": "client_id",
+                                            "operator": "equal",
+                                            "operation": "=",
+                                            "value": "{{client.client_id}}"
+                                          },
+                                          {
+                                            "table": "ivp_checks",
+                                            "column": "session_id",
+                                            "operator": "equal",
+                                            "operation": "=",
+                                            "value": "{{$_POST.session_id}}"
+                                          },
+                                          {
+                                            "table": "ivp_checks",
+                                            "column": "check_code",
+                                            "operator": "equal",
+                                            "operation": "=",
+                                            "value": "OCR_EXTRACTION"
+                                          }
+                                        ]
+                                      }
+                                    }
+                                  },
+                                  "output": false,
+                                  "meta": [
+                                    {
+                                      "name": "affected",
+                                      "type": "number"
+                                    }
+                                  ],
+                                  "outputType": "object"
+                                },
+                                {
+                                  "name": "reset_ocr_review",
+                                  "module": "dbupdater",
+                                  "action": "update",
+                                  "options": {
+                                    "connection": "ivp",
+                                    "sql": {
+                                      "type": "UPDATE",
+                                      "table": "ivp_checks",
+                                      "values": [
+                                        { "column": "status", "value": "PENDING" },
+                                        { "column": "provider_name", "value": null },
+                                        { "column": "model_version", "value": null },
+                                        { "column": "details_json", "value": null }
+                                      ],
+                                      "wheres": {
+                                        "condition": "AND",
+                                        "rules": [
+                                          {
+                                            "table": "ivp_checks",
+                                            "column": "client_id",
+                                            "operator": "equal",
+                                            "operation": "=",
+                                            "value": "{{client.client_id}}"
+                                          },
+                                          {
+                                            "table": "ivp_checks",
+                                            "column": "session_id",
+                                            "operator": "equal",
+                                            "operation": "=",
+                                            "value": "{{$_POST.session_id}}"
+                                          },
+                                          {
+                                            "table": "ivp_checks",
+                                            "column": "check_code",
+                                            "operator": "equal",
+                                            "operation": "=",
+                                            "value": "OCR_REVIEW"
+                                          }
+                                        ]
+                                      }
+                                    }
+                                  },
+                                  "output": false,
+                                  "meta": [{ "name": "affected", "type": "number" }],
+                                  "outputType": "object"
+                                },
+                                {
+                                  "name": "save_ocr_result",
+                                  "module": "dbupdater",
+                                  "action": "insert",
+                                  "options": {
+                                    "connection": "ivp",
+                                    "sql": {
+                                      "type": "INSERT",
+                                      "table": "ivp_ocr_results",
+                                      "values": [
+                                        {
+                                          "column": "client_id",
+                                          "value": "{{client.client_id}}"
+                                        },
+                                        {
+                                          "column": "session_id",
+                                          "value": "{{$_POST.session_id}}"
+                                        },
+                                        {
+                                          "column": "evidence_id",
+                                          "value": "{{document_evidence_id}}"
+                                        },
+                                        {
+                                          "column": "check_id",
+                                          "value": "{{ocr_check.check_id}}"
+                                        },
+                                        {
+                                          "column": "original_text",
+                                          "value": "{{ocr_result.text}}"
+                                        },
+                                        {
+                                          "column": "extracted_fields",
+                                          "value": "{{ocr_result.extractedFieldsJson}}"
+                                        },
+                                        {
+                                          "column": "corrected_fields",
+                                          "value": null
+                                        },
+                                        {
+                                          "column": "confidence",
+                                          "value": "{{ocr_result.ocrConfidence}}"
+                                        },
+                                        {
+                                          "column": "engine_version",
+                                          "value": "{{ocr_result.engine}}"
+                                        },
+                                        {
+                                          "column": "model_revision",
+                                          "value": "{{ocr_result.modelRevision}}"
+                                        }
+                                      ]
+                                    }
+                                  },
+                                  "output": false,
+                                  "meta": [
+                                    {
+                                      "name": "identity",
+                                      "type": "text"
+                                    },
+                                    {
+                                      "name": "affected",
+                                      "type": "number"
+                                    }
+                                  ],
+                                  "outputType": "object"
+                                }
+                              ]
+                            }
+                          },
+                          "output": false
+                        },
+                        {
+                          "name": "upload_result",
+                          "module": "core",
+                          "action": "setvalue",
+                          "options": {
+                            "value": {
+                              "accepted": true,
+                              "ocr_status": "{{ocr_result.status}}",
+                              "documentReadable": "{{ocr_result.documentReadable}}"
+                            }
+                          },
+                          "output": true,
+                          "meta": [
+                            {
+                              "name": "accepted",
+                              "type": "boolean"
+                            },
+                            {
+                              "name": "ocr_status",
+                              "type": "text"
+                            },
+                            {
+                              "name": "documentReadable",
+                              "type": "boolean"
+                            }
+                          ],
+                          "outputType": "object"
+                        }
+                      ],
+                      "else": [
+                        {
+                          "name": "remove_rejected_file",
+                          "module": "fs",
+                          "action": "remove",
+                          "options": {
+                            "path": "{{'/storage/ivp_dev/evidence/' + document_upload.name}}"
+                          },
+                          "output": false
+                        },
+                        {
+                          "name": "reject_invalid_upload",
+                          "module": "core",
+                          "action": "response",
+                          "options": {
+                            "status": 400,
+                            "data": {
+                              "message": "Choose a valid JPEG or PNG image no larger than 5 MB and at least 320 × 200 pixels."
+                            }
+                          },
+                          "output": false
+                        }
+                      ]
+                    },
+                    "output": false
+                  }
+                ],
+                "else": [
+                  {
+                    "name": "remove_rejected_file",
+                    "module": "fs",
+                    "action": "remove",
+                    "options": {
+                      "path": "{{'/storage/ivp_dev/evidence/' + document_upload.name}}"
+                    },
+                    "output": false
+                  },
+                  {
+                    "name": "reject_invalid_upload",
+                    "module": "core",
+                    "action": "response",
+                    "options": {
+                      "status": 400,
+                      "data": {
+                        "message": "Choose a valid JPEG or PNG image no larger than 5 MB and at least 320 × 200 pixels."
+                      }
+                    },
+                    "output": false
+                  }
+                ]
+              },
+              "output": false
+            }
+          ],
+          "else": [
+            {
+              "name": "reject_unknown_session",
+              "module": "core",
+              "action": "response",
+              "options": {
+                "status": 404,
+                "data": {
+                  "message": "Session not found or unavailable."
+                }
+              },
+              "output": false
+            }
+          ]
+        },
+        "output": false
+      }
+    ]
+  }
+}
