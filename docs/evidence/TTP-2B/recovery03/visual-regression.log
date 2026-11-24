@@ -1,0 +1,4 @@
+PASS home-1440.png: 5656/1296000 differing pixels (0.4364%, limit 1.00% for cross-version font rasterization); primary heading visible; current capture: docs/evidence/TTP-2B/visual-regression/home-1440.png
+PASS home-375.png: 2506/337500 differing pixels (0.7425%, limit 1.00% for cross-version font rasterization); primary heading visible; current capture: docs/evidence/TTP-2B/visual-regression/home-375.png
+PASS backoffice-review-1440.png: 5122/1296000 differing pixels (0.3952%, limit 1.00% for cross-version font rasterization); primary heading visible; current capture: docs/evidence/TTP-2B/visual-regression/backoffice-review-1440.png
+PASS backoffice-review-375.png: 2390/337500 differing pixels (0.7081%, limit 1.00% for cross-version font rasterization); primary heading visible; current capture: docs/evidence/TTP-2B/visual-regression/backoffice-review-375.png

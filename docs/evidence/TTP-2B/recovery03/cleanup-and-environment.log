@@ -1,0 +1,27 @@
+TTP-2B-RECOVERY-03 cleanup and environment observations — 2026-11-24
+
+Accepted Wappler project
+- Wappler 7.9.9 project picker opened the accepted `ttpassport` project.
+- Wappler Design view rendered the accepted home screen.
+- Read-only Development target settings: http://localhost:3002/, database type SQLite, file /db/db_dev.sqlite3.
+- Accepted Wappler connection tree contained only `db`.
+- `npm --prefix tests run test:config`: PASS; port 3002, SQLite db, and all 15 accepted routes/layouts unchanged.
+- Port 3002: Wappler listener present; GET / => HTTP 200; GET /account/sign-in => HTTP 200.
+
+Disposable Wappler cleanup
+- The temporary restore connection was removed using Wappler Database Manager after its Fetch Data read failed.
+- The disposable project was closed through Wappler. No TCP listener remained on port 3000.
+- Searches of the disposable `.wappler`, app/config, app/modules/connections and app/api folders found no Recovery 03 connection/principal references.
+- The temporary MySQL Test restore-reader account was dropped. A read-only account inventory query returned zero matching rows.
+- The private one-use password and client-option files were removed; neither was copied into repository evidence.
+- Package-owned MySQL Test and Development services remained running and healthy on loopback 3307 and 3308. No unrelated service was stopped.
+
+Root lockfile
+- `npm ci --dry-run --ignore-scripts --offline --no-audit --no-fund`: PASS, reported `up to date`.
+- No application dependencies, package manifests or lockfiles were changed.
+
+MAMP read-only status
+- MAMP PRO showed MySQL On.
+- Process inspection identified the MAMP `mysqld` listener at 127.0.0.1:3306.
+- No MAMP database was queried and no MAMP setting/service was changed.
+- Recovery 02 recorded no 3306 listener in its final check. The cause/timing of the changed observation is unknown.

@@ -1,0 +1,9 @@
+TTP-2B-RECOVERY-03 port smoke — 2026-11-24
+
+Command: curl -sS -o /tmp/ttp2b-r03-root.body -w 'HTTP %{http_code}\n' http://127.0.0.1:3002/
+Actual: HTTP 200
+
+Command: curl -sS -o /dev/null -w 'ROUTE /account/sign-in HTTP %{http_code}\n' http://127.0.0.1:3002/account/sign-in
+Actual: ROUTE /account/sign-in HTTP 200
+
+Wappler process inspection: Wappler listened on TCP *:3002. No TCP listener existed on port 3000 after the disposable project was closed.

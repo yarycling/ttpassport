@@ -1,0 +1,7 @@
+TTP-2B-RECOVERY-03 — restricted restore reader smoke
+Target: loopback-only MySQL 8.4.13 Test service; database passport_test_restore
+PASS principal=ttp2b_r03_restore_reader@%|rows=1|fixture=fixture|value=passport-boundary-synthetic
+PASS IVP restore read denied
+PASS sibling Passport Test read denied
+PASS UPDATE denied
+PASS fixture unchanged after denied write
