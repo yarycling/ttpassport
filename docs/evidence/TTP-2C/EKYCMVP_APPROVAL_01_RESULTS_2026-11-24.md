@@ -13,7 +13,7 @@ The credential-bearing local connection file, `app/modules/connections/ivp.json`
 
 ## OCR extension evaluation
 
-Wappler 7.9.9 recognizes the custom Server Connect action **IVP OCR → Extract private image text for review** after reopening the project. The extension follows Wappler's documented project module/HJSON layout. The OCR implementation was evaluated directly and remains isolated under `extensions/server_connect/modules/`; it is not wired to a public endpoint or application screen.
+Wappler 7.9.9 recognizes the custom Server Connect action **IVP OCR → Extract private image text for review** after reopening the project. The extension follows Wappler's documented project module/HJSON layout. The OCR implementation was evaluated directly and remains isolated under `extensions/server_connect/modules/`; it is not wired to a public endpoint or application screen. The exported action function passed in the local harness, but execution from a Wappler Server Connect action has not yet been verified.
 
 | Test ID | Check | Result |
 |---|---|---|
@@ -24,6 +24,7 @@ Wappler 7.9.9 recognizes the custom Server Connect action **IVP OCR → Extract 
 | CT-3E-005 | Private-root path traversal rejection | PASS — path outside the configured evidence root rejected. |
 | CT-3E-006 | Local-only processing and remote fallback guard | PASS — OCR completed with the local model; the test blocked non-loopback HTTP/HTTPS and fetch calls. |
 | CT-3E-007 | Verification integrity flags | PASS — `authenticityVerified` and `identityVerified` remained `false`. |
+| CT-3E-008 | Invoke OCR through a Wappler Server Connect action | BLOCKED — the action is visible in the editor, but no application action/API was saved and the running Wappler target does not have the private OCR evidence root configured. Include this end-to-end check in the next authorized Stage 3 package. |
 
 Exact readable-sample text:
 
@@ -58,6 +59,6 @@ Visual regression comparison against a new baseline is `N/A` because no TTPASSPO
 
 No verification-session or consent persistence, private evidence upload workflow, selfie capture, database schema, migration, authentication, application route, public API, or passport/eKYC decision behavior was added. The database prerequisite and OCR action are evaluation foundations only.
 
-The next smallest executable increment requires a separate Stage 3 package baseline/authorization for **verification-session creation and explicit synthetic-test consent using the native `ivp` connection**. Then add private synthetic evidence upload and OCR/review integration, and implement selfie capture as a separate evidence flow. Persistence must use a subsequently approved schema/migration. Keep each check status truthful and never issue `VERIFIED` from OCR or an unreviewed selfie.
+The next smallest executable increment requires a separate Stage 3 package baseline/authorization for **verification-session creation and explicit synthetic-test consent using the native `ivp` connection**. Include a temporary local-only Wappler action test to clear CT-3E-008, then add private synthetic evidence upload and OCR/review integration, and implement selfie capture as a separate evidence flow. Persistence must use a subsequently approved schema/migration. Keep each check status truthful and never issue `VERIFIED` from OCR or an unreviewed selfie.
 
 Rollback for the additive prerequisite is documented but was not executed: remove only the ignored local `ivp.json` and the dedicated dependency changes if the connection is abandoned, then confirm SQLite `db`, port 3002, and all 15 routes remain unchanged. Preserve this evidence and the original Stage 2B failure record.
