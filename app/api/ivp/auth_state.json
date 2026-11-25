@@ -1,23 +1,72 @@
 {
+  "meta": {},
   "exec": {
     "steps": [
+      {
+        "name": "citizen_identity",
+        "module": "auth",
+        "action": "identify",
+        "options": {
+          "provider": "citizen"
+        },
+        "output": false,
+        "meta": [
+          {
+            "name": "citizen_identity",
+            "type": "text"
+          }
+        ],
+        "outputType": "text"
+      },
       {
         "name": "identity",
         "module": "auth",
         "action": "identify",
-        "options": { "provider": "ivpDemo" },
+        "options": {
+          "provider": "ivpDemo"
+        },
         "output": false,
-        "meta": [{ "name": "identity", "type": "text" }],
+        "meta": [
+          {
+            "name": "identity",
+            "type": "text"
+          }
+        ],
         "outputType": "text"
       },
       {
         "name": "authenticated",
         "module": "core",
         "action": "setvalue",
-        "options": { "value": "{{identity ? true : false}}" },
+        "options": {
+          "key": "authenticated",
+          "value": "{{citizen_identity || identity ? true : false}}"
+        },
         "output": true,
-        "meta": [{ "name": "authenticated", "type": "boolean" }],
+        "meta": [
+          {
+            "name": "authenticated",
+            "type": "boolean"
+          }
+        ],
         "outputType": "boolean"
+      },
+      {
+        "name": "mode",
+        "module": "core",
+        "action": "setvalue",
+        "options": {
+          "key": "mode",
+          "value": "{{citizen_identity ? 'CITIZEN' : (identity ? 'IVP_DEMO' : 'SIGNED_OUT')}}"
+        },
+        "output": true,
+        "meta": [
+          {
+            "name": "mode",
+            "type": "text"
+          }
+        ],
+        "outputType": "text"
       }
     ]
   }

@@ -1,6 +1,7 @@
 <!-- Wappler include head-page="layouts/main" bootstrap5="local" is="dmx-app" id="verificationReview" appConnect="local" -->
 <dmx-value id="verificationReviewAuthenticated" dmx-bind:value="false"></dmx-value>
-<dmx-serverconnect id="verificationReviewAuthState" url="/api/ivp/auth_state" dmx-on:success="verificationReviewAuthenticated.setValue(verificationReviewAuthState.data.authenticated);verificationReviewAuthState.data.authenticated &amp;&amp; verificationReviewSession.load()"></dmx-serverconnect>
+<dmx-value id="verificationReviewClientMode" dmx-bind:value="'SIGNED_OUT'"></dmx-value>
+<dmx-serverconnect id="verificationReviewAuthState" url="/api/ivp/auth_state" dmx-on:success="verificationReviewAuthenticated.setValue(verificationReviewAuthState.data.authenticated);verificationReviewClientMode.setValue(verificationReviewAuthState.data.mode);verificationReviewAuthState.data.authenticated &amp;&amp; verificationReviewSession.load()"></dmx-serverconnect>
 <dmx-serverconnect id="verificationReviewSession" url="/api/ivp/session_latest" noload="true" dmx-on:success="verificationReviewAuthenticated.setValue(true)" dmx-on:error="verificationReviewAuthenticated.setValue(false)"></dmx-serverconnect>
 
 <section class="page-section" aria-labelledby="verification-review-heading">
@@ -9,7 +10,8 @@
       <div>
         <p class="section-kicker">Identity verification · Development demonstration</p>
         <h1 id="verification-review-heading">Verification results</h1>
-        <p class="page-subtitle">Saved results for the latest session belonging to your signed-in test account.</p>
+        <p class="page-subtitle" dmx-show="verificationReviewClientMode.value != 'CITIZEN'">Saved results for the latest session belonging to your signed-in IVP test account.</p>
+        <p class="page-subtitle" dmx-show="verificationReviewClientMode.value == 'CITIZEN'">Saved results are scoped to your current first-time passport draft.</p>
       </div>
       <span class="status-chip status-chip--neutral" dmx-show="verificationReviewAuthenticated.value &amp;&amp; verificationReviewSession.data.session.session_id" dmx-text="verificationReviewSession.data.session.status"></span>
     </div>
@@ -21,15 +23,21 @@
 
     <div class="content-panel mb-4" dmx-show="!verificationReviewAuthenticated.value">
       <h2>Sign in to view your saved results</h2>
-      <p>Only the test account that created a session can retrieve its evidence and results.</p>
+      <p>Sign in to the account that owns the IVP test session, or sign in to the citizen account that owns the linked first-time draft.</p>
       <a class="btn btn-primary-government" href="/verification/preview">Continue to the development sign-in</a>
     </div>
 
-    <div class="content-panel mb-4" dmx-show="verificationReviewAuthenticated.value &amp;&amp; !verificationReviewSession.data.session.session_id">
+    <div class="content-panel mb-4" dmx-show="verificationReviewAuthenticated.value &amp;&amp; !verificationReviewSession.data.session.session_id &amp;&amp; verificationReviewClientMode.value != 'CITIZEN'">
       <h2>No verification session found</h2>
       <p>Start a test session and complete the consent step before returning here.</p>
       <a class="btn btn-primary-government" href="/verification/preview">Start a test session</a>
     </div>
+      <div class="content-panel mb-4" dmx-show="verificationReviewAuthenticated.value &amp;&amp; !verificationReviewSession.data.session.session_id &amp;&amp; verificationReviewClientMode.value == 'CITIZEN'">
+        <h2>No verification session linked yet</h2>
+        <p>Start identity verification from your saved first-time draft. Your draft remains separate from IVP evidence and is not submitted.</p>
+        <a class="btn btn-primary-government" href="/verification/preview">Start identity checks</a>
+        <a class="btn btn-outline-crimson ms-2" href="/citizen/apply/first-time">Return to passport draft</a>
+      </div>
 
     <div dmx-show="verificationReviewAuthenticated.value &amp;&amp; verificationReviewSession.data.session.session_id">
       <section class="content-panel mb-4" aria-labelledby="review-checks-heading">
@@ -115,6 +123,9 @@
       </div>
     </div>
 
-    <div class="mt-4"><a class="btn btn-outline-crimson" href="/verification/preview">Return to identity evidence steps</a></div>
+    <div class="mt-4 d-flex flex-wrap gap-2">
+      <a class="btn btn-outline-crimson" href="/verification/preview">Return to identity evidence steps</a>
+      <a class="btn btn-outline-crimson" href="/citizen/apply/first-time" dmx-show="verificationReviewClientMode.value == 'CITIZEN'">Return to passport draft</a>
+    </div>
   </div>
 </section>

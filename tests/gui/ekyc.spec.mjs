@@ -215,7 +215,14 @@ test('CT-3B-001 / CT-3C-001 / CT-3D-001 / CT-3E-001 / CT-3E-002 / CT-3E-008 / CT
   await expect(page.locator('li').filter({ hasText: 'OCR_EXTRACTION' })).toContainText('FAILED');
 
   await page.goto(new URL('/verification/preview', baseURL).toString(), { waitUntil: 'networkidle' });
+  const secondSessionCreate = page.waitForResponse(response => new URL(response.url()).pathname === '/api/ivp/session_create');
   await page.getByRole('button', { name: 'Start a new test session' }).click();
+  const secondSessionResponse = await secondSessionCreate;
+  if (secondSessionResponse.status() !== 200) {
+    const responseBody = await secondSessionResponse.json().catch(() => ({}));
+    console.log('TTP-4F IVP demo session-create failure', JSON.stringify({ status: secondSessionResponse.status(), keys: Object.keys(responseBody), message: responseBody.message || responseBody.error?.message || null }));
+  }
+  expect(secondSessionResponse.status()).toBe(200);
   await expect(page.locator('#ivpConsentForm')).toBeVisible();
   sessionId = await page.locator('#ivpConsentForm input[name="session_id"]').inputValue();
   expect(sessionId).toMatch(/^[0-9a-f-]{36}$/i);

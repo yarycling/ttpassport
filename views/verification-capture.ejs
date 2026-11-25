@@ -1,8 +1,9 @@
 <!-- Wappler include head-page="layouts/main" bootstrap5="local" is="dmx-app" id="verificationCapture" appConnect="local" -->
 <dmx-value id="ivpAuthenticated" dmx-bind:value="false"></dmx-value>
+<dmx-value id="ivpClientMode" dmx-bind:value="'SIGNED_OUT'"></dmx-value>
 <dmx-value id="ivpRegistrationSaved" dmx-bind:value="false"></dmx-value>
-<dmx-serverconnect id="ivpAuthState" url="/api/ivp/auth_state" dmx-on:success="ivpAuthenticated.setValue(ivpAuthState.data.authenticated);ivpAuthState.data.authenticated &amp;&amp; ivpSessionLatest.load()"></dmx-serverconnect>
-<dmx-serverconnect id="ivpSessionLatest" url="/api/ivp/session_latest" noload="true" dmx-on:success="ivpAuthenticated.setValue(true)" dmx-on:error="ivpAuthenticated.setValue(false)"></dmx-serverconnect>
+<dmx-serverconnect id="ivpAuthState" url="/api/ivp/auth_state" dmx-on:success="ivpAuthenticated.setValue(ivpAuthState.data.authenticated);ivpClientMode.setValue(ivpAuthState.data.mode);ivpAuthState.data.authenticated &amp;&amp; ivpSessionLatest.load()"></dmx-serverconnect>
+<dmx-serverconnect id="ivpSessionLatest" url="/api/ivp/session_latest" noload="true" dmx-on:success="ivpAuthenticated.setValue(true)"></dmx-serverconnect>
 <dmx-serverconnect id="ivpCreateSession" url="/api/ivp/session_create" noload="true" dmx-on:success="ivpSessionLatest.load()"></dmx-serverconnect>
 
 <section class="page-section" aria-labelledby="verification-heading">
@@ -81,24 +82,31 @@
         <div>
           <p class="section-kicker mb-1">Private development session</p>
           <h2 id="session-heading">Verification session</h2>
-          <p class="field-help mb-0">Session access is limited to the signed-in test account.</p>
+      <p class="field-help mb-0" dmx-show="ivpClientMode.value == 'IVP_DEMO'">Session access is limited to the signed-in IVP test account.</p>
+      <p class="field-help mb-0" dmx-show="ivpClientMode.value == 'CITIZEN'">Session access is limited to the signed-in citizen’s current first-time draft.</p>
         </div>
         <div class="d-flex flex-wrap gap-2">
-          <button class="btn btn-primary-government" type="button" dmx-bind:disabled="ivpCreateSession.state.executing" dmx-on:click="ivpCreateSession.load()">
-            <span dmx-show="!ivpCreateSession.state.executing">Start a new test session</span>
+          <button class="btn btn-primary-government" type="button" dmx-show="(ivpClientMode.value != 'CITIZEN' || !ivpSessionLatest.data.session.session_id) &amp;&amp; !(ivpClientMode.value == 'CITIZEN' &amp;&amp; ivpSessionLatest.lastError.status == 404)" dmx-bind:disabled="ivpCreateSession.state.executing" dmx-on:click="ivpCreateSession.load()">
+            <span dmx-show="!ivpCreateSession.state.executing &amp;&amp; ivpClientMode.value != 'CITIZEN'">Start a new test session</span>
+            <span dmx-show="!ivpCreateSession.state.executing &amp;&amp; ivpClientMode.value == 'CITIZEN'">Start or resume identity checks</span>
             <span dmx-show="ivpCreateSession.state.executing">Starting…</span>
           </button>
-          <form id="ivpLogoutForm" is="dmx-serverconnect-form" method="post" action="/api/ivp/logout" dmx-on:success="ivpAuthenticated.setValue(false)">
+          <form id="ivpLogoutForm" is="dmx-serverconnect-form" method="post" action="/api/ivp/logout" dmx-show="ivpClientMode.value == 'IVP_DEMO'" dmx-on:success="ivpAuthenticated.setValue(false)">
             <button class="btn btn-outline-crimson" type="submit" dmx-bind:disabled="ivpLogoutForm.state.executing">Sign out</button>
           </form>
+          <a class="btn btn-outline-crimson" href="/citizen/apply/first-time" dmx-show="ivpClientMode.value == 'CITIZEN'">Return to passport draft</a>
         </div>
       </div>
 
       <div class="notice-alert mt-3" role="status" dmx-show="ivpSessionLatest.data.session.session_id">
         Session status: <strong dmx-text="ivpSessionLatest.data.session.status"></strong>
       </div>
-      <div class="notice-alert mt-3" role="status" dmx-show="!ivpSessionLatest.data.session.session_id">
+      <div class="notice-alert mt-3" role="status" dmx-show="!ivpSessionLatest.data.session.session_id &amp;&amp; !ivpSessionLatest.lastError.status">
         No test session exists for this account yet. Start a session to continue.
+      </div>
+      <div class="notice-alert notice-alert--warning mt-3" role="alert" dmx-show="ivpClientMode.value == 'CITIZEN' &amp;&amp; ivpSessionLatest.lastError.status == 404">
+        Save a first-time passport draft before starting identity checks. Your verification session is linked to that draft.
+        <a class="btn btn-outline-crimson btn-sm ms-2" href="/citizen/apply/first-time">Open passport draft</a>
       </div>
 
       <div class="mt-4" dmx-show="ivpSessionLatest.data.session.status == 'CONSENT_REQUIRED'">
@@ -234,7 +242,8 @@
     </section>
 
     <div class="d-flex flex-wrap justify-content-between gap-2 mt-4">
-      <a class="btn btn-outline-crimson" href="/">Return to citizen preview</a>
+      <a class="btn btn-outline-crimson" href="/" dmx-show="ivpClientMode.value != 'CITIZEN'">Return to home</a>
+      <a class="btn btn-outline-crimson" href="/citizen/apply/first-time" dmx-show="ivpClientMode.value == 'CITIZEN'">Return to passport draft</a>
       <a class="btn btn-primary-government" href="/verification/preview/review">View verification results</a>
     </div>
   </div>

@@ -266,8 +266,10 @@ test('CT-3H-006 — camera denial and local model failure remain non-completed a
       }
     });
   });
+  const modelFailureSaveResponse = page.waitForResponse(response => new URL(response.url()).pathname === '/api/ivp/liveness_result');
   await page.getByRole('button', { name: 'Start or retry camera check' }).click();
   await expect(page.getByRole('alert').filter({ hasText: 'local liveness models could not be loaded' })).toBeVisible({ timeout: 60_000 });
+  expect((await modelFailureSaveResponse).status()).toBe(200);
   await expect(page.getByRole('button', { name: 'Start or retry camera check' })).toBeEnabled();
   latest = await readLatest(page);
   check = latest.checks.find(item => item.check_code === 'LIVENESS');

@@ -240,7 +240,9 @@ test('CT-4A5C-002 through CT-4A5C-010 — citizen account, profile, first-time d
     expect((await saveDraftPromise).status()).toBe(200);
     await expect(pageA.getByRole('heading', { name: '8. Review saved draft' })).toBeVisible();
     const reviewPanel = pageA.locator('section[aria-labelledby="stage-eight-heading"]');
-    await expect(reviewPanel.getByText('REVIEW_REQUIRED', { exact: true })).toHaveCount(3);
+    await expect(reviewPanel.locator('.col-md-6').filter({ hasText: 'Identity status' })).toContainText('REVIEW_REQUIRED');
+    await expect(reviewPanel.locator('.col-md-6').filter({ hasText: 'Citizenship status' })).toContainText('REVIEW_REQUIRED');
+    await expect(reviewPanel.locator('.col-md-6').filter({ hasText: 'Age screening status' })).toContainText('REVIEW_REQUIRED');
 
     const saved = await pageA.evaluate(async () => {
       const response = await fetch('/api/citizen/application_current');

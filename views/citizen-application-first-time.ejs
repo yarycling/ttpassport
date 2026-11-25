@@ -2,8 +2,10 @@
 <dmx-value id="wizardStep" dmx-bind:value="1"></dmx-value>
 <dmx-value id="citizenAuthenticated" dmx-bind:value="false"></dmx-value>
 <dmx-value id="draftSaved" dmx-bind:value="false"></dmx-value>
-<dmx-serverconnect id="citizenAuthState" url="/api/citizen/auth_state" dmx-on:success="citizenAuthenticated.setValue(citizenAuthState.data.authenticated);citizenAuthState.data.authenticated &amp;&amp; citizenApplicationCurrent.load()"></dmx-serverconnect>
-<dmx-serverconnect id="citizenApplicationCurrent" url="/api/citizen/application_current" noload="true"></dmx-serverconnect>
+<dmx-value id="draftRefreshPending" dmx-bind:value="false"></dmx-value>
+<dmx-serverconnect id="citizenAuthState" url="/api/citizen/auth_state" dmx-on:success="citizenAuthenticated.setValue(citizenAuthState.data.authenticated);citizenAuthState.data.authenticated &amp;&amp; citizenApplicationCurrent.load();citizenAuthState.data.authenticated &amp;&amp; citizenIvpSession.load()"></dmx-serverconnect>
+<dmx-serverconnect id="citizenApplicationCurrent" url="/api/citizen/application_current" dmx-on:success="draftRefreshPending.value &amp;&amp; wizardStep.setValue(wizardStep.value &lt; 3 ? wizardStep.value + 1 : 8);draftRefreshPending.setValue(false)" noload="true"></dmx-serverconnect>
+<dmx-serverconnect id="citizenIvpSession" url="/api/ivp/session_latest" noload="true"></dmx-serverconnect>
 
 <section class="page-section application-backdrop" aria-labelledby="application-heading">
   <div class="container-fluid page-container">
@@ -53,7 +55,7 @@
         <section class="content-panel" aria-label="First-time application draft details">
           <div class="notice-alert mb-3" role="status" dmx-show="draftSaved.value">Draft saved. You can return to this page from your dashboard.</div>
           <div class="notice-alert notice-alert--warning mb-3" role="alert" dmx-show="citizenDraftForm.lastError.status">The draft could not be saved. Check the entered dates and retry. No application was submitted.</div>
-          <form id="citizenDraftForm" is="dmx-serverconnect-form" method="post" action="/api/citizen/application_save" dmx-on:success="citizenApplicationCurrent.load();draftSaved.setValue(true);wizardStep.setValue(wizardStep.value < 3 ? wizardStep.value + 1 : 8)">
+          <form id="citizenDraftForm" is="dmx-serverconnect-form" method="post" action="/api/citizen/application_save" dmx-on:success="draftSaved.setValue(true);draftRefreshPending.setValue(true);citizenApplicationCurrent.load()">
             <input type="hidden" name="application_key" dmx-bind:value="citizenApplicationCurrent.data.applications[0].application_key">
             <input type="hidden" name="current_step" dmx-bind:value="wizardStep.value">
 
@@ -119,11 +121,47 @@
                 <div class="col-md-6"><strong>Applicant name</strong><p><span dmx-text="citizenApplicationCurrent.data.applications[0].first_name"></span> <span dmx-text="citizenApplicationCurrent.data.applications[0].middle_names"></span> <span dmx-text="citizenApplicationCurrent.data.applications[0].surname"></span></p></div>
                 <div class="col-md-6"><strong>Date of birth</strong><p dmx-text="citizenApplicationCurrent.data.applications[0].date_of_birth"></p></div>
                 <div class="col-md-6"><strong>Home address</strong><p><span dmx-text="citizenApplicationCurrent.data.applications[0].home_street"></span> <span dmx-text="citizenApplicationCurrent.data.applications[0].home_city"></span> <span dmx-text="citizenApplicationCurrent.data.applications[0].home_country"></span></p></div>
-                <div class="col-md-6"><strong>Citizenship basis</strong><p>Self-reported; no basis is treated as verified.</p></div>
+                <div class="col-md-6"><strong>Citizenship basis</strong><p class="mb-1" dmx-show="citizenApplicationCurrent.data.applications[0].basis_birth == 1">Birth</p><p class="mb-1" dmx-show="citizenApplicationCurrent.data.applications[0].basis_descent == 1">Descent</p><p class="mb-1" dmx-show="citizenApplicationCurrent.data.applications[0].basis_adoption == 1">Adoption</p><p class="mb-1" dmx-show="citizenApplicationCurrent.data.applications[0].basis_registration == 1">Registration</p><p class="mb-1" dmx-show="citizenApplicationCurrent.data.applications[0].basis_naturalisation == 1">Naturalisation</p><p class="mb-1" dmx-show="!citizenApplicationCurrent.data.applications[0].basis_birth &amp;&amp; !citizenApplicationCurrent.data.applications[0].basis_descent &amp;&amp; !citizenApplicationCurrent.data.applications[0].basis_adoption &amp;&amp; !citizenApplicationCurrent.data.applications[0].basis_registration &amp;&amp; !citizenApplicationCurrent.data.applications[0].basis_naturalisation">Not recorded</p><p class="field-help mb-0">Self-reported; no basis is treated as verified.</p></div>
+                <div class="col-md-6"><strong>Family information</strong><p class="mb-1">Mother’s maiden surname: <span dmx-text="citizenApplicationCurrent.data.applications[0].mother_maiden_surname || 'Not recorded'"></span></p><p class="mb-0">Father: <span dmx-text="(citizenApplicationCurrent.data.applications[0].father_first_name || '') + ' ' + (citizenApplicationCurrent.data.applications[0].father_surname || '')"></span></p></div>
+                <div class="col-md-6"><strong>Other citizenship (self-reported)</strong><p class="mb-1" dmx-text="citizenApplicationCurrent.data.applications[0].other_citizenship == 1 ? 'Yes' : (citizenApplicationCurrent.data.applications[0].other_citizenship == 0 ? 'No' : 'Not recorded')"></p><p class="mb-0" dmx-show="citizenApplicationCurrent.data.applications[0].other_citizenship_country">Country: <span dmx-text="citizenApplicationCurrent.data.applications[0].other_citizenship_country"></span></p></div>
+                <div class="col-md-6"><strong>Prior Trinidad &amp; Tobago document</strong><p class="mb-1" dmx-text="citizenApplicationCurrent.data.applications[0].previous_tt_document == 1 ? 'Previously applied for or issued (self-reported)' : (citizenApplicationCurrent.data.applications[0].previous_tt_document == 0 ? 'No (self-reported)' : 'Not recorded')"></p><p class="mb-1">Number: <span dmx-text="citizenApplicationCurrent.data.applications[0].prior_document_number || 'Not recorded'"></span></p><p class="mb-0">Place of issue: <span dmx-text="citizenApplicationCurrent.data.applications[0].prior_document_place || 'Not recorded'"></span></p></div>
                 <div class="col-md-6"><strong>Identity status</strong><p dmx-text="citizenApplicationCurrent.data.applications[0].identity_status"></p></div>
                 <div class="col-md-6"><strong>Citizenship status</strong><p dmx-text="citizenApplicationCurrent.data.applications[0].citizenship_status"></p></div>
                 <div class="col-md-6"><strong>Age screening status</strong><p dmx-text="citizenApplicationCurrent.data.applications[0].age_screening_status"></p></div>
               </div>
+              <div class="notice-alert notice-alert--warning mt-3" role="note" dmx-show="citizenApplicationCurrent.data.applications[0].age_group_self_reported == '16_17'">
+                <strong>Guardian consent is still required</strong> for applicants aged 16–17. The guardian workflow is not available, and this saved draft cannot be submitted.
+              </div>
+              <section class="content-panel mt-4" aria-labelledby="application-missing-heading">
+                <h3 class="h5" id="application-missing-heading">Blank mapped fields to review</h3>
+                <p class="field-help">These are saved fields with no value yet, not a statement of official requiredness. Confirmed Immigration field requirements are not configured.</p>
+                <ul class="mb-0">
+                  <li dmx-show="!citizenApplicationCurrent.data.applications[0].first_name">First name</li>
+                  <li dmx-show="!citizenApplicationCurrent.data.applications[0].surname">Surname</li>
+                  <li dmx-show="!citizenApplicationCurrent.data.applications[0].date_of_birth">Date of birth</li>
+                  <li dmx-show="!citizenApplicationCurrent.data.applications[0].home_country">Home country</li>
+                  <li dmx-show="citizenApplicationCurrent.data.applications[0].previous_tt_document == null">Prior passport/travel-document history</li>
+                  <li dmx-show="!citizenApplicationCurrent.data.applications[0].basis_birth &amp;&amp; !citizenApplicationCurrent.data.applications[0].basis_descent &amp;&amp; !citizenApplicationCurrent.data.applications[0].basis_adoption &amp;&amp; !citizenApplicationCurrent.data.applications[0].basis_registration &amp;&amp; !citizenApplicationCurrent.data.applications[0].basis_naturalisation">Citizenship basis (self-reported)</li>
+                </ul>
+              </section>
+              <section class="content-panel mt-4" aria-labelledby="application-ivp-heading">
+                <div class="d-flex flex-wrap justify-content-between align-items-start gap-3">
+                  <div><h3 class="h5 mb-1" id="application-ivp-heading">Identity verification</h3><p class="field-help mb-0">This reuses the separate IVP session for this saved application. It does not verify legal identity or citizenship.</p></div>
+                  <a class="btn btn-primary-government" href="/verification/preview">Continue verification</a>
+                </div>
+                <div class="mt-3" dmx-show="citizenIvpSession.data.session.session_id">
+                  <p class="mb-2">Session status: <strong dmx-text="citizenIvpSession.data.session.status"></strong></p>
+                  <ul class="step-bullet-list mb-0">
+                    <li dmx-repeat:citizenIvpChecks="citizenIvpSession.data.checks">
+                      <div class="d-flex flex-wrap justify-content-between align-items-start gap-2"><strong dmx-text="check_code"></strong><span class="status-chip status-chip--neutral" dmx-text="status"></span></div>
+                      <small class="d-block text-secondary mt-1" dmx-show="check_code == 'FACE_COMPARISON' &amp;&amp; details_json.similarity_score != null" dmx-text="'Experimental similarity score: ' + details_json.similarity_score_display + ' (no match threshold configured)' "></small>
+                      <small class="d-block text-secondary mt-1" dmx-show="check_code == 'LIVENESS' &amp;&amp; (status == 'NOT_PERFORMED' || status == 'UNAVAILABLE')">Experimental desktop liveness has not produced an available result for this session.</small>
+                    </li>
+                  </ul>
+                </div>
+                <p class="mt-3 mb-0" dmx-show="!citizenIvpSession.data.session.session_id">No verification session is linked to this draft yet.</p>
+                <p class="field-help mt-2 mb-0">Identity and citizenship remain <strong>REVIEW_REQUIRED</strong> until approved evidence and authoritative checks exist.</p>
+              </section>
               <div class="notice-alert notice-alert--warning" role="note">
                 <strong>Not submitted</strong>
                 This saved draft is not an application submission, identity assertion, citizenship finding, approval or passport request.
