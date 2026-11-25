@@ -4,6 +4,8 @@
 
 **Starting commit:** `7ad6a85c3d4ac720df189b324b680155969bd00d`
 
+**Implementation commit:** `1de48fc29c7704fb8bd80866ccd3844b89de2446` — adult citizen MVP and desktop release-candidate tests.
+
 **Environment:** Wappler 7.9.9 Development at `http://127.0.0.1:3002`; Node v23.6.0; Playwright 1.65.1 / Chromium; MySQL Community Server 8.4.13 Development; local MailHog at `http://127.0.0.1:8025`; synthetic records only.
 **GUI acceptance:** PENDING owner review. No Stage 4 or Stage 5 package is closed.
 
