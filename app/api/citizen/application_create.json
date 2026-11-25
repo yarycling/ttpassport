@@ -61,13 +61,6 @@
                   "operator": "equal",
                   "operation": "=",
                   "value": "FIRST_TIME"
-                },
-                {
-                  "table": "passport_applications",
-                  "column": "status",
-                  "operator": "equal",
-                  "operation": "=",
-                  "value": "DRAFT"
                 }
               ]
             },

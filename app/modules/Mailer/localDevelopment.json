@@ -1,0 +1,11 @@
+{
+  "name": "localDevelopment",
+  "module": "mail",
+  "action": "setup",
+  "options": {
+    "host": "127.0.0.1",
+    "port": 1025,
+    "username": "{{$_ENV.TTP_MAILHOG_USERNAME}}",
+    "password": "{{$_ENV.TTP_MAILHOG_PASSWORD}}"
+  }
+}

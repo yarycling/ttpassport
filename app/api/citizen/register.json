@@ -70,6 +70,54 @@
               "outputType": "text"
             },
             {
+              "name": "email_token",
+              "module": "crypto",
+              "action": "uuid",
+              "options": {},
+              "output": false,
+              "meta": [
+                {
+                  "name": "email_token",
+                  "type": "text"
+                }
+              ],
+              "outputType": "text"
+            },
+            {
+              "name": "email_token_hash",
+              "module": "core",
+              "action": "setvalue",
+              "options": {
+                "key": "emailTokenHash",
+                "value": "{{email_token.sha256()}}"
+              },
+              "output": false,
+              "meta": [
+                {
+                  "name": "emailTokenHash",
+                  "type": "text"
+                }
+              ],
+              "outputType": "text"
+            },
+            {
+              "name": "email_token_expiry",
+              "module": "core",
+              "action": "setvalue",
+              "options": {
+                "key": "emailTokenExpiry",
+                "value": "{{NOW.dateAdd('hours', 24).formatDate('yyyy-MM-dd HH:mm:ss', true)}}"
+              },
+              "output": false,
+              "meta": [
+                {
+                  "name": "emailTokenExpiry",
+                  "type": "text"
+                }
+              ],
+              "outputType": "text"
+            },
+            {
               "name": "existing_account",
               "module": "dbconnector",
               "action": "select",
@@ -197,9 +245,67 @@
                               }
                             ],
                             "outputType": "object"
+                          },
+                          {
+                            "name": "create_email_verification_token",
+                            "module": "dbupdater",
+                            "action": "insert",
+                            "options": {
+                              "connection": "passport",
+                              "sql": {
+                                "type": "INSERT",
+                                "table": "citizen_email_verification_tokens",
+                                "values": [
+                                  {
+                                    "column": "account_id",
+                                    "value": "{{create_account.identity}}"
+                                  },
+                                  {
+                                    "column": "token_hash",
+                                    "value": "{{emailTokenHash}}"
+                                  },
+                                  {
+                                    "column": "expires_at",
+                                    "value": "{{emailTokenExpiry}}"
+                                  },
+                                  {
+                                    "column": "consumed",
+                                    "value": 0
+                                  }
+                                ]
+                              }
+                            },
+                            "output": false,
+                            "meta": [
+                              {
+                                "name": "identity",
+                                "type": "number"
+                              },
+                              {
+                                "name": "affected",
+                                "type": "number"
+                              }
+                            ],
+                            "outputType": "object"
                           }
                         ]
                       }
+                    },
+                    "output": false
+                  },
+                  {
+                    "name": "send_verification_email",
+                    "module": "mail",
+                    "action": "send",
+                    "options": {
+                      "instance": "localDevelopment",
+                      "fromEmail": "citizen-accounts@ttpassport.local",
+                      "fromName": "TTPASSPORT Development",
+                      "toEmail": "{{$_POST.email}}",
+                      "subject": "Verify your TTPASSPORT development account",
+                      "source": "static",
+                      "contentType": "html",
+                      "body": "<p>This is a local TTPASSPORT Development email.</p><p><a href=\"http://127.0.0.1:3002/account/verify-email?token={{email_token}}\">Verify this email address</a></p><p>The link expires in 24 hours. If you did not request this message, you can ignore it.</p>"
                     },
                     "output": false
                   },

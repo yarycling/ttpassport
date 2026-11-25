@@ -99,13 +99,6 @@
                   "operator": "equal",
                   "operation": "=",
                   "value": "FIRST_TIME"
-                },
-                {
-                  "table": "passport_applications",
-                  "column": "status",
-                  "operator": "equal",
-                  "operation": "=",
-                  "value": "DRAFT"
                 }
               ]
             },
@@ -152,7 +145,7 @@
               "options": {
                 "status": 404,
                 "data": {
-                  "message": "A saved first-time draft is required before verification can continue."
+                  "message": "A saved first-time application is required before verification can continue."
                 }
               },
               "output": false

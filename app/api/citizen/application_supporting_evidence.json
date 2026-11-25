@@ -1,0 +1,545 @@
+{
+  "meta": {
+    "$_POST": [
+      {
+        "name": "application_key",
+        "type": "text",
+        "fieldName": "application_key",
+        "options": {
+          "rules": {
+            "core:required": {}
+          }
+        }
+      },
+      {
+        "name": "document_category",
+        "type": "text",
+        "fieldName": "document_category",
+        "options": {
+          "rules": {
+            "core:required": {}
+          }
+        }
+      },
+      {
+        "name": "evidence_file",
+        "type": "file",
+        "fieldName": "evidence_file",
+        "options": {
+          "rules": {
+            "core:required": {},
+            "upload:accept": {
+              "param": ".pdf,.jpg,.jpeg,.png"
+            },
+            "upload:maxsize": {
+              "param": "10485760"
+            }
+          }
+        }
+      }
+    ]
+  },
+  "exec": {
+    "steps": [
+      {
+        "name": "require_citizen",
+        "module": "auth",
+        "action": "restrict",
+        "options": {
+          "provider": "citizen"
+        },
+        "output": false
+      },
+      {
+        "name": "identity",
+        "module": "auth",
+        "action": "identify",
+        "options": {
+          "provider": "citizen"
+        },
+        "output": false,
+        "meta": [
+          {
+            "name": "identity",
+            "type": "number"
+          }
+        ],
+        "outputType": "number"
+      },
+      {
+        "name": "owned_draft",
+        "module": "dbconnector",
+        "action": "select",
+        "options": {
+          "connection": "passport",
+          "sql": {
+            "type": "SELECT",
+            "table": {
+              "name": "passport_applications"
+            },
+            "primary": "id",
+            "columns": [
+              {
+                "table": "passport_applications",
+                "column": "id"
+              }
+            ],
+            "wheres": {
+              "condition": "AND",
+              "rules": [
+                {
+                  "table": "passport_applications",
+                  "column": "application_key",
+                  "operator": "equal",
+                  "operation": "=",
+                  "value": "{{$_POST.application_key}}"
+                },
+                {
+                  "table": "passport_applications",
+                  "column": "account_id",
+                  "operator": "equal",
+                  "operation": "=",
+                  "value": "{{identity}}"
+                },
+                {
+                  "table": "passport_applications",
+                  "column": "application_type",
+                  "operator": "equal",
+                  "operation": "=",
+                  "value": "FIRST_TIME"
+                },
+                {
+                  "table": "passport_applications",
+                  "column": "status",
+                  "operator": "equal",
+                  "operation": "=",
+                  "value": "DRAFT"
+                }
+              ]
+            },
+            "limit": 1
+          }
+        },
+        "output": false,
+        "meta": [
+          {
+            "name": "id",
+            "type": "text"
+          }
+        ],
+        "outputType": "array"
+      },
+      {
+        "name": "upload_for_owned_draft",
+        "module": "core",
+        "action": "condition",
+        "options": {
+          "if": "{{owned_draft.count() == 1}}",
+          "then": [
+            {
+              "name": "evidence_key",
+              "module": "crypto",
+              "action": "uuid",
+              "options": {},
+              "output": false,
+              "meta": [
+                {
+                  "name": "evidence_key",
+                  "type": "text"
+                }
+              ],
+              "outputType": "text"
+            },
+            {
+              "name": "file_upload",
+              "module": "upload",
+              "action": "upload",
+              "options": {
+                "fields": "{{$_POST.evidence_file}}",
+                "path": "/storage/passport_dev/applications",
+                "template": "{guid}{ext}",
+                "createPath": true,
+                "throwErrors": true
+              },
+              "output": false,
+              "meta": [
+                {
+                  "name": "name",
+                  "type": "text"
+                },
+                {
+                  "name": "path",
+                  "type": "text"
+                },
+                {
+                  "name": "url",
+                  "type": "text"
+                },
+                {
+                  "name": "type",
+                  "type": "text"
+                },
+                {
+                  "name": "size",
+                  "type": "number"
+                },
+                {
+                  "name": "error",
+                  "type": "number"
+                }
+              ],
+              "outputType": "object"
+            },
+            {
+              "name": "validate_private_evidence",
+              "module": "core",
+              "action": "condition",
+              "options": {
+                "if": "{{file_upload.size <= 10485760 && (file_upload.type == 'image/jpeg' || file_upload.type == 'image/png' || file_upload.type == 'application/pdf') && ( $_POST.document_category == 'IDENTITY' || $_POST.document_category == 'BIRTH_CITIZENSHIP' || $_POST.document_category == 'PRIOR_TRAVEL_DOCUMENT' || $_POST.document_category == 'OTHER' )}}",
+                "then": [
+                  {
+                    "name": "evidence_history",
+                    "module": "dbconnector",
+                    "action": "select",
+                    "options": {
+                      "connection": "passport",
+                      "sql": {
+                        "type": "SELECT",
+                        "table": {
+                          "name": "passport_application_evidence"
+                        },
+                        "primary": "id",
+                        "columns": [
+                          {
+                            "table": "passport_application_evidence",
+                            "column": "id"
+                          },
+                          {
+                            "table": "passport_application_evidence",
+                            "column": "version_number"
+                          },
+                          {
+                            "table": "passport_application_evidence",
+                            "column": "evidence_status"
+                          }
+                        ],
+                        "wheres": {
+                          "condition": "AND",
+                          "rules": [
+                            {
+                              "table": "passport_application_evidence",
+                              "column": "application_id",
+                              "operator": "equal",
+                              "operation": "=",
+                              "value": "{{owned_draft[0].id}}"
+                            },
+                            {
+                              "table": "passport_application_evidence",
+                              "column": "evidence_kind",
+                              "operator": "equal",
+                              "operation": "=",
+                              "value": "SUPPORTING_DOCUMENT"
+                            },
+                            {
+                              "table": "passport_application_evidence",
+                              "column": "document_category",
+                              "operator": "equal",
+                              "operation": "=",
+                              "value": "{{$_POST.document_category}}"
+                            }
+                          ]
+                        },
+                        "limit": 100
+                      }
+                    },
+                    "output": false,
+                    "meta": [
+                      {
+                        "name": "id",
+                        "type": "text"
+                      },
+                      {
+                        "name": "version_number",
+                        "type": "text"
+                      },
+                      {
+                        "name": "evidence_status",
+                        "type": "text"
+                      }
+                    ],
+                    "outputType": "array"
+                  },
+                  {
+                    "name": "active_evidence",
+                    "module": "dbconnector",
+                    "action": "select",
+                    "options": {
+                      "connection": "passport",
+                      "sql": {
+                        "type": "SELECT",
+                        "table": {
+                          "name": "passport_application_evidence"
+                        },
+                        "primary": "id",
+                        "columns": [
+                          {
+                            "table": "passport_application_evidence",
+                            "column": "id"
+                          }
+                        ],
+                        "wheres": {
+                          "condition": "AND",
+                          "rules": [
+                            {
+                              "table": "passport_application_evidence",
+                              "column": "application_id",
+                              "operator": "equal",
+                              "operation": "=",
+                              "value": "{{owned_draft[0].id}}"
+                            },
+                            {
+                              "table": "passport_application_evidence",
+                              "column": "evidence_kind",
+                              "operator": "equal",
+                              "operation": "=",
+                              "value": "SUPPORTING_DOCUMENT"
+                            },
+                            {
+                              "table": "passport_application_evidence",
+                              "column": "document_category",
+                              "operator": "equal",
+                              "operation": "=",
+                              "value": "{{$_POST.document_category}}"
+                            },
+                            {
+                              "table": "passport_application_evidence",
+                              "column": "evidence_status",
+                              "operator": "equal",
+                              "operation": "=",
+                              "value": "ACTIVE"
+                            }
+                          ]
+                        },
+                        "limit": 1
+                      }
+                    },
+                    "output": false,
+                    "meta": [
+                      {
+                        "name": "id",
+                        "type": "text"
+                      }
+                    ],
+                    "outputType": "array"
+                  },
+                  {
+                    "name": "save_evidence_transaction",
+                    "module": "dbupdater",
+                    "action": "transaction",
+                    "options": {
+                      "connection": "passport",
+                      "exec": {
+                        "steps": [
+                          {
+                            "name": "mark_previous_version",
+                            "module": "dbupdater",
+                            "action": "update",
+                            "options": {
+                              "connection": "passport",
+                              "sql": {
+                                "type": "UPDATE",
+                                "table": "passport_application_evidence",
+                                "values": [
+                                  {
+                                    "column": "evidence_status",
+                                    "value": "REPLACED"
+                                  }
+                                ],
+                                "wheres": {
+                                  "condition": "AND",
+                                  "rules": [
+                                    {
+                                      "table": "passport_application_evidence",
+                                      "column": "application_id",
+                                      "operator": "equal",
+                                      "operation": "=",
+                                      "value": "{{owned_draft[0].id}}"
+                                    },
+                                    {
+                                      "table": "passport_application_evidence",
+                                      "column": "evidence_kind",
+                                      "operator": "equal",
+                                      "operation": "=",
+                                      "value": "SUPPORTING_DOCUMENT"
+                                    },
+                                    {
+                                      "table": "passport_application_evidence",
+                                      "column": "document_category",
+                                      "operator": "equal",
+                                      "operation": "=",
+                                      "value": "{{$_POST.document_category}}"
+                                    },
+                                    {
+                                      "table": "passport_application_evidence",
+                                      "column": "evidence_status",
+                                      "operator": "equal",
+                                      "operation": "=",
+                                      "value": "ACTIVE"
+                                    }
+                                  ]
+                                }
+                              }
+                            },
+                            "output": false,
+                            "meta": [
+                              {
+                                "name": "affected",
+                                "type": "number"
+                              }
+                            ],
+                            "outputType": "object"
+                          },
+                          {
+                            "name": "save_evidence",
+                            "module": "dbupdater",
+                            "action": "insert",
+                            "options": {
+                              "connection": "passport",
+                              "sql": {
+                                "type": "INSERT",
+                                "table": "passport_application_evidence",
+                                "values": [
+                                  {
+                                    "column": "evidence_key",
+                                    "value": "{{evidence_key}}"
+                                  },
+                                  {
+                                    "column": "application_id",
+                                    "value": "{{owned_draft[0].id}}"
+                                  },
+                                  {
+                                    "column": "uploaded_by_account_id",
+                                    "value": "{{identity}}"
+                                  },
+                                  {
+                                    "column": "evidence_kind",
+                                    "value": "SUPPORTING_DOCUMENT"
+                                  },
+                                  {
+                                    "column": "document_category",
+                                    "value": "{{$_POST.document_category}}"
+                                  },
+                                  {
+                                    "column": "original_filename",
+                                    "value": "{{file_upload.name}}"
+                                  },
+                                  {
+                                    "column": "storage_key",
+                                    "value": "{{file_upload.name}}"
+                                  },
+                                  {
+                                    "column": "mime_type",
+                                    "value": "{{file_upload.type}}"
+                                  },
+                                  {
+                                    "column": "byte_size",
+                                    "value": "{{file_upload.size}}"
+                                  },
+                                  {
+                                    "column": "version_number",
+                                    "value": "{{evidence_history.count() + 1}}"
+                                  },
+                                  {
+                                    "column": "evidence_status",
+                                    "value": "ACTIVE"
+                                  },
+                                  {
+                                    "column": "replaces_evidence_id",
+                                    "value": "{{active_evidence.count() > 0 ? active_evidence[0].id : null}}"
+                                  }
+                                ]
+                              }
+                            },
+                            "output": false,
+                            "meta": [
+                              {
+                                "name": "identity",
+                                "type": "number"
+                              },
+                              {
+                                "name": "affected",
+                                "type": "number"
+                              }
+                            ],
+                            "outputType": "object"
+                          }
+                        ]
+                      }
+                    },
+                    "output": false
+                  },
+                  {
+                    "name": "evidence_saved",
+                    "module": "core",
+                    "action": "setvalue",
+                    "options": {
+                      "key": "evidenceSaved",
+                      "value": true
+                    },
+                    "output": true,
+                    "meta": [
+                      {
+                        "name": "evidenceSaved",
+                        "type": "boolean"
+                      }
+                    ],
+                    "outputType": "boolean"
+                  }
+                ],
+                "else": [
+                  {
+                    "name": "remove_invalid_upload",
+                    "module": "fs",
+                    "action": "remove",
+                    "options": {
+                      "path": "{{'/storage/passport_dev/applications/' + file_upload.name}}"
+                    },
+                    "output": false
+                  },
+                  {
+                    "name": "invalid_evidence",
+                    "module": "core",
+                    "action": "response",
+                    "options": {
+                      "status": 400,
+                      "data": {
+                        "message": "Upload a PDF or image no larger than 10 MB using a mapped document category."
+                      }
+                    },
+                    "output": false
+                  }
+                ]
+              },
+              "output": false
+            }
+          ],
+          "else": [
+            {
+              "name": "application_not_found",
+              "module": "core",
+              "action": "response",
+              "options": {
+                "status": 404,
+                "data": {
+                  "message": "The saved draft was not found."
+                }
+              },
+              "output": false
+            }
+          ]
+        },
+        "output": false
+      }
+    ]
+  }
+}

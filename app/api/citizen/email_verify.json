@@ -1,0 +1,284 @@
+{
+  "meta": {
+    "$_POST": [
+      {
+        "name": "token",
+        "type": "text",
+        "fieldName": "token",
+        "options": {
+          "rules": {
+            "core:required": {},
+            "core:maxlength": {
+              "param": 100
+            }
+          }
+        }
+      }
+    ]
+  },
+  "exec": {
+    "steps": [
+      {
+        "name": "current_time",
+        "module": "core",
+        "action": "setvalue",
+        "options": {
+          "key": "current_time",
+          "value": "{{NOW.formatDate('yyyy-MM-dd HH:mm:ss', true)}}"
+        },
+        "output": false,
+        "meta": [
+          {
+            "name": "current_time",
+            "type": "text"
+          }
+        ],
+        "outputType": "text"
+      },
+      {
+        "name": "token_hash",
+        "module": "core",
+        "action": "setvalue",
+        "options": {
+          "key": "token_hash",
+          "value": "{{$_POST.token.sha256()}}"
+        },
+        "output": false,
+        "meta": [
+          {
+            "name": "token_hash",
+            "type": "text"
+          }
+        ],
+        "outputType": "text"
+      },
+      {
+        "name": "valid_token",
+        "module": "dbconnector",
+        "action": "select",
+        "options": {
+          "connection": "passport",
+          "sql": {
+            "type": "SELECT",
+            "table": {
+              "name": "citizen_email_verification_tokens"
+            },
+            "primary": "id",
+            "columns": [
+              {
+                "table": "citizen_email_verification_tokens",
+                "column": "id"
+              },
+              {
+                "table": "citizen_email_verification_tokens",
+                "column": "account_id"
+              }
+            ],
+            "wheres": {
+              "condition": "AND",
+              "rules": [
+                {
+                  "table": "citizen_email_verification_tokens",
+                  "column": "token_hash",
+                  "operator": "equal",
+                  "operation": "=",
+                  "value": "{{token_hash}}"
+                },
+                {
+                  "table": "citizen_email_verification_tokens",
+                  "column": "consumed",
+                  "operator": "equal",
+                  "operation": "=",
+                  "value": 0
+                },
+                {
+                  "table": "citizen_email_verification_tokens",
+                  "column": "expires_at",
+                  "operator": "greater",
+                  "operation": ">",
+                  "value": "{{current_time}}"
+                }
+              ]
+            },
+            "limit": 1
+          }
+        },
+        "output": false,
+        "meta": [
+          {
+            "name": "id",
+            "type": "text"
+          },
+          {
+            "name": "account_id",
+            "type": "text"
+          }
+        ],
+        "outputType": "array"
+      },
+      {
+        "name": "verify_once",
+        "module": "core",
+        "action": "condition",
+        "options": {
+          "if": "{{valid_token.count() == 1}}",
+          "then": [
+            {
+              "name": "verification_transaction",
+              "module": "dbupdater",
+              "action": "transaction",
+              "options": {
+                "connection": "passport",
+                "exec": {
+                  "steps": [
+                    {
+                      "name": "consume_verification_token",
+                      "module": "dbupdater",
+                      "action": "update",
+                      "options": {
+                        "connection": "passport",
+                        "sql": {
+                          "type": "UPDATE",
+                          "table": "citizen_email_verification_tokens",
+                          "values": [
+                            {
+                              "column": "consumed",
+                              "value": 1
+                            }
+                          ],
+                          "wheres": {
+                            "condition": "AND",
+                            "rules": [
+                              {
+                                "table": "citizen_email_verification_tokens",
+                                "column": "id",
+                                "operator": "equal",
+                                "operation": "=",
+                                "value": "{{valid_token[0].id}}"
+                              },
+                              {
+                                "table": "citizen_email_verification_tokens",
+                                "column": "consumed",
+                                "operator": "equal",
+                                "operation": "=",
+                                "value": 0
+                              }
+                            ]
+                          }
+                        }
+                      },
+                      "output": true,
+                      "meta": [
+                        {
+                          "name": "affected",
+                          "type": "number"
+                        }
+                      ],
+                      "outputType": "object"
+                    },
+                    {
+                      "name": "apply_email_verification",
+                      "module": "core",
+                      "action": "condition",
+                      "options": {
+                        "if": "{{consume_verification_token.affected == 1}}",
+                        "then": [
+                          {
+                            "name": "mark_email_verified",
+                            "module": "dbupdater",
+                            "action": "update",
+                            "options": {
+                              "connection": "passport",
+                              "sql": {
+                                "type": "UPDATE",
+                                "table": "citizen_accounts",
+                                "values": [
+                                  {
+                                    "column": "email_verified",
+                                    "value": 1
+                                  }
+                                ],
+                                "wheres": {
+                                  "condition": "AND",
+                                  "rules": [
+                                    {
+                                      "table": "citizen_accounts",
+                                      "column": "id",
+                                      "operator": "equal",
+                                      "operation": "=",
+                                      "value": "{{valid_token[0].account_id}}"
+                                    }
+                                  ]
+                                }
+                              }
+                            },
+                            "output": false,
+                            "meta": [
+                              {
+                                "name": "affected",
+                                "type": "number"
+                              }
+                            ],
+                            "outputType": "object"
+                          },
+                          {
+                            "name": "verification_complete",
+                            "module": "core",
+                            "action": "setvalue",
+                            "options": {
+                              "key": "verificationResult",
+                              "value": "EMAIL_VERIFIED"
+                            },
+                            "output": true,
+                            "meta": [
+                              {
+                                "name": "verificationResult",
+                                "type": "text"
+                              }
+                            ],
+                            "outputType": "text"
+                          }
+                        ],
+                        "else": [
+                          {
+                            "name": "verification_already_used",
+                            "module": "core",
+                            "action": "response",
+                            "options": {
+                              "status": 409,
+                              "data": {
+                                "message": "This verification link has expired or was already used."
+                              }
+                            },
+                            "output": false
+                          }
+                        ]
+                      },
+                      "output": false
+                    }
+                  ]
+                }
+              },
+              "output": false
+            }
+          ],
+          "else": [
+            {
+              "name": "verification_invalid",
+              "module": "core",
+              "action": "response",
+              "options": {
+                "status": 410,
+                "data": {
+                  "message": "This verification link has expired or was already used."
+                }
+              },
+              "output": false
+            }
+          ]
+        },
+        "output": false
+      }
+    ]
+  }
+}

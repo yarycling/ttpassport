@@ -28,10 +28,12 @@
           <span dmx-show="!citizenLoginForm.state.executing">Sign in</span>
           <span dmx-show="citizenLoginForm.state.executing">Signing in…</span>
         </button>
-        <p id="signin-help" class="field-help mt-3 mb-0">The email verification service and account recovery are not configured for this demonstration. The dashboard remains a development workspace.</p>
+        <p id="signin-help" class="field-help mt-3 mb-0">Verify your email address before signing in. Local Development account recovery is available; account access does not verify identity or citizenship.</p>
       </form>
       <div class="d-flex flex-wrap gap-3 mt-4">
         <a href="/account/register">Create a development account</a>
+        <a href="/account/forgot-password">Forgot password?</a>
+        <a href="/account/verify-email">Resend verification email</a>
       </div>
     </div>
   </div>

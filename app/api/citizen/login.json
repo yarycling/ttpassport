@@ -27,33 +27,115 @@
   "exec": {
     "steps": [
       {
-        "name": "sign_in",
-        "module": "auth",
-        "action": "login",
+        "name": "account_status",
+        "module": "dbconnector",
+        "action": "select",
         "options": {
-          "provider": "citizen",
-          "username": "{{$_POST.email}}",
-          "password": "{{$_POST.password}}",
-          "remember": false
+          "connection": "passport",
+          "sql": {
+            "type": "SELECT",
+            "table": {
+              "name": "citizen_accounts"
+            },
+            "primary": "id",
+            "columns": [
+              {
+                "table": "citizen_accounts",
+                "column": "id"
+              },
+              {
+                "table": "citizen_accounts",
+                "column": "email_verified"
+              }
+            ],
+            "wheres": {
+              "condition": "AND",
+              "rules": [
+                {
+                  "table": "citizen_accounts",
+                  "column": "email",
+                  "operator": "equal",
+                  "operation": "=",
+                  "value": "{{$_POST.email}}"
+                },
+                {
+                  "table": "citizen_accounts",
+                  "column": "status",
+                  "operator": "equal",
+                  "operation": "=",
+                  "value": "ACTIVE"
+                }
+              ]
+            },
+            "limit": 1
+          }
         },
-        "output": false
-      },
-      {
-        "name": "login_result",
-        "module": "core",
-        "action": "setvalue",
-        "options": {
-          "key": "loginResult",
-          "value": "SIGNED_IN"
-        },
-        "output": true,
+        "output": false,
         "meta": [
           {
-            "name": "loginResult",
-            "type": "text"
+            "name": "id",
+            "type": "number"
+          },
+          {
+            "name": "email_verified",
+            "type": "boolean"
           }
         ],
-        "outputType": "text"
+        "outputType": "array"
+      },
+      {
+        "name": "require_verified_email",
+        "module": "core",
+        "action": "condition",
+        "options": {
+          "if": "{{account_status.count() == 1 && account_status[0].email_verified == 1}}",
+          "then": [
+            {
+              "name": "sign_in",
+              "module": "auth",
+              "action": "login",
+              "options": {
+                "provider": "citizen",
+                "username": "{{$_POST.email}}",
+                "password": "{{$_POST.password}}",
+                "remember": false
+              },
+              "output": false
+            },
+            {
+              "name": "login_result",
+              "module": "core",
+              "action": "setvalue",
+              "options": {
+                "key": "loginResult",
+                "value": "SIGNED_IN"
+              },
+              "output": true,
+              "meta": [
+                {
+                  "name": "loginResult",
+                  "type": "text"
+                }
+              ],
+              "outputType": "text"
+            }
+          ],
+          "else": [
+            {
+              "name": "login_not_available",
+              "module": "core",
+              "action": "response",
+              "options": {
+                "status": 401,
+                "data": {
+                  "message": "The email, password, or email verification status is not valid."
+                }
+              },
+              "output": false
+            }
+          ]
+        },
+        "output": false
       }
     ]
   }

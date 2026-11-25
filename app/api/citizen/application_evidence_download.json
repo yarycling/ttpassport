@@ -1,0 +1,238 @@
+{
+  "meta": {
+    "$_GET": [
+      {
+        "name": "evidence_key",
+        "type": "text",
+        "fieldName": "evidence_key",
+        "options": {
+          "rules": {
+            "core:required": {},
+            "core:maxlength": {
+              "param": 36
+            }
+          }
+        }
+      }
+    ]
+  },
+  "exec": {
+    "steps": [
+      {
+        "name": "require_citizen",
+        "module": "auth",
+        "action": "restrict",
+        "options": {
+          "provider": "citizen"
+        },
+        "output": false
+      },
+      {
+        "name": "identity",
+        "module": "auth",
+        "action": "identify",
+        "options": {
+          "provider": "citizen"
+        },
+        "output": false,
+        "meta": [
+          {
+            "name": "identity",
+            "type": "number"
+          }
+        ],
+        "outputType": "number"
+      },
+      {
+        "name": "evidence",
+        "module": "dbconnector",
+        "action": "select",
+        "options": {
+          "connection": "passport",
+          "sql": {
+            "type": "SELECT",
+            "table": {
+              "name": "passport_application_evidence"
+            },
+            "primary": "id",
+            "columns": [
+              {
+                "table": "passport_application_evidence",
+                "column": "id"
+              },
+              {
+                "table": "passport_application_evidence",
+                "column": "application_id"
+              },
+              {
+                "table": "passport_application_evidence",
+                "column": "evidence_key"
+              },
+              {
+                "table": "passport_application_evidence",
+                "column": "original_filename"
+              },
+              {
+                "table": "passport_application_evidence",
+                "column": "storage_key"
+              }
+            ],
+            "wheres": {
+              "condition": "AND",
+              "rules": [
+                {
+                  "table": "passport_application_evidence",
+                  "column": "evidence_key",
+                  "operator": "equal",
+                  "operation": "=",
+                  "value": "{{$_GET.evidence_key}}"
+                }
+              ]
+            },
+            "limit": 1
+          }
+        },
+        "output": false,
+        "meta": [
+          {
+            "name": "id",
+            "type": "text"
+          },
+          {
+            "name": "application_id",
+            "type": "text"
+          },
+          {
+            "name": "evidence_key",
+            "type": "text"
+          },
+          {
+            "name": "original_filename",
+            "type": "text"
+          },
+          {
+            "name": "storage_key",
+            "type": "text"
+          }
+        ],
+        "outputType": "array"
+      },
+      {
+        "name": "authorize_evidence_owner",
+        "module": "core",
+        "action": "condition",
+        "options": {
+          "if": "{{evidence.count() == 1}}",
+          "then": [
+            {
+              "name": "owned_application",
+              "module": "dbconnector",
+              "action": "select",
+              "options": {
+                "connection": "passport",
+                "sql": {
+                  "type": "SELECT",
+                  "table": {
+                    "name": "passport_applications"
+                  },
+                  "primary": "id",
+                  "columns": [
+                    {
+                      "table": "passport_applications",
+                      "column": "id"
+                    }
+                  ],
+                  "wheres": {
+                    "condition": "AND",
+                    "rules": [
+                      {
+                        "table": "passport_applications",
+                        "column": "id",
+                        "operator": "equal",
+                        "operation": "=",
+                        "value": "{{evidence[0].application_id}}"
+                      },
+                      {
+                        "table": "passport_applications",
+                        "column": "account_id",
+                        "operator": "equal",
+                        "operation": "=",
+                        "value": "{{identity}}"
+                      },
+                      {
+                        "table": "passport_applications",
+                        "column": "application_type",
+                        "operator": "equal",
+                        "operation": "=",
+                        "value": "FIRST_TIME"
+                      }
+                    ]
+                  },
+                  "limit": 1
+                }
+              },
+              "output": false,
+              "meta": [
+                {
+                  "name": "id",
+                  "type": "text"
+                }
+              ],
+              "outputType": "array"
+            },
+            {
+              "name": "download_owned_evidence",
+              "module": "core",
+              "action": "condition",
+              "options": {
+                "if": "{{owned_application.count() == 1}}",
+                "then": [
+                  {
+                    "name": "private_file_download",
+                    "module": "fs",
+                    "action": "download",
+                    "options": {
+                      "path": "{{'/storage/passport_dev/applications/' + evidence[0].storage_key}}",
+                      "filename": "{{evidence[0].original_filename}}"
+                    },
+                    "output": false
+                  }
+                ],
+                "else": [
+                  {
+                    "name": "evidence_not_found",
+                    "module": "core",
+                    "action": "response",
+                    "options": {
+                      "status": 404,
+                      "data": {
+                        "message": "The evidence was not found."
+                      }
+                    },
+                    "output": false
+                  }
+                ]
+              },
+              "output": false
+            }
+          ],
+          "else": [
+            {
+              "name": "evidence_not_found",
+              "module": "core",
+              "action": "response",
+              "options": {
+                "status": 404,
+                "data": {
+                  "message": "The evidence was not found."
+                }
+              },
+              "output": false
+            }
+          ]
+        },
+        "output": false
+      }
+    ]
+  }
+}

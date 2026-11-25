@@ -7,7 +7,7 @@
       <h1 id="register-heading">Create an account</h1>
       <div class="notice-alert notice-alert--warning mb-4" role="note">
         <strong>Development use only</strong>
-        Use synthetic test details. Email verification and password recovery are not configured; this account does not verify identity or citizenship.
+        Use synthetic test details. A local Development email is required to activate this account; account verification does not verify identity or citizenship.
       </div>
       <form id="citizenRegisterForm" is="dmx-serverconnect-form" method="post" action="/api/citizen/register" dmx-on:success="citizenRegistrationSaved.setValue(true)" aria-describedby="register-help">
         <div class="mb-3">
@@ -24,7 +24,7 @@
           <input class="form-control" id="register-confirm" name="password_confirm" type="password" autocomplete="new-password" required maxlength="255" aria-describedby="register-help">
         </div>
         <div class="notice-alert mb-3" role="status" dmx-show="citizenRegistrationSaved.value">
-          Account created for this Development demonstration. Email remains unverified because no email delivery service is configured. <a href="/account/sign-in">Sign in</a> to continue.
+          Account created. Check the local Development email inbox and verify the address before signing in. <a href="/account/verify-email">Open the verification page</a>.
         </div>
         <div class="notice-alert notice-alert--warning mb-3" role="alert" dmx-show="citizenRegisterForm.lastError.status">
           The account could not be created. Check that the email is valid, the passwords match and the email has not already been used.
@@ -33,7 +33,7 @@
           <span dmx-show="!citizenRegisterForm.state.executing">Create account</span>
           <span dmx-show="citizenRegisterForm.state.executing">Creating account…</span>
         </button>
-        <p class="field-help mt-3 mb-0" id="register-help">This local account is separate from the eKYC service, passport eligibility, identity proofing and citizenship decisions.</p>
+        <p class="field-help mt-3 mb-0" id="register-help">Verification email is delivered only to the local Development MailHog service. This account is separate from eKYC, passport eligibility, identity proofing and citizenship decisions.</p>
       </form>
       <p class="mt-4 mb-0">Already have an account? <a href="/account/sign-in">Sign in</a></p>
     </div>

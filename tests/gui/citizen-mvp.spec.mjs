@@ -4,10 +4,11 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import mysql from 'mysql2/promise';
 import { expect, test } from '@playwright/test';
+import { completeDevelopmentEmailVerification } from './helpers/mailhog.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(here, '../..');
-const screenshots = path.join(repoRoot, 'docs/evidence/TTP-4A-5C/screenshots');
+const screenshots = path.join(repoRoot, 'docs/evidence/TTP-4B-5E-5J/screenshots/citizen-regression');
 const passportConnection = JSON.parse(await readFile(path.join(repoRoot, 'app/modules/connections/passport.json'), 'utf8'));
 
 async function postForm(page, pathname, fields) {
@@ -35,6 +36,12 @@ async function cleanSyntheticAccounts(emails) {
     const ids = accounts.map(row => row.id);
     if (!ids.length) return;
     const marks = ids.map(() => '?').join(',');
+    await connection.execute(`DELETE FROM passport_application_demo_submissions WHERE account_id IN (${marks})`, ids);
+    await connection.execute(`DELETE e FROM passport_application_evidence e JOIN passport_applications a ON a.id = e.application_id WHERE a.account_id IN (${marks})`, ids);
+    await connection.execute(`DELETE r FROM passport_application_references r JOIN passport_applications a ON a.id = r.application_id WHERE a.account_id IN (${marks})`, ids);
+    await connection.execute(`DELETE r FROM passport_application_recommenders r JOIN passport_applications a ON a.id = r.application_id WHERE a.account_id IN (${marks})`, ids);
+    await connection.execute(`DELETE FROM citizen_password_recovery_tokens WHERE account_id IN (${marks})`, ids);
+    await connection.execute(`DELETE FROM citizen_email_verification_tokens WHERE account_id IN (${marks})`, ids);
     await connection.execute(`DELETE FROM passport_applications WHERE account_id IN (${marks})`, ids);
     await connection.execute(`DELETE FROM applicant_profiles WHERE account_id IN (${marks})`, ids);
     await connection.execute(`DELETE FROM citizen_accounts WHERE id IN (${marks})`, ids);
@@ -133,7 +140,16 @@ test('CT-4A5C-002 through CT-4A5C-010 — citizen account, profile, first-time d
     expect(Number(registeredAccount.email_verified)).toBe(0);
     expect(registeredAccount.password_hash).toMatch(/^\$argon2id\$/);
     expect(registeredAccount.password_hash).not.toBe(passwordA);
-    await expect(pageA.getByRole('status').filter({ hasText: 'Email remains unverified' })).toBeVisible();
+    await expect(pageA.getByRole('status').filter({ hasText: 'Account created. Check the local Development email inbox and verify the address before signing in.' })).toBeVisible();
+
+    const unverifiedLogin = await postForm(pageA, '/api/citizen/login', { email: emailA, password: passwordA });
+    expect(unverifiedLogin.status).not.toBe(200);
+    const verification = await completeDevelopmentEmailVerification(pageA, emailA);
+    expect(verification.status).toBe(200);
+    const verifiedAccount = await citizenAccountState(emailA);
+    expect(Number(verifiedAccount.email_verified)).toBe(1);
+    const reusedVerificationToken = await postForm(pageA, '/api/citizen/email_verify', { token: verification.token });
+    expect([400, 410]).toContain(reusedVerificationToken.status);
 
     const mismatch = await postForm(pageA, '/api/citizen/register', {
       email: `mismatch.${crypto.randomUUID()}@example.test`, password: passwordA, password_confirm: `${passwordA}x`,
@@ -231,14 +247,41 @@ test('CT-4A5C-002 through CT-4A5C-010 — citizen account, profile, first-time d
     await pageA.locator('#app-birth_certificate_number').fill('SYNTHETIC-CERT-01');
     await pageA.locator('#app-mother_maiden_surname').fill('SYNTHETIC FAMILY');
     await pageA.locator('#app-father_first_name').fill('SYNTHETIC FATHER');
+    await pageA.locator('#app-father_surname').fill('SAMPLE');
     await pageA.locator('#app-other_citizenship-1').check();
     await pageA.locator('#app-other_citizenship_country').fill('Testland');
     await pageA.locator('#app-prior_document_number').fill('SYNTHETIC-DOC-01');
     await pageA.locator('#app-prior_document_place').fill('Sample Office');
-    const saveDraftPromise = pageA.waitForResponse(response => new URL(response.url()).pathname === '/api/citizen/application_save');
-    await pageA.getByRole('button', { name: 'Save and review' }).click();
-    expect((await saveDraftPromise).status()).toBe(200);
-    await expect(pageA.getByRole('heading', { name: '8. Review saved draft' })).toBeVisible();
+    const citizenshipSavePromise = pageA.waitForResponse(response => new URL(response.url()).pathname === '/api/citizen/application_save');
+    await pageA.getByRole('button', { name: 'Save and continue' }).click();
+    expect((await citizenshipSavePromise).status()).toBe(200);
+    await expect(pageA.getByRole('heading', { name: '4. Proposed recommender and personal references' })).toBeVisible();
+
+    await pageA.locator('#recommender-first-name').fill('SYNTHETIC RECOMMENDER');
+    await pageA.locator('#recommender-surname').fill('SAMPLE');
+    await pageA.locator('#recommender-occupation').fill('Test Occupation');
+    await pageA.locator('#recommender-city').fill('Sample City');
+    await pageA.locator('#recommender-country').fill('Testland');
+    await pageA.locator('#recommender-years').fill('5');
+    await pageA.locator('#reference1-first-name').fill('SYNTHETIC REFERENCE ONE');
+    await pageA.locator('#reference1-surname').fill('SAMPLE');
+    await pageA.locator('#reference1-city').fill('Sample City');
+    await pageA.locator('#reference1-country').fill('Testland');
+    await pageA.locator('#reference1-years').fill('3');
+    await pageA.locator('#reference1-relative').selectOption('YES');
+    await pageA.locator('#reference2-first-name').fill('SYNTHETIC REFERENCE TWO');
+    await pageA.locator('#reference2-surname').fill('SAMPLE');
+    await pageA.locator('#reference2-city').fill('Sample City');
+    await pageA.locator('#reference2-country').fill('Testland');
+    await pageA.locator('#reference2-years').fill('2');
+    const peopleSavePromise = pageA.waitForResponse(response => new URL(response.url()).pathname === '/api/citizen/application_people_save');
+    await pageA.getByRole('button', { name: 'Save and continue' }).click();
+    expect((await peopleSavePromise).status()).toBe(200);
+    await expect(pageA.getByRole('heading', { name: '5. Supporting documents' })).toBeVisible();
+    await pageA.getByRole('button', { name: 'Continue to passport photo' }).click();
+    await expect(pageA.getByRole('heading', { name: '6. Proposed passport photograph' })).toBeVisible();
+    await pageA.getByRole('button', { name: 'Review application' }).click();
+    await expect(pageA.getByRole('heading', { name: '8. Review application' })).toBeVisible();
     const reviewPanel = pageA.locator('section[aria-labelledby="stage-eight-heading"]');
     await expect(reviewPanel.locator('.col-md-6').filter({ hasText: 'Identity status' })).toContainText('REVIEW_REQUIRED');
     await expect(reviewPanel.locator('.col-md-6').filter({ hasText: 'Citizenship status' })).toContainText('REVIEW_REQUIRED');
@@ -271,7 +314,7 @@ test('CT-4A5C-002 through CT-4A5C-010 — citizen account, profile, first-time d
     await expect(pageA.locator('#app-first_name')).toHaveValue('SYNTHETIC');
     await expect(pageA.locator('#app-basis_descent')).toBeChecked();
     await pageA.getByRole('button', { name: 'Review saved draft' }).click();
-    await expect(pageA.getByRole('heading', { name: '8. Review saved draft' })).toBeVisible();
+    await expect(pageA.getByRole('heading', { name: '8. Review application' })).toBeVisible();
 
     const formLabels = await pageA.locator('#citizenDraftForm input:not([type="hidden"]), #citizenDraftForm select, #citizenDraftForm textarea').evaluateAll(elements => elements.map(el => ({ id: el.id, labelled: el.id && Boolean(document.querySelector(`label[for="${CSS.escape(el.id)}"]`) || el.closest('fieldset')?.querySelector('legend')) })));
     expect(formLabels.filter(item => item.id).every(item => item.labelled)).toBeTruthy();
@@ -301,6 +344,7 @@ test('CT-4A5C-002 through CT-4A5C-010 — citizen account, profile, first-time d
       const registerBPromise = pageB.waitForResponse(response => new URL(response.url()).pathname === '/api/citizen/register');
       await pageB.getByRole('button', { name: 'Create account' }).click();
       expect((await registerBPromise).status()).toBe(200);
+      expect((await completeDevelopmentEmailVerification(pageB, emailB)).status).toBe(200);
       await pageB.goto(new URL('/account/sign-in', baseURL).toString(), { waitUntil: 'networkidle' });
       await pageB.locator('#signin-email').fill(emailB);
       await pageB.locator('#signin-password').fill(passwordB);

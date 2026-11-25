@@ -31,6 +31,7 @@ const expectedIvpActions = [
   'consent.json',
   'document_upload.json',
   'login.json',
+  'liveness_result.json',
   'logout.json',
   'register.json',
   'review.json',

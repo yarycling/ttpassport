@@ -1,14 +1,32 @@
 <!-- Wappler include head-page="layouts/main" bootstrap5="local" is="dmx-app" id="verifyEmail" appConnect="local" -->
+<dmx-value id="citizenEmailVerified" dmx-bind:value="false"></dmx-value>
+<dmx-value id="verificationMessageSent" dmx-bind:value="false"></dmx-value>
 <section class="auth-page" aria-labelledby="verify-heading">
   <div class="container-fluid page-container">
     <div class="auth-card">
       <p class="section-kicker">Citizen account</p>
       <h1 id="verify-heading">Email verification</h1>
-      <div class="notice-alert" role="status">
-        <strong>Verification is not connected</strong>
-        This preview does not send email or verify an address.
+      <div class="notice-alert notice-alert--warning mb-4" role="note">
+        <strong>Local Development only</strong>
+        Verification messages are captured by MailHog on this development machine. Email verification confirms access to the mailbox only; it does not prove identity or citizenship.
       </div>
-      <p class="mt-4">The approved verification message, expiry period and recovery steps will be added with the account service.</p>
+      <form id="citizenEmailVerifyForm" is="dmx-serverconnect-form" method="post" action="/api/citizen/email_verify" dmx-on:success="citizenEmailVerified.setValue(true)" aria-describedby="verify-help" dmx-show="query.token">
+        <input type="hidden" name="token" dmx-bind:value="query.token">
+        <p id="verify-help">Use the link from the local verification email. The link expires after 24 hours and can be used once.</p>
+        <div class="notice-alert" role="status" dmx-show="citizenEmailVerified.value">Email verified. You can now sign in.</div>
+        <div class="notice-alert notice-alert--warning" role="alert" dmx-show="citizenEmailVerifyForm.lastError.status">This verification link is invalid, expired or already used. Request a fresh link below.</div>
+        <button class="btn btn-primary-government" type="submit" dmx-bind:disabled="citizenEmailVerifyForm.state.executing || citizenEmailVerified.value">Verify email address</button>
+      </form>
+      <div class="notice-alert notice-alert--warning" role="note" dmx-show="!query.token">Open the verification link from the local email, or request a new one below.</div>
+      <form id="citizenResendVerificationForm" class="mt-4" is="dmx-serverconnect-form" method="post" action="/api/citizen/email_resend" dmx-on:success="verificationMessageSent.setValue(true)" aria-describedby="resend-verification-help">
+        <h2 class="h5">Send a new verification link</h2>
+        <label class="form-label" for="resend-verification-email">Email address</label>
+        <input class="form-control mb-3" id="resend-verification-email" name="email" type="email" autocomplete="email" required maxlength="254">
+        <div class="notice-alert" role="status" dmx-show="verificationMessageSent.value">If an account needs verification, a new message has been sent to the local Development inbox.</div>
+        <div class="notice-alert notice-alert--warning" role="alert" dmx-show="citizenResendVerificationForm.lastError.status">The request could not be completed. Try again shortly.</div>
+        <button class="btn btn-outline-crimson" type="submit" dmx-bind:disabled="citizenResendVerificationForm.state.executing">Send verification email</button>
+        <p class="field-help mt-2 mb-0" id="resend-verification-help">The response is the same whether or not the address has an account.</p>
+      </form>
       <a class="btn btn-outline-crimson" href="/account/sign-in">Return to sign in</a>
     </div>
   </div>
